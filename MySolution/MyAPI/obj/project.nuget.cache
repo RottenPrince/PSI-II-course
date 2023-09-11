@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "V+2LeSdpDnnFJ08jzORBtoIGT4wLY4z9R/LWfFhcWhaaJe9awvQF2BE/8KMvmIHjxazvi3/3o3tLZQ1om8zElg==",
+  "success": true,
+  "projectFilePath": "C:\\Education\\VU\\3-semester\\Programu-sistemu-inzinerija\\PSI-II-course\\MySolution\\MyAPI\\MyAPI.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\zheny\\.nuget\\packages\\microsoft.aspnetcore.openapi\\7.0.10\\microsoft.aspnetcore.openapi.7.0.10.nupkg.sha512",
+    "C:\\Users\\zheny\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "C:\\Users\\zheny\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512",
+    "C:\\Users\\zheny\\.nuget\\packages\\swashbuckle.aspnetcore\\6.5.0\\swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
+    "C:\\Users\\zheny\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.5.0\\swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
+    "C:\\Users\\zheny\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.5.0\\swashbuckle.aspnetcore.swaggergen.6.5.0.nupkg.sha512",
+    "C:\\Users\\zheny\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.5.0\\swashbuckle.aspnetcore.swaggerui.6.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}
