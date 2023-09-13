@@ -1,0 +1,11 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model IEnumerable<API.WeatherForecast>
+
+<div class="text-center">
+    @foreach(var v in Model)
+    {
+        <ul>@Html.DisplayFor(a => v.TemperatureC)</ul>
+    }
+</div>

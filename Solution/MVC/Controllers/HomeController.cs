@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MVC.Models;
 using System.Diagnostics;
+using API;
+using Newtonsoft.Json;
 
 namespace MVC.Controllers
 {
@@ -21,6 +23,12 @@ namespace MVC.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public IActionResult Test()
+        {
+            var forecast = APIHelper.Get<List<API.WeatherForecast>>("WeatherForecast");
+            return View(forecast);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
