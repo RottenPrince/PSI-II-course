@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+@model Dictionary<int, string>
+
+<partial name="_Navigation" />
+<div>
+    <h4>Get all</h4>
+    @if (Model.Count == 0)
+    {
+        <text>There are no strings added</text>
+    }
+    <table>
+        @foreach(KeyValuePair<int, string> pair in Model)
+        {
+            <tr>
+                <td>@pair.Key</td>
+                <td>@pair.Value</td>
+            </tr>
+        }
+    </table>
+</div>

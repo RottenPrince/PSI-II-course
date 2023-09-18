@@ -11,8 +11,33 @@ namespace MVC
         {
             var apiResult = _client.GetAsync(_apiUrl + endpoint).Result;
             apiResult.EnsureSuccessStatusCode();
-            var forecast = JsonConvert.DeserializeObject<T>(apiResult.Content.ReadAsStringAsync().Result);
-            return forecast;
+            var content = apiResult.Content.ReadAsStringAsync().Result;
+            var result = JsonConvert.DeserializeObject<T>(content);
+            return result;
+        }
+        
+        public static U? Post<T, U>(string endpoint, T data)
+        {
+            var apiResult = _client.PostAsJsonAsync(_apiUrl + endpoint, data).Result;
+            apiResult.EnsureSuccessStatusCode();
+            var result = JsonConvert.DeserializeObject<U>(apiResult.Content.ReadAsStringAsync().Result);
+            return result;
+        }
+
+        public static T? Delete<T>(string endpoint)
+        {
+            var apiResult = _client.DeleteAsync(_apiUrl + endpoint).Result;
+            apiResult.EnsureSuccessStatusCode();
+            var result = JsonConvert.DeserializeObject<T>(apiResult.Content.ReadAsStringAsync().Result);
+            return result;
+        }
+
+        public static U? Put<T, U>(string endpoint, T data)
+        {
+            var apiResult = _client.PutAsJsonAsync(_apiUrl + endpoint, data).Result;
+            apiResult.EnsureSuccessStatusCode();
+            var result = JsonConvert.DeserializeObject<U>(apiResult.Content.ReadAsStringAsync().Result);
+            return result;
         }
     }
 }
