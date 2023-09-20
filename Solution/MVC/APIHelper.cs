@@ -11,8 +11,7 @@ namespace MVC
         {
             var apiResult = _client.GetAsync(_apiUrl + endpoint).Result;
             apiResult.EnsureSuccessStatusCode();
-            var content = apiResult.Content.ReadAsStringAsync().Result;
-            var result = JsonConvert.DeserializeObject<T>(content);
+            var result = JsonConvert.DeserializeObject<T>(apiResult.Content.ReadAsStringAsync().Result);
             return result;
         }
         
