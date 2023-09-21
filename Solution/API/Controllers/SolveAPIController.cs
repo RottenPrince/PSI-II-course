@@ -64,5 +64,15 @@ namespace API.Controllers
 			string questionFolder = questionSubfolders[randomIndex];
 			return APIResultWithData<string>.CreateSuccess(questionFolder);
 		}
+
+		[HttpPost("CheckAnswer")]
+		public APIResultWithData<bool> CheckAnswer([FromBody] CheckAnswerModel model)
+		{
+			var result = this.GetQuestion(model.name);
+			if(!result.Success)
+				return APIResultWithData<bool>.CreateFailure(result.Message);
+
+			return APIResultWithData<bool>.CreateSuccess(result.Result.CorrectAnswer == model.answer);
+		}
     }
 }

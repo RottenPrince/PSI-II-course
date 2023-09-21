@@ -34,17 +34,25 @@
 
     <script>
         document.getElementById("submitButton").addEventListener("click", function () {
-            
             var selectedAnswer = document.querySelector("input[name='answer']:checked").getAttribute("value");
 
             if (selectedAnswer !== null) {
-                if (selectedAnswer == @(Model.CorrectAnswer)) {
-                    document.getElementById("answerMessage").textContent = "You are Right!";
-                } else {
-                    document.getElementById("answerMessage").textContent = "WRONG!";
-                }
+				$.ajax({
+					type: "POST",
+					url: "/api/SolveAPI/CheckAnswer",
+					data: JSON.stringify({ name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
+					success: function (data) {
+						if(data.result === true) {
+							document.getElementById("answerMessage").textContent = "You are Right!";
+						} else {
+							document.getElementById("answerMessage").textContent = "WRONG!";
+						}
+						console.log(data);
+					}, // TODO error handling
+					contentType: "application/json",
+					dataType: "json"
+				});
             }
-            document.getElementById("selected").textContent = "Right one is /* Replace with the correct answer value */";
         });
     </script>
 </body>
