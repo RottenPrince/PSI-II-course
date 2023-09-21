@@ -10,50 +10,59 @@ namespace API.Controllers
     public class SolveAPIController : ControllerBase
     {
         private static readonly string _questionsFolder = "../../questions";
-
         private readonly ILogger<SolveAPIController> _logger;
+		private static Random random = new Random();
 
         public SolveAPIController(ILogger<SolveAPIController> logger)
         {
             _logger = logger;
         }
 
-        [HttpGet("GetQuestion")]
-        public IActionResult GetQuestion()
+        [HttpGet("GetQuestion/{question}")]
+        public APIResultWithData<QuestionModel> GetQuestion(string question)
         {
-            // Get a list of subdirectories (each subdirectory is a question)
-            string[] questionSubfolders = Directory.GetDirectories(_questionsFolder);
+            // string[] imageFiles = Directory.GetFiles(questionFolder, "*.jpg");
 
-            if (questionSubfolders.Length == 0)
-                return NotFound("No questions found");
+            // if (imageFiles.Length == 0)
+            //     return NotFound("No image file found in the selected question subfolder");
 
-            // Choose a random subfolder (question) from the list
-            Random random = new Random();
-            int randomIndex = random.Next(0, questionSubfolders.Length);
-            string questionFolder = questionSubfolders[randomIndex];
-
-            // Find the image file in the subfolder
-            string[] imageFiles = Directory.GetFiles(questionFolder, "*.jpg");
-
-            if (imageFiles.Length == 0)
-                return NotFound("No image file found in the selected question subfolder");
-
-            // Read the image data into a byte array
-            string questionImageFile = imageFiles[0]; // Assuming only one image file per subfolder
-            byte[] imageBytes = System.IO.File.ReadAllBytes(questionImageFile);
+            // string questionImageFile = imageFiles[0]; // Assuming only one image file per subfolder
+            // byte[] imageBytes = System.IO.File.ReadAllBytes(questionImageFile);
 
             // Find the corresponding answer text file (assuming the name matches)
-            string questionModelFile = Path.Combine(questionFolder, "question.json");
+
+			// verify all question characters are alphanumeric
+			if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
+				return APIResultWithData<QuestionModel>.CreateFailure("Question name should only contain alphanumeric characters, dashes and underscores");
+
+            string questionModelFile = Path.Combine(_questionsFolder, question, "question.json");
 
             if (!System.IO.File.Exists(questionModelFile))
-                return NotFound("Answer file not found for the selected question");
+                return APIResultWithData<QuestionModel>.CreateFailure("Answer file not found for the selected question");
 
             // Read the answer from the text file
             string questionModelText = System.IO.File.ReadAllText(questionModelFile);
 
 			var questionModel = JsonConvert.DeserializeObject<QuestionModel>(questionModelText);
-
-            return Ok(questionModel); // Return the question as JSON with image data
+			return APIResultWithData<QuestionModel>.CreateSuccess(questionModel);
         }
+
+		[HttpGet("GetRandomQuestionName")]
+		public APIResultWithData<string> GetRandomQuestionName()
+		{
+			string[] questionSubfolders = Directory.GetDirectories(_questionsFolder).Select(s => new DirectoryInfo(s).Name).ToArray();
+
+			if(questionSubfolders.Length == 0)
+				return APIResultWithData<string>.CreateFailure("No questions found");
+
+			int randomIndex;
+			lock(random)
+			{
+				randomIndex = random.Next(0, questionSubfolders.Length);
+			}
+
+			string questionFolder = questionSubfolders[randomIndex];
+			return APIResultWithData<string>.CreateSuccess(questionFolder);
+		}
     }
 }

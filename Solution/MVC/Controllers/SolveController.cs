@@ -7,9 +7,12 @@ namespace MVC.Controllers
     {
         public IActionResult Index()
         {
+			// TODO handle bad results
+			var question = APIHelper.Get<APIResultWithData<string>>("api/SolveAPI/GetRandomQuestionName");
+			var questionName = question.Result;
             
-            var question = APIHelper.Get<QuestionModel>("api/SolveAPI/GetQuestion");
-            return View(question);
+            var questionModel = APIHelper.Get<APIResultWithData<QuestionModel>>($"api/SolveAPI/GetQuestion/{questionName}");
+            return View(questionModel.Result);
         }
     }
 }
