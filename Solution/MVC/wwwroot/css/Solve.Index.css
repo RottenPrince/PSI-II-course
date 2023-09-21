@@ -8,7 +8,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#questionImage {
+#questionImage, #questionTitle {
     text-align: center;
 }
 

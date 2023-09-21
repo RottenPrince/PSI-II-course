@@ -8,11 +8,13 @@ namespace API.Controllers
     [ApiController]
     public class SolveAPIController : ControllerBase
     {
-        private readonly string _questionsFolder;
+        private static readonly string _questionsFolder = "../../questions";
 
-        public SolveAPIController()
+        private readonly ILogger<SolveAPIController> _logger;
+
+        public SolveAPIController(ILogger<SolveAPIController> logger)
         {
-            _questionsFolder = "../../questions"; // Update with the actual folder path
+            _logger = logger;
         }
 
         [HttpGet("GetQuestion")]
@@ -40,7 +42,7 @@ namespace API.Controllers
             byte[] imageBytes = System.IO.File.ReadAllBytes(questionImageFile);
 
             // Find the corresponding answer text file (assuming the name matches)
-            string answerTextFile = Path.Combine(questionFolder, "answer.txt");
+            string answerTextFile = Path.Combine(questionFolder, "Answer.txt");
 
             if (!System.IO.File.Exists(answerTextFile))
                 return NotFound("Answer file not found for the selected question");
@@ -54,10 +56,12 @@ namespace API.Controllers
 
             // Create a QuestionModel object with the image data and answer
             var questionModel = new QuestionModel
-            {
-                ImageData = imageBytes,
-                CorrectAnswer = answer
-            };
+			{
+				Question = "Test Question",
+				AnswerOptions = new List<string>{ "A", "B", "C", "D", "E" },
+				ImageName = null,
+				CorrectAnswer = 2,
+			};
 
             return Ok(questionModel); // Return the question as JSON with image data
         }
