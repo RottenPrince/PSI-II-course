@@ -1,0 +1,11 @@
+{
+	"question": "What is the capital of Uruguay?",
+	"answerOptions": [
+		"Monterey",
+		"New Uruguay",
+		"Montevideo",
+		"Panama City",
+	],
+	"correctAnswer": 2,
+	"imageName": null,
+}

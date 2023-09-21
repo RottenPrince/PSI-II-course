@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using API.Models;
+using Newtonsoft.Json;
 
 namespace API.Controllers
 {
@@ -42,26 +43,15 @@ namespace API.Controllers
             byte[] imageBytes = System.IO.File.ReadAllBytes(questionImageFile);
 
             // Find the corresponding answer text file (assuming the name matches)
-            string answerTextFile = Path.Combine(questionFolder, "Answer.txt");
+            string questionModelFile = Path.Combine(questionFolder, "question.json");
 
-            if (!System.IO.File.Exists(answerTextFile))
+            if (!System.IO.File.Exists(questionModelFile))
                 return NotFound("Answer file not found for the selected question");
 
             // Read the answer from the text file
-            string answerText = System.IO.File.ReadAllText(answerTextFile);
+            string questionModelText = System.IO.File.ReadAllText(questionModelFile);
 
-            // Parse the answer text to an integer
-            if (!int.TryParse(answerText, out int answer))
-                return BadRequest("Invalid answer format");
-
-            // Create a QuestionModel object with the image data and answer
-            var questionModel = new QuestionModel
-			{
-				Question = "Test Question",
-				AnswerOptions = new List<string>{ "A", "B", "C", "D", "E" },
-				ImageName = null,
-				CorrectAnswer = 2,
-			};
+			var questionModel = JsonConvert.DeserializeObject<QuestionModel>(questionModelText);
 
             return Ok(questionModel); // Return the question as JSON with image data
         }
