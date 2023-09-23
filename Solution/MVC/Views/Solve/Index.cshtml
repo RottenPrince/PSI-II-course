@@ -11,9 +11,12 @@
 		<h1>@Model.Question</h1>
 	</div>
 
-    <div id="questionImage">
-        @* <img src="data:image/jpeg;base64,@Convert.ToBase64String(Model.ImageData)" alt="Question Image" /> *@
-    </div>
+	@if(Model.ImageName != null)
+	{
+		<div id="questionImage">
+			<img src="~/img/@Model.ImageName" alt="Question Image" />
+		</div>
+	}
 
     <div id="form">
         <form id="choiceForm">
