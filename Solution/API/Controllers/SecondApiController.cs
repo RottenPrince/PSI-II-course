@@ -21,35 +21,63 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public APIResultWithData<string> Get(int id)
         {
-            if (_db.TryGetValue(id, out var value)) return APIResultWithData<string>.CreateSuccess(value);
-            else return APIResultWithData<string>.CreateFailure("ID not found");
+			lock(_db)
+			{
+				if (_db.TryGetValue(id, out var value))
+					return APIResultWithData<string>.CreateSuccess(value);
+				else
+					return APIResultWithData<string>.CreateFailure("ID not found");
+			}
         }
 
         [HttpPost]
         public APIResult Post(NewString data)
         {
-            if (_db.TryAdd(data.id, data.value)) return APIResult.CreateSuccess();
-            else return APIResult.CreateFailure("ID already taken");
+			lock(_db)
+			{
+				if (_db.TryAdd(data.id, data.value))
+					return APIResult.CreateSuccess();
+				else
+					return APIResult.CreateFailure("ID already taken");
+			}
         }
 
         [HttpPut]
         public APIResult Put(NewString data)
         {
-            if (_db.ContainsKey(data.id)) { _db[data.id] = data.value; return APIResult.CreateSuccess(); }
-            else { return APIResult.CreateFailure("ID not found"); }
+			lock(_db)
+			{
+				if (_db.ContainsKey(data.id))
+				{
+					_db[data.id] = data.value;
+					return APIResult.CreateSuccess();
+				}
+				else
+				{
+					return APIResult.CreateFailure("ID not found");
+				}
+			}
         }
 
         [HttpDelete("{id}")]
         public APIResult Delete(int id)
         {
-            if (_db.Remove(id)) return APIResult.CreateSuccess();
-            else return APIResult.CreateFailure("ID not found");
+			lock(_db)
+			{
+				if (_db.Remove(id))
+					return APIResult.CreateSuccess();
+				else
+					return APIResult.CreateFailure("ID not found");
+			}
         }
 
         [HttpGet("GetAll")]
         public Dictionary<int, string> GetAll()
         {
-            return _db;
+			lock(_db)
+			{
+				return _db;
+			}
         }
     }
 }
