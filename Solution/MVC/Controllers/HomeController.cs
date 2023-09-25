@@ -25,12 +25,6 @@ namespace MVC.Controllers
             return View();
         }
 
-        public IActionResult Test()
-        {
-            var forecast = APIHelper.Get<List<API.WeatherForecast>>("WeatherForecast");
-            return View(forecast);
-        }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
