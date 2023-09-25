@@ -1,0 +1,62 @@
+﻿@model API.Models.QuestionModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Question Page</title>
+    <link rel="stylesheet" href="~/css/Solve.Index.css">
+</head>
+<body>
+    <div id="questionTitle">
+        <h1>@Model.Question</h1>
+    </div>
+
+    @if(Model.ImageName != null)
+    {
+        <div id="questionImage">
+            <img src="~/img/@Model.ImageName" alt="Question Image" />
+        </div>
+    }
+
+    <div id="form">
+        <form id="choiceForm">
+            @foreach(var (idx, option) in Model.AnswerOptions.WithIndex())
+            {
+                <label class="option">
+                    <input type="radio" name="answer" value="@idx" /> @option
+                </label>
+                <br />
+            }
+
+            <button type="button" id="submitButton">Submit</button>
+            <div id="answerMessage"></div>
+        </form>
+    </div>
+
+  
+
+    <script>
+        document.getElementById("submitButton").addEventListener("click", function () {
+            var selectedAnswer = document.querySelector("input[name='answer']:checked").getAttribute("value");
+
+            if (selectedAnswer !== null) {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/SolveAPI/CheckAnswer",
+                    data: JSON.stringify({ name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
+                    success: function (data) {
+                        if(data.result === true) {
+                            document.getElementById("answerMessage").textContent = "You are Right!";
+                        } else {
+                            document.getElementById("answerMessage").textContent = "WRONG!";
+                        }
+                        console.log(data);
+                    }, // TODO error handling
+                    contentType: "application/json",
+                    dataType: "json"
+                });
+            }
+        });
+    </script>
+</body>
+</html>
