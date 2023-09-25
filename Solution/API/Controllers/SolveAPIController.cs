@@ -19,35 +19,43 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetQuestion/{question}")]
-        public APIResultWithData<QuestionModel> GetQuestion(string question)
+        private static ObjectResult ParseQuestionFromDatabase(string question)
         {
             if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
-                return APIResultWithData<QuestionModel>.CreateFailure("Question name should only contain alphanumeric characters, dashes and underscores");
+                return new BadRequestObjectResult("Question name should only contain alphanumeric characters, dashes and underscores");
 
             string questionModelFile = Path.Combine(_questionsFolder, question + ".json");
 
             if (!System.IO.File.Exists(questionModelFile))
-                return APIResultWithData<QuestionModel>.CreateFailure("Answer file not found for the selected question");
+                return new NotFoundObjectResult("Question not found with given name");
 
             string questionModelText = System.IO.File.ReadAllText(questionModelFile);
 
             var questionModel = JsonConvert.DeserializeObject<QuestionModel>(questionModelText);
-            return APIResultWithData<QuestionModel>.CreateSuccess(questionModel);
+            if(questionModel == null)
+                return new UnprocessableEntityObjectResult("Failed deserializing question");
+
+            return new OkObjectResult(questionModel);
+        }
+
+        [HttpGet("GetQuestion/{question}")]
+        public IActionResult GetQuestion(string question)
+        {
+            return ParseQuestionFromDatabase(question);
         }
 
         [HttpGet("GetRandomQuestionName")]
-        public APIResultWithData<string> GetRandomQuestionName()
+        public IActionResult GetRandomQuestionName()
         {
             DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder);
             string[] questionFiles = (from file in dirinfo.GetFiles()
-                                                where file.Name.EndsWith(_questionDBExtension)
-                                                select file.Name.Substring(0, file.Name.Length - _questionDBExtension.Length))
-                                                .ToArray();
+                    where file.Name.EndsWith(_questionDBExtension)
+                    select file.Name.Substring(0, file.Name.Length - _questionDBExtension.Length))
+                .ToArray();
 
 
             if(questionFiles.Length == 0)
-                return APIResultWithData<string>.CreateFailure("No questions found");
+                return NotFound("No questions found");
 
             int randomIndex;
             lock(random)
@@ -55,18 +63,19 @@ namespace API.Controllers
                 randomIndex = random.Next(0, questionFiles.Length);
             }
 
-            string questionFolder = questionFiles[randomIndex];
-            return APIResultWithData<string>.CreateSuccess(questionFolder);
+            string selectionQuestion = questionFiles[randomIndex];
+            return Ok(selectionQuestion);
         }
 
         [HttpPost("CheckAnswer")]
-        public APIResultWithData<bool> CheckAnswer([FromBody] CheckAnswerModel model)
+        public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
         {
-            var result = this.GetQuestion(model.name);
-            if(!result.Success)
-                return APIResultWithData<bool>.CreateFailure(result.Message);
+            var result = ParseQuestionFromDatabase(model.name);
+            if(result.StatusCode != 200)
+                return result;
 
-            return APIResultWithData<bool>.CreateSuccess(result.Result.CorrectAnswer == model.answer);
+            var questionModel = (QuestionModel)result.Value;
+            return Ok(questionModel.CorrectAnswer == model.answer);
         }
     }
 }
