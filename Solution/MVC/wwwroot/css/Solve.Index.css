@@ -12,11 +12,11 @@ body {
     text-align: center;
 }
 
-    #questionImage img {
-        width: 50%;
-        height: auto;
-        filter: drop-shadow(2px 4px 4px gray);
-    }
+#questionImage img {
+    width: 50%;
+    height: auto;
+    filter: drop-shadow(2px 4px 4px gray);
+}
 
 
 #choiceForm {
@@ -59,9 +59,9 @@ input[type="radio"] {
     transition: background-color 0.3s ease;
 }
 
-    #submitButton:hover {
-        background-color: rgb(0, 70, 128);
-    }
+#submitButton:hover {
+    background-color: rgb(0, 70, 128);
+}
 
 #answerMessage {
     display: inline-block;

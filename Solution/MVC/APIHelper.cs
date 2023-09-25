@@ -5,7 +5,7 @@ namespace MVC
     public class APIHelper
     {
         private static readonly string _apiUrl = "http://localhost:5096/";
-        
+
         private static HttpClient _client = new HttpClient();
         public static T? Get<T>(string endpoint)
         {
@@ -14,7 +14,7 @@ namespace MVC
             var result = JsonConvert.DeserializeObject<T>(apiResult.Content.ReadAsStringAsync().Result);
             return result;
         }
-        
+
         public static U? Post<T, U>(string endpoint, T data)
         {
             var apiResult = _client.PostAsJsonAsync(_apiUrl + endpoint, data).Result;
