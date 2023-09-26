@@ -1,4 +1,4 @@
-﻿using API.Models;
+using API.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MVC.Controllers
@@ -7,14 +7,11 @@ namespace MVC.Controllers
     {
         public IActionResult Index()
         {
-            // TODO handle bad results
-            var question = APIHelper.Get<APIResultWithData<string>>("api/SolveAPI/GetRandomQuestionName");
-            var questionName = question.Result;
-
-            var questionModel = APIHelper.Get<APIResultWithData<QuestionModel>>($"api/SolveAPI/GetQuestion/{questionName}");
+            var questionName = APIHelper.Get<string>("api/SolveAPI/GetRandomQuestionName", out _);
+            var questionModel = APIHelper.Get<QuestionModel>($"api/SolveAPI/GetQuestion/{questionName}", out _);
 
             ViewData["QuestionName"] = questionName; // TODO I don't like this
-            return View(questionModel.Result);
+            return View(questionModel);
         }
     }
 }

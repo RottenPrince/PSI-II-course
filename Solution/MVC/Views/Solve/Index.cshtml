@@ -45,7 +45,7 @@
                     url: "/api/SolveAPI/CheckAnswer",
                     data: JSON.stringify({ name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
                     success: function (data) {
-                        if(data.result === true) {
+                        if(data === true) {
                             document.getElementById("answerMessage").textContent = "You are Right!";
                         } else {
                             document.getElementById("answerMessage").textContent = "WRONG!";
