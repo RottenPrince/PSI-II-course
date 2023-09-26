@@ -7,9 +7,8 @@ namespace MVC.Controllers
     {
         public IActionResult Index()
         {
-            // TODO handle bad results
-            var questionName = APIHelper.Get<String>("api/SolveAPI/GetRandomQuestionName");
-            var questionModel = APIHelper.Get<QuestionModel>($"api/SolveAPI/GetQuestion/{questionName}");
+            var questionName = APIHelper.Get<string>("api/SolveAPI/GetRandomQuestionName", out _);
+            var questionModel = APIHelper.Get<QuestionModel>($"api/SolveAPI/GetQuestion/{questionName}", out _);
 
             ViewData["QuestionName"] = questionName; // TODO I don't like this
             return View(questionModel);

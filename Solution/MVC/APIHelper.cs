@@ -8,37 +8,41 @@ namespace MVC
 
         private static HttpClient _client = new HttpClient();
 
-        private static T? MakeRequest<T>(string endpoint, Func<HttpClient, string, Task<HttpResponseMessage>> f)
+        private static T? MakeRequest<T>(string endpoint, Func<HttpClient, string, Task<HttpResponseMessage>> f, out APIError? error)
         {
             var apiResult = f(_client, _apiUrl + endpoint).Result;
-            apiResult.EnsureSuccessStatusCode();
             var content = apiResult.Content.ReadAsStringAsync().Result;
+            if(!apiResult.IsSuccessStatusCode)
+            {
+                error = new APIError(apiResult.StatusCode, content);
+                return default(T);
+            }
             if(typeof(T) == typeof(string))
             {
                 content = $"\"{content}\"";
             }
+            error = null;
             return JsonConvert.DeserializeObject<T>(content);
         }
 
-        public static T? Get<T>(string endpoint)
+        public static T? Get<T>(string endpoint, out APIError? error)
         {
-            return MakeRequest<T>(endpoint, (client, url) => client.GetAsync(url));
+            return MakeRequest<T>(endpoint, (client, url) => client.GetAsync(url), out error);
         }
 
-
-        public static U? Post<T, U>(string endpoint, T data)
+        public static U? Post<T, U>(string endpoint, T data, out APIError? error)
         {
-            return MakeRequest<U>(endpoint, (client, url) => client.PostAsJsonAsync(url, data));
+            return MakeRequest<U>(endpoint, (client, url) => client.PostAsJsonAsync(url, data), out error);
         }
 
-        public static T? Delete<T>(string endpoint)
+        public static T? Delete<T>(string endpoint, out APIError? error)
         {
-            return MakeRequest<T>(endpoint, (client, url) => client.DeleteAsync(url));
+            return MakeRequest<T>(endpoint, (client, url) => client.DeleteAsync(url), out error);
         }
 
-        public static U? Put<T, U>(string endpoint, T data)
+        public static U? Put<T, U>(string endpoint, T data, out APIError? error)
         {
-            return MakeRequest<U>(endpoint, (client, url) => client.PutAsJsonAsync(url, data));
+            return MakeRequest<U>(endpoint, (client, url) => client.PutAsJsonAsync(url, data), out error);
         }
     }
 }
