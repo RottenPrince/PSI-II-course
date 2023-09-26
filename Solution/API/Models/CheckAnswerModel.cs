@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace API.Models
 {
     public class CheckAnswerModel
     {
-        public int answer { get; set; }
-        public string name { get; set; }
+        [Required]
+        public string? QuestionName { get; set; }
+        [Required]
+        public string? Answer { get; set; }
     }
 }
