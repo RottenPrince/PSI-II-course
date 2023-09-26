@@ -7,4 +7,4 @@ namespace MVC.Models
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }
 }
-//mano komentaras
+//mano komentar
