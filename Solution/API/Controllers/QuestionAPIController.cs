@@ -7,14 +7,14 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SolveAPIController : ControllerBase
+    public class QuestionAPIController : ControllerBase
     {
         private static readonly string _questionsFolder = "../../questions";
         private static readonly string _questionDBExtension = ".json";
-        private readonly ILogger<SolveAPIController> _logger;
+        private readonly ILogger<QuestionAPIController> _logger;
         private static Random random = new Random();
 
-        public SolveAPIController(ILogger<SolveAPIController> logger)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger)
         {
             _logger = logger;
         }
