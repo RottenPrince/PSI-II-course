@@ -1,11 +1,12 @@
 {
-	"question": "The examination of everyday human social interactions on a small scale describes:",
-	"answerOptions": [
+	"$type": "CheckboxQuestionModel",
+	"Question": "The examination of everyday human social interactions on a small scale describes:",
+	"AnswerOptions": [
 		"functionalism",
 		"macrosociology",
 		"cultural anthropology",
-		"microsociology",
+		"microsociology"
 	],
-	"correctAnswer": 3,
-	"imageName": null,
+	"CorrectAnswer": 3,
+	"ImageName": null
 }

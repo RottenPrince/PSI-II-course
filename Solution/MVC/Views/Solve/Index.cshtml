@@ -1,4 +1,5 @@
-﻿@model API.Models.QuestionModel
+﻿@using API.Models.Question
+@model BaseQuestionModel
 
 <!DOCTYPE html>
 <html>
@@ -18,22 +19,14 @@
         </div>
     }
 
-    <div id="form">
-        <form id="choiceForm">
-            @foreach(var (idx, option) in Model.AnswerOptions.WithIndex())
-            {
-                <label class="option">
-                    <input type="radio" name="answer" value="@idx" /> @option
-                </label>
-                <br />
-            }
-
-            <button type="button" id="submitButton">Submit</button>
-            <div id="answerMessage"></div>
-        </form>
-    </div>
-
-  
+	@if(Model is CheckboxQuestionModel)
+	{
+		<partial name="Checkbox" />
+	}
+	else
+	{
+		throw new Exception("Question types non-exhaustive");
+	}
 
     <script>
         document.getElementById("submitButton").addEventListener("click", function () {
@@ -43,7 +36,7 @@
                 $.ajax({
                     type: "POST",
                     url: "/api/SolveAPI/CheckAnswer",
-                    data: JSON.stringify({ name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
+                    data: JSON.stringify({ QuestionName: "@ViewData["QuestionName"]", Answer: getCurrentAnswer() }),
                     success: function (data) {
                         if(data === true) {
                             document.getElementById("answerMessage").textContent = "You are Right!";

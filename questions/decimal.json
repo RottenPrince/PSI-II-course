@@ -1,0 +1,6 @@
+{
+	"$type": "DecimalNumberQuestionModel",
+	"Question": "round(pi, 2)",
+	"CorrectAnswer": 3.14,
+	"ImageName": null
+}

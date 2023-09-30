@@ -1,0 +1,6 @@
+{
+	"$type": "IntegerQuestionModel",
+	"Question": "5",
+	"CorrectAnswer": 5,
+	"ImageName": null
+}

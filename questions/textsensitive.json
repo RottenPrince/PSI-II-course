@@ -1,0 +1,6 @@
+{
+	"$type": "TextCaseSensitiveQuestionModel",
+	"Question": "hello",
+	"CorrectAnswer": "hi",
+	"ImageName": null
+}

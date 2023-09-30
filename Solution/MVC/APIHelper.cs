@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace MVC
 {
@@ -22,7 +22,7 @@ namespace MVC
                 content = $"\"{content}\"";
             }
             error = null;
-            return JsonConvert.DeserializeObject<T>(content);
+            return JsonSerializer.Deserialize<T>(content);
         }
 
         public static T? Get<T>(string endpoint, out APIError? error)

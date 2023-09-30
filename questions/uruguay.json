@@ -1,11 +1,12 @@
 {
-	"question": "What is the capital of Uruguay?",
-	"answerOptions": [
+	"$type": "CheckboxQuestionModel",
+	"Question": "What is the capital of Uruguay?",
+	"AnswerOptions": [
 		"Monterey",
 		"New Uruguay",
 		"Montevideo",
-		"Panama City",
+		"Panama City"
 	],
-	"correctAnswer": 2,
-	"imageName": "uruguay.jpg",
+	"CorrectAnswer": 2,
+	"ImageName": "uruguay.jpg"
 }

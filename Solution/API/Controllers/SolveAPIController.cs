@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using API.Models;
-using Newtonsoft.Json;
+using API.Models.Question;
+using System.Text.Json;
 
 namespace API.Controllers
 {
@@ -31,7 +31,7 @@ namespace API.Controllers
 
             string questionModelText = System.IO.File.ReadAllText(questionModelFile);
 
-            var questionModel = JsonConvert.DeserializeObject<QuestionModel>(questionModelText);
+            var questionModel = JsonSerializer.Deserialize<BaseQuestionModel>(questionModelText);
             if(questionModel == null)
                 return new UnprocessableEntityObjectResult("Failed deserializing question");
 
@@ -70,41 +70,12 @@ namespace API.Controllers
         [HttpPost("CheckAnswer")]
         public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
         {
-            var result = ParseQuestionFromDatabase(model.QuestionName);
-            if(result.StatusCode != 200)
-                return result;
+			var result = ParseQuestionFromDatabase(model.QuestionName);
+			if(result.StatusCode != 200)
+				return result;
 
-            var questionModel = (QuestionModel)result.Value;
-
-            bool validationResult;
-            switch (questionModel.ValidationStrategy)
-            {
-                case AnswerValidationStrategy.Checkboxes:
-                    validationResult = questionModel.CorrectAnswer == model.Answer;
-                    break;
-                case AnswerValidationStrategy.TextComparisonCaseSensitive:
-                    validationResult = questionModel.CorrectAnswer.Trim().ToLower() == model.Answer.Trim().ToLower();
-                    break;
-                case AnswerValidationStrategy.TextComparisonCaseInsensitive:
-                    validationResult = questionModel.CorrectAnswer.Trim() == model.Answer.Trim();
-                    break;
-                case AnswerValidationStrategy.DecimalNumber:
-                    decimal correctD = decimal.Parse(questionModel.CorrectAnswer);
-                    bool parseSuccessD = decimal.TryParse(model.Answer, out var submittedD);
-                    if (!parseSuccessD) return BadRequest("Failed parsing decimal from answer");
-                    validationResult = correctD == submittedD;
-                    break;
-                case AnswerValidationStrategy.IntegerNumber:
-                    int correctI = int.Parse(questionModel.CorrectAnswer);
-                    bool parseSuccessI = int.TryParse(model.Answer, out var submittedI);
-                    if (!parseSuccessI) return BadRequest("Failed parsing integer from answer");
-                    validationResult = correctI == submittedI;
-                    break;
-                default:
-                    throw new Exception("Validation strategy switch non-exhaustive");
-            }
-
-            return Ok(validationResult);
+			var questionModel = (BaseQuestionModel)result.Value;
+            return Ok(questionModel.Validate(model.Answer));
         }
     }
 }
