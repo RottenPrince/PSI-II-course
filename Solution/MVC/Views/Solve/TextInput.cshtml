@@ -1,0 +1,13 @@
+<div id="form">
+	<form id="choiceForm">
+		<input type="text" name="answer" />
+		<button type="button" id="submitButton">Submit</button>
+		<div id="answerMessage"></div>
+	</form>
+</div>
+
+<script>
+	function getCurrentAnswer() {
+		return $("input[name='answer']").val();
+	}
+</script>

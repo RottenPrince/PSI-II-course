@@ -12,13 +12,15 @@ namespace MVC.Controllers
 			_logger = logger;
 		}
 		
-        public IActionResult Index()
+		[HttpGet("Solve/{questionName}")]
+        public IActionResult Index(string questionName)
         {
-            var questionName = APIHelper.Get<string>("api/SolveAPI/GetRandomQuestionName", out _);
-			questionName = "uruguay";
-            var questionModel = APIHelper.Get<BaseQuestionModel>($"api/SolveAPI/GetQuestion/{questionName}", out _);
-
-			_logger.LogInformation($"{questionModel}");
+            var questionModel = APIHelper.Get<BaseQuestionModel>($"api/SolveAPI/GetQuestion/{questionName}", out var err);
+			if(err != null)
+			{
+				_logger.LogError($"Failure: {err.Status} {err.Message}");
+				return View("Error");
+			}
 
             ViewData["QuestionName"] = questionName; // TODO I don't like this
             return View(questionModel);

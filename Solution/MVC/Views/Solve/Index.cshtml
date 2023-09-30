@@ -23,6 +23,15 @@
 	{
 		<partial name="Checkbox" />
 	}
+	else if(
+		Model is TextCaseSensitiveQuestionModel ||
+		Model is TextCaseInsensitiveQuestionModel ||
+		Model is IntegerQuestionModel ||
+		Model is DecimalNumberQuestionModel
+	)
+	{
+		<partial name="TextInput" />
+	}
 	else
 	{
 		throw new Exception("Question types non-exhaustive");
@@ -30,13 +39,12 @@
 
     <script>
         document.getElementById("submitButton").addEventListener("click", function () {
-            var selectedAnswer = document.querySelector("input[name='answer']:checked").getAttribute("value");
-
+			var selectedAnswer = getCurrentAnswer();
             if (selectedAnswer !== null) {
                 $.ajax({
                     type: "POST",
                     url: "/api/SolveAPI/CheckAnswer",
-                    data: JSON.stringify({ QuestionName: "@ViewData["QuestionName"]", Answer: getCurrentAnswer() }),
+                    data: JSON.stringify({ QuestionName: "@ViewData["QuestionName"]", Answer: selectedAnswer }),
                     success: function (data) {
                         if(data === true) {
                             document.getElementById("answerMessage").textContent = "You are Right!";
