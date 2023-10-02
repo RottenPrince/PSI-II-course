@@ -13,5 +13,22 @@ namespace MVC.Controllers
             ViewData["QuestionName"] = questionName; // TODO I don't like this
             return View(questionModel);
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            var questionModel = new QuestionModel();
+
+            return View(questionModel);
+        }
+
+        [HttpPost]
+        public IActionResult Create(QuestionModel sm)
+        {
+            
+            ViewBag.Title = sm.Question;
+
+            return View("CreateSuccess");
+        }
     }
 }

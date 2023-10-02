@@ -75,7 +75,7 @@ namespace API.Controllers
                 return result;
 
             var questionModel = (QuestionModel)result.Value;
-            return Ok(questionModel.CorrectAnswer == model.answer);
+            return Ok(questionModel.CorrectAnswerIndex == model.answer);
         }
     }
 }
