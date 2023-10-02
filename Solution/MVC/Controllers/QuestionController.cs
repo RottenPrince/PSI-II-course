@@ -1,5 +1,7 @@
 using API.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Net.Http.Json;
 
 namespace MVC.Controllers
 {
@@ -27,8 +29,20 @@ namespace MVC.Controllers
         {
             
             ViewBag.Title = sm.Question;
+            ViewBag.Index = sm.CorrectAnswerIndex;
 
-            return View("CreateSuccess");
+            string jsonQuestion = JsonConvert.SerializeObject(sm);
+            var response = APIHelper.Post<string, string>("api/QuestionAPI/SaveQuestion", jsonQuestion, out APIError? error);
+
+            if (error == null)
+            {
+                return View("CreateSuccess");
+            }
+            else
+            {
+                ViewBag.ErrorMessage = error.Message;
+                return View("CreateError");
+            }
         }
     }
 }

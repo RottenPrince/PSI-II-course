@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
+using System.IO;
 
 namespace API.Controllers
 {
@@ -76,6 +78,26 @@ namespace API.Controllers
 
             var questionModel = (QuestionModel)result.Value;
             return Ok(questionModel.CorrectAnswerIndex == model.answer);
+        }
+
+        [HttpPost("SaveQuestion")]
+        public IActionResult SaveQuestion([FromBody] string questionModel)
+        {
+
+            if (questionModel == null)
+            {
+                return BadRequest("Question data is null.");
+            }
+
+            string uniqueIdentifier = Guid.NewGuid().ToString();
+            string fileName = $"question_{uniqueIdentifier}.json";
+
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, fileName)))
+            {
+                outputFile.Write(questionModel);
+            }
+
+            return Ok("Question created successfully.");
         }
     }
 }
