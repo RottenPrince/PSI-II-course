@@ -11,6 +11,12 @@
         <h1>@Model.Question</h1>
     </div>
 
+  <div id="timer" style="font-size: 18px; margin-top: 20px;">
+    <span style="font-weight: bold; color: #333;">Your time:</span>
+    <span id="countdown" style="font-size: 24px; color: #e74c3c;">0</span> seconds
+</div>
+
+
     @if(Model.ImageName != null)
     {
         <div id="questionImage">
@@ -34,7 +40,6 @@
     </div>
     <div>@ViewBag.Title</div>
 
-  
 
     <script>
         document.getElementById("submitButton").addEventListener("click", function () {
@@ -60,3 +65,33 @@
         });    </script>
 </body>
 </html>
+
+
+<script>
+    var countdownTime = 0;
+    var countdownInterval;
+
+    function updateTimerDisplay() {
+        document.getElementById("countdown").textContent = countdownTime;
+    }
+
+    function startTimer() {
+        countdownInterval = setInterval(function () {
+            countdownTime++; 
+            updateTimerDisplay();
+        }, 1000); 
+    }
+
+
+    document.getElementById("submitButton").addEventListener("click", function () {
+        var selectedAnswer = document.querySelector("input[name='answer']:checked").getAttribute("value");
+
+        if (selectedAnswer !== null) {
+       
+            clearInterval(countdownInterval);
+
+            updateTimerDisplay();
+        }
+    });
+    window.addEventListener("load", startTimer);
+</script>
