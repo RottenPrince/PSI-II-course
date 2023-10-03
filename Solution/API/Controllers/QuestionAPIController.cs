@@ -2,19 +2,21 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Models;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
+using System.IO;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SolveAPIController : ControllerBase
+    public class QuestionAPIController : ControllerBase
     {
         private static readonly string _questionsFolder = "../../questions";
         private static readonly string _questionDBExtension = ".json";
-        private readonly ILogger<SolveAPIController> _logger;
+        private readonly ILogger<QuestionAPIController> _logger;
         private static Random random = new Random();
 
-        public SolveAPIController(ILogger<SolveAPIController> logger)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger)
         {
             _logger = logger;
         }
@@ -75,7 +77,28 @@ namespace API.Controllers
                 return result;
 
             var questionModel = (QuestionModel)result.Value;
-            return Ok(questionModel.CorrectAnswer == model.answer);
+            return Ok(questionModel.CorrectAnswerIndex == model.answer);
+        }
+
+        [HttpPost("SaveQuestion")]
+        public IActionResult SaveQuestion([FromBody] QuestionModel questionModel)
+        {
+
+            if (questionModel == null)
+            {
+                return BadRequest("Question data is null.");
+            }
+
+            string jsonQuestion = JsonConvert.SerializeObject(questionModel);
+            string uniqueIdentifier = Guid.NewGuid().ToString();
+            string fileName = $"question_{uniqueIdentifier}.json";
+
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, fileName)))
+            {
+                outputFile.Write(jsonQuestion);
+            }
+
+            return Ok("Question created successfully.");
         }
     }
 }
