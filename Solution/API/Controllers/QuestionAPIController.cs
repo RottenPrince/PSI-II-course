@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using API.Models;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Identity;
-using System.IO;
 
 namespace API.Controllers
 {
@@ -21,7 +18,7 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        private static ObjectResult ParseQuestionFromDatabase(string question)
+        private static ObjectResult ParseQuestionFromDatabase<T>(string question) where T: QuestionModel
         {
             if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
                 return new BadRequestObjectResult("Question name should only contain alphanumeric characters, dashes and underscores");
@@ -33,7 +30,7 @@ namespace API.Controllers
 
             string questionModelText = System.IO.File.ReadAllText(questionModelFile);
 
-            var questionModel = JsonConvert.DeserializeObject<QuestionModel>(questionModelText);
+            var questionModel = JsonConvert.DeserializeObject<T>(questionModelText);
             if(questionModel == null)
                 return new UnprocessableEntityObjectResult("Failed deserializing question");
 
@@ -43,7 +40,7 @@ namespace API.Controllers
         [HttpGet("GetQuestion/{question}")]
         public IActionResult GetQuestion(string question)
         {
-            return ParseQuestionFromDatabase(question);
+            return ParseQuestionFromDatabase<QuestionModel>(question);
         }
 
         [HttpGet("GetRandomQuestionName")]
@@ -72,16 +69,16 @@ namespace API.Controllers
         [HttpPost("CheckAnswer")]
         public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
         {
-            var result = ParseQuestionFromDatabase(model.name);
+            var result = ParseQuestionFromDatabase<QuestionModelWithAnswer>(model.Name);
             if(result.StatusCode != 200)
                 return result;
 
-            var questionModel = (QuestionModel)result.Value;
-            return Ok(questionModel.CorrectAnswerIndex == model.answer);
+            var questionModel = (QuestionModelWithAnswer)result.Value;
+            return Ok(questionModel.CorrectAnswerIndex == model.Answer);
         }
 
         [HttpPost("SaveQuestion")]
-        public IActionResult SaveQuestion([FromBody] QuestionModel questionModel)
+        public IActionResult SaveQuestion([FromBody] QuestionModelWithAnswer questionModel)
         {
 
             if (questionModel == null)

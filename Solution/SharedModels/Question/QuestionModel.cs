@@ -1,4 +1,4 @@
-﻿namespace API.Models
+﻿namespace SharedModels.Question
 {
     public class QuestionModel
     {
@@ -10,6 +10,5 @@
         public string? Question { get; set; }
         public List<string>? AnswerOptions { get; set; }
         public string? ImageName { get; set; }
-        public int CorrectAnswerIndex { get; set; }
     }
 }

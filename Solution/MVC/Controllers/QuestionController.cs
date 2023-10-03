@@ -1,7 +1,5 @@
-using API.Models;
+using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Net.Http.Json;
 
 namespace MVC.Controllers
 {
