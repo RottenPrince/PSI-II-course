@@ -43,7 +43,7 @@
             if (selectedAnswer !== null) {
                 $.ajax({
                     type: "POST",
-                    url: "/api/QuestionAPI/CheckAnswer",
+                    url: "https://localhost:7016/api/QuestionAPI/CheckAnswer",
                     data: JSON.stringify({ name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
                     success: function (data) {
                         if(data === true) {
