@@ -6,6 +6,6 @@
 		"Montevideo",
 		"Panama City",
 	],
-	"correctAnswer": 2,
+	"correctAnswerIndex": 2,
 	"imageName": "uruguay.jpg",
 }

@@ -1,7 +1,5 @@
-using API.Models;
+using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Net.Http.Json;
 
 namespace MVC.Controllers
 {
@@ -19,18 +17,18 @@ namespace MVC.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var questionModel = new QuestionModel();
+            var questionModel = new QuestionModelWithAnswer();
 
             return View(questionModel);
         }
 
         [HttpPost]
-        public IActionResult Create(QuestionModel sm)
+        public IActionResult Create(QuestionModelWithAnswer sm)
         {
             
             ViewBag.Title = sm.Question;
 
-            var response = APIHelper.Post<QuestionModel, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
+            var response = APIHelper.Post<QuestionModelWithAnswer, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
 
             if (error == null)
             {

@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using API.Models;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Identity;
-using System.IO;
+using API.Databases;
 
 namespace API.Controllers
 {
@@ -11,8 +8,6 @@ namespace API.Controllers
     [ApiController]
     public class QuestionAPIController : ControllerBase
     {
-        private static readonly string _questionsFolder = "../../questions";
-        private static readonly string _questionDBExtension = ".json";
         private readonly ILogger<QuestionAPIController> _logger;
         private static Random random = new Random();
 
@@ -21,40 +16,18 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        private static ObjectResult ParseQuestionFromDatabase(string question)
-        {
-            if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
-                return new BadRequestObjectResult("Question name should only contain alphanumeric characters, dashes and underscores");
-
-            string questionModelFile = Path.Combine(_questionsFolder, question + ".json");
-
-            if (!System.IO.File.Exists(questionModelFile))
-                return new NotFoundObjectResult("Question not found with given name");
-
-            string questionModelText = System.IO.File.ReadAllText(questionModelFile);
-
-            var questionModel = JsonConvert.DeserializeObject<QuestionModel>(questionModelText);
-            if(questionModel == null)
-                return new UnprocessableEntityObjectResult("Failed deserializing question");
-
-            return new OkObjectResult(questionModel);
-        }
-
         [HttpGet("GetQuestion/{question}")]
         public IActionResult GetQuestion(string question)
         {
-            return ParseQuestionFromDatabase(question);
+            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(question, out var error);
+            if (error != null) return error;
+            return Ok(questionModel);
         }
 
         [HttpGet("GetRandomQuestionName")]
         public IActionResult GetRandomQuestionName()
         {
-            DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder);
-            string[] questionFiles = (from file in dirinfo.GetFiles()
-                    where file.Name.EndsWith(_questionDBExtension)
-                    select file.Name.Substring(0, file.Name.Length - _questionDBExtension.Length))
-                .ToArray();
-
+            string[] questionFiles = QuestionDatabase.GetAllQuestionNames();
 
             if(questionFiles.Length == 0)
                 return NotFound("No questions found");
@@ -72,31 +45,24 @@ namespace API.Controllers
         [HttpPost("CheckAnswer")]
         public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
         {
-            var result = ParseQuestionFromDatabase(model.name);
-            if(result.StatusCode != 200)
-                return result;
+            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.Name, out var error);
+            if (error != null)
+                return error;
 
-            var questionModel = (QuestionModel)result.Value;
-            return Ok(questionModel.CorrectAnswerIndex == model.answer);
+            return Ok(questionModel.CorrectAnswerIndex == model.Answer);
         }
 
         [HttpPost("SaveQuestion")]
-        public IActionResult SaveQuestion([FromBody] QuestionModel questionModel)
+        public IActionResult SaveQuestion([FromBody] QuestionModelWithAnswer questionModel)
         {
-
             if (questionModel == null)
             {
                 return BadRequest("Question data is null.");
             }
 
-            string jsonQuestion = JsonConvert.SerializeObject(questionModel);
             string uniqueIdentifier = Guid.NewGuid().ToString();
-            string fileName = $"question_{uniqueIdentifier}.json";
-
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, fileName)))
-            {
-                outputFile.Write(jsonQuestion);
-            }
+            string questionName = $"question_{uniqueIdentifier}";
+            QuestionDatabase.CreateNewQuestion(questionName, questionModel);
 
             return Ok("Question created successfully.");
         }
