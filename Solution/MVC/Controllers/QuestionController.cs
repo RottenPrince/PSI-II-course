@@ -29,10 +29,8 @@ namespace MVC.Controllers
         {
             
             ViewBag.Title = sm.Question;
-            ViewBag.Index = sm.CorrectAnswerIndex;
 
-            string jsonQuestion = JsonConvert.SerializeObject(sm);
-            var response = APIHelper.Post<string, string>("api/QuestionAPI/SaveQuestion", jsonQuestion, out APIError? error);
+            var response = APIHelper.Post<QuestionModel, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
 
             if (error == null)
             {

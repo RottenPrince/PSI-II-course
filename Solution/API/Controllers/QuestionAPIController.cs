@@ -81,7 +81,7 @@ namespace API.Controllers
         }
 
         [HttpPost("SaveQuestion")]
-        public IActionResult SaveQuestion([FromBody] string questionModel)
+        public IActionResult SaveQuestion([FromBody] QuestionModel questionModel)
         {
 
             if (questionModel == null)
@@ -89,12 +89,13 @@ namespace API.Controllers
                 return BadRequest("Question data is null.");
             }
 
+            string jsonQuestion = JsonConvert.SerializeObject(questionModel);
             string uniqueIdentifier = Guid.NewGuid().ToString();
             string fileName = $"question_{uniqueIdentifier}.json";
 
             using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, fileName)))
             {
-                outputFile.Write(questionModel);
+                outputFile.Write(jsonQuestion);
             }
 
             return Ok("Question created successfully.");
