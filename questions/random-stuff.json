@@ -1,5 +1,5 @@
 {
-	"$type": "CheckboxQuestionModel",
+	"$type": "CheckboxQuestionWithAnswerModel",
 	"Question": "The examination of everyday human social interactions on a small scale describes:",
 	"AnswerOptions": [
 		"functionalism",
@@ -7,6 +7,6 @@
 		"cultural anthropology",
 		"microsociology"
 	],
-	"CorrectAnswer": 3,
-	"ImageName": null
+	"CorrectAnswerIndex": 3,
+	"ImageName": null,
 }

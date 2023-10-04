@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace MVC
 {
-    public class APIHelper
+    public static class APIHelper
     {
         private static readonly string _apiUrl = "http://localhost:5096/";
 

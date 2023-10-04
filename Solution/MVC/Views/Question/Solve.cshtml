@@ -1,11 +1,11 @@
-﻿@using API.Models.Question
+﻿@using SharedModels.Question.WithoutAnswer
 @model BaseQuestionModel
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Question Page</title>
-    <link rel="stylesheet" href="~/css/Solve.Index.css">
+    <link rel="stylesheet" href="~/css/Question.Solve.css">
 </head>
 <body>
     <div id="questionTitle">
@@ -41,7 +41,7 @@
             if (selectedAnswer !== null) {
                 $.ajax({
                     type: "POST",
-                    url: "/api/SolveAPI/CheckAnswer",
+                    url: "https://localhost:7016/api/QuestionAPI/CheckAnswer",
                     data: JSON.stringify({ QuestionName: "@ViewData["QuestionName"]", Answer: selectedAnswer }),
                     success: function (data) {
                         if(data === true) {

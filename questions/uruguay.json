@@ -1,5 +1,5 @@
 {
-	"$type": "CheckboxQuestionModel",
+	"$type": "CheckboxQuestionWithAnswerModel",
 	"Question": "What is the capital of Uruguay?",
 	"AnswerOptions": [
 		"Monterey",
@@ -7,6 +7,6 @@
 		"Montevideo",
 		"Panama City"
 	],
-	"CorrectAnswer": 2,
-	"ImageName": "uruguay.jpg"
+	"CorrectAnswerIndex": 2,
+	"ImageName": "uruguay.jpg",
 }

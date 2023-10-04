@@ -1,5 +1,5 @@
 {
-	"$type": "TextQuestionModel",
+	"$type": "TextQuestionWithAnswerModel",
 	"CaseSensitive": false,
 	"Question": "HeLlO",
 	"CorrectAnswer": "hi",
