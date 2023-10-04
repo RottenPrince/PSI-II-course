@@ -44,7 +44,7 @@
                 $.ajax({
                     type: "POST",
                     url: "https://localhost:7016/api/QuestionAPI/CheckAnswer",
-                    data: JSON.stringify({ name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
+                    data: JSON.stringify({ room: "@ViewData["Room"]", name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
                     success: function (data) {
                         if(data === true) {
                             document.getElementById("answerMessage").textContent = "You are Right!";

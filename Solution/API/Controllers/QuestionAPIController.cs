@@ -16,18 +16,18 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetQuestion/{question}")]
-        public IActionResult GetQuestion(string question)
+        [HttpGet("GetQuestion/{room}/{question}")]
+        public IActionResult GetQuestion(string room, string question)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(question, out var error);
+            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(room, question, out var error);
             if (error != null) return error;
             return Ok(questionModel);
         }
 
-        [HttpGet("GetRandomQuestionName")]
-        public IActionResult GetRandomQuestionName()
+        [HttpGet("GetRandomQuestionName/{room}")]
+        public IActionResult GetRandomQuestionName(string room)
         {
-            string[] questionFiles = QuestionDatabase.GetAllQuestionNames();
+            string[] questionFiles = QuestionDatabase.GetAllQuestionNames(room);
 
             if(questionFiles.Length == 0)
                 return NotFound("No questions found");
@@ -45,7 +45,7 @@ namespace API.Controllers
         [HttpPost("CheckAnswer")]
         public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.Name, out var error);
+            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.Room, model.Name, out var error);
             if (error != null)
                 return error;
 

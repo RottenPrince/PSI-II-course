@@ -5,12 +5,14 @@ namespace MVC.Controllers
 {
     public class QuestionController : Controller
     {
-        public IActionResult Solve()
+        [HttpGet("Solve/{room}")]
+        public IActionResult Solve(string room)
         {
-            var questionName = APIHelper.Get<string>("api/QuestionAPI/GetRandomQuestionName", out _);
-            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{questionName}", out _);
+            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{room}", out _);
+            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{room}/{questionName}", out _);
 
             ViewData["QuestionName"] = questionName; // TODO I don't like this
+            ViewData["Room"] = room; // You don't like it, but here's more
             return View(questionModel);
         }
 
