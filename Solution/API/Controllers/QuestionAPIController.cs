@@ -52,8 +52,8 @@ namespace API.Controllers
             return Ok(questionModel.CorrectAnswerIndex == model.Answer);
         }
 
-        [HttpPost("SaveQuestion")]
-        public IActionResult SaveQuestion([FromBody] QuestionModelWithAnswer questionModel)
+        [HttpPost("SaveQuestion/{room}")]
+        public IActionResult SaveQuestion(string room, [FromBody] QuestionModelWithAnswer questionModel)
         {
             if (questionModel == null)
             {
@@ -62,7 +62,7 @@ namespace API.Controllers
 
             string uniqueIdentifier = Guid.NewGuid().ToString();
             string questionName = $"question_{uniqueIdentifier}";
-            QuestionDatabase.CreateNewQuestion(questionName, questionModel);
+            QuestionDatabase.CreateNewQuestion(room, questionName, questionModel);
 
             return Ok("Question created successfully.");
         }

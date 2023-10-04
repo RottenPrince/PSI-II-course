@@ -28,12 +28,12 @@ namespace API.Databases
                 .ToArray();
         }
 
-        public static void CreateNewQuestion(string questionName, QuestionModelWithAnswer questionModel)
+        public static void CreateNewQuestion(string roomName, string questionName, QuestionModelWithAnswer questionModel)
         {
             string jsonQuestion = JsonConvert.SerializeObject(questionModel);
             string fileName = $"{questionName}{_questionDBExtension}";
 
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, fileName)))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, (roomName+"/"), fileName)))
             {
                 outputFile.Write(jsonQuestion);
             }

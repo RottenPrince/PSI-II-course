@@ -14,21 +14,21 @@ namespace MVC.Controllers
             return View(questionModel);
         }
 
-        [HttpGet]
-        public IActionResult Create()
+        [HttpGet("Create/{room}")]
+        public IActionResult Create(string room)
         {
             var questionModel = new QuestionModelWithAnswer();
 
             return View(questionModel);
         }
 
-        [HttpPost]
-        public IActionResult Create(QuestionModelWithAnswer sm)
+        [HttpPost("Create/{room}")]
+        public IActionResult Create(string room, QuestionModelWithAnswer questionModel)
         {
             
-            ViewBag.Title = sm.Question;
+            ViewBag.Title = questionModel.Question;
 
-            var response = APIHelper.Post<QuestionModelWithAnswer, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
+            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{room}", questionModel, out APIError? error);
 
             if (error == null)
             {
