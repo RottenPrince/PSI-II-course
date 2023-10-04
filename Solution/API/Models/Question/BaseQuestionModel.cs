@@ -5,9 +5,7 @@ namespace API.Models.Question
 {
 	[JsonDerivedType(typeof(CheckboxQuestionModel), typeDiscriminator: "CheckboxQuestionModel")]
 	[JsonDerivedType(typeof(DecimalNumberQuestionModel), typeDiscriminator: "DecimalNumberQuestionModel")]
-	[JsonDerivedType(typeof(IntegerQuestionModel), typeDiscriminator: "IntegerQuestionModel")]
-	[JsonDerivedType(typeof(TextCaseInsensitiveQuestionModel), typeDiscriminator: "TextCaseInsensitiveQuestionModel")]
-	[JsonDerivedType(typeof(TextCaseSensitiveQuestionModel), typeDiscriminator: "TextCaseSensitiveQuestionModel")]
+	[JsonDerivedType(typeof(TextQuestionModel), typeDiscriminator: "TextQuestionModel")]
     public class BaseQuestionModel
     {
 		[JsonRequired]

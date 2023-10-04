@@ -1,5 +1,6 @@
 {
-	"$type": "TextCaseSensitiveQuestionModel",
+	"$type": "TextQuestionModel",
+	"CaseSensitive": true,
 	"Question": "hello",
 	"CorrectAnswer": "hi",
 	"ImageName": null
