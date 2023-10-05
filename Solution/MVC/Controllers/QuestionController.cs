@@ -16,7 +16,7 @@ namespace MVC.Controllers
 		[HttpGet("Solve/{questionName}")]
         public IActionResult Index(string questionName)
         {
-            var questionModel = APIHelper.Get<BaseQuestionWithAnswerModel>($"api/SolveAPI/GetQuestion/{questionName}", out var err);
+            var questionModel = APIHelper.Get<BaseQuestionModel>($"api/SolveAPI/GetQuestion/{questionName}", out var err);
 			if(err != null)
 			{
 				_logger.LogError($"Failure: {err.Status} {err.Message}");
@@ -30,18 +30,18 @@ namespace MVC.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            var questionModel = new BaseQuestionWithAnswerModel();
+            var questionModel = new BaseQuestionModel();
 
             return View(questionModel);
         }
 
         [HttpPost]
-        public IActionResult Create(BaseQuestionWithAnswerModel sm)
+        public IActionResult Create(IVerifiable sm)
         {
-            
-            ViewBag.Title = sm.Question;
+            var questionModel = (BaseQuestionModel)sm;
+            ViewBag.Title = questionModel.Question;
 
-            var response = APIHelper.Post<BaseQuestionWithAnswerModel, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
+            var response = APIHelper.Post<IVerifiable, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
 
             if (error == null)
             {

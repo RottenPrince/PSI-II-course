@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using API.Databases;
 using SharedModels.Question.WithoutAnswer;
+using SharedModels.Question.WithAnswer;
+using AutoMapper;
 
 namespace API.Controllers
 {
@@ -10,19 +12,22 @@ namespace API.Controllers
     public class QuestionAPIController : ControllerBase
     {
         private readonly ILogger<QuestionAPIController> _logger;
+        private readonly IMapper _mapper;
         private static Random random = new Random();
 
-        public QuestionAPIController(ILogger<QuestionAPIController> logger)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper)
         {
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet("GetQuestion/{question}")]
         public IActionResult GetQuestion(string question)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(question, out var error);
+            var questionModel = QuestionDatabase.GetQuestionWithAnswer(question, out var error);
             if (error != null) return error;
-            return Ok(questionModel);
+            var mappedModel = questionModel.MapToWithoutAnswer(_mapper);
+            return Ok(mappedModel);
         }
 
         [HttpGet("GetRandomQuestionName")]

@@ -3,11 +3,9 @@
 namespace SharedModels.Question.WithoutAnswer
 {
     [JsonDerivedType(typeof(CheckboxQuestionModel), typeDiscriminator: "CheckboxQuestionModel")]
-    public class CheckboxQuestionModel : BaseQuestionWithAnswerModel
+    public class CheckboxQuestionModel : BaseQuestionModel
     {
         [JsonRequired]
         public List<string> AnswerOptions { get; set; }
-        [JsonRequired]
-        public int CorrectAnswerIndex { get; set; }
     }
 }

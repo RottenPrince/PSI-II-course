@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using SharedModels.Question.WithoutAnswer;
 using SharedModels.Question.WithAnswer;
+using System.Text.Json;
 
 namespace API.Databases
 {
@@ -12,7 +13,9 @@ namespace API.Databases
 
         public static BaseQuestionModel? GetQuestionWithoutAnswer(string questionName, out ActionResult? error)
         {
-            return ParseQuestionFromDatabase<BaseQuestionModel>(questionName, out error);
+            // return ParseQuestionFromDatabase<BaseQuestionModel>(questionName, out error);
+            error = null;
+            return null;
         }
         
         public static BaseQuestionWithAnswerModel? GetQuestionWithAnswer(string questionName, out ActionResult? error)
@@ -40,7 +43,7 @@ namespace API.Databases
             }
         }
 
-        private static T? ParseQuestionFromDatabase<T>(string question, out ActionResult? error) where T: BaseQuestionModel
+        private static T? ParseQuestionFromDatabase<T>(string question, out ActionResult? error) where T: BaseQuestionWithAnswerModel
         {
             if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
             {
@@ -58,7 +61,7 @@ namespace API.Databases
 
             string questionModelText = System.IO.File.ReadAllText(questionModelFile);
 
-            var questionModel = JsonConvert.DeserializeObject<T>(questionModelText);
+            var questionModel = System.Text.Json.JsonSerializer.Deserialize<T>(questionModelText);
             if(questionModel == null)
             {
                 error = new UnprocessableEntityObjectResult("Failed deserializing question");

@@ -1,10 +1,11 @@
-using System.Text.Json.Serialization;
+using AutoMapper;
 using SharedModels.Question.WithoutAnswer;
+using System.Text.Json.Serialization;
 
-namespace SharedModels.Question.WithoutAnswer
+namespace SharedModels.Question.WithAnswer
 {
     [JsonDerivedType(typeof(DecimalNumberWithAnswerModel), typeDiscriminator: "DecimalNumberWithAnswerModel")]
-    public class DecimalNumberWithAnswerModel : DecimalNumberQuestionModel
+    public class DecimalNumberWithAnswerModel : BaseQuestionWithAnswerModel
     {
         [JsonRequired]
         public decimal CorrectAnswer { get; set; }
@@ -16,6 +17,12 @@ namespace SharedModels.Question.WithoutAnswer
                 return false;
             }
             return decimalAnswer == CorrectAnswer;
+        }
+
+        
+        public override BaseQuestionModel MapToWithoutAnswer(IMapper mapper)
+        {
+            return mapper.Map<DecimalNumberQuestionModel>(this);
         }
     }
 }

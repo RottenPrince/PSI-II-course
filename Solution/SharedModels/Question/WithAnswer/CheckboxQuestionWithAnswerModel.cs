@@ -1,5 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using AutoMapper;
 using SharedModels.Question.WithoutAnswer;
+using System.Text.Json.Serialization;
 
 namespace SharedModels.Question.WithAnswer
 {
@@ -7,7 +8,9 @@ namespace SharedModels.Question.WithAnswer
     public class CheckboxQuestionWithAnswerModel : BaseQuestionWithAnswerModel
     {
         [JsonRequired]
-        public int CorrectAnswer { get; set; }
+        public List<string> AnswerOptions { get; set; }
+        [JsonRequired]
+        public int CorrectAnswerIndex { get; set; }
 
         public override bool Validate(string answer)
         {
@@ -15,7 +18,12 @@ namespace SharedModels.Question.WithAnswer
             {
                 return false;
             }
-            return intAnswer == CorrectAnswer;
+            return intAnswer == CorrectAnswerIndex;
         }
+
+        public override BaseQuestionModel MapToWithoutAnswer(IMapper mapper)
+        {
+            return mapper.Map<CheckboxQuestionModel>(this);
+        } 
     }
 }

@@ -1,9 +1,13 @@
+using API.Models;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAutoMapper(config => {
+    config.AddProfile<QuestionProfile>();
+}, typeof(Program));
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => {
