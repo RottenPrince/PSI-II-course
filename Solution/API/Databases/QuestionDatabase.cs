@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using SharedModels.Question.WithoutAnswer;
 using SharedModels.Question.WithAnswer;
 using System.Text.Json;
+using AutoMapper;
 
 namespace API.Databases
 {
@@ -11,16 +12,16 @@ namespace API.Databases
         private static readonly string _questionsFolder = "../../questions";
         private static readonly string _questionDBExtension = ".json";
 
-        public static BaseQuestionModel? GetQuestionWithoutAnswer(string questionName, out ActionResult? error)
+        public static BaseQuestionModel? GetQuestionWithoutAnswer(string questionName, IMapper _mapper, out ActionResult? error)
         {
-            // return ParseQuestionFromDatabase<BaseQuestionModel>(questionName, out error);
-            error = null;
-            return null;
+            var modelWithAnswer = ParseQuestionFromDatabase(questionName, out error);
+            if (error != null) return null;
+            return modelWithAnswer.MapToWithoutAnswer(_mapper);
         }
         
         public static BaseQuestionWithAnswerModel? GetQuestionWithAnswer(string questionName, out ActionResult? error)
         {
-            return ParseQuestionFromDatabase<BaseQuestionWithAnswerModel>(questionName, out error);
+            return ParseQuestionFromDatabase(questionName, out error);
         }
 
         public static string[] GetAllQuestionNames()
@@ -43,7 +44,7 @@ namespace API.Databases
             }
         }
 
-        private static T? ParseQuestionFromDatabase<T>(string question, out ActionResult? error) where T: BaseQuestionWithAnswerModel
+        private static BaseQuestionWithAnswerModel? ParseQuestionFromDatabase(string question, out ActionResult? error)
         {
             if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
             {
@@ -61,7 +62,7 @@ namespace API.Databases
 
             string questionModelText = System.IO.File.ReadAllText(questionModelFile);
 
-            var questionModel = System.Text.Json.JsonSerializer.Deserialize<T>(questionModelText);
+            var questionModel = System.Text.Json.JsonSerializer.Deserialize<BaseQuestionWithAnswerModel>(questionModelText);
             if(questionModel == null)
             {
                 error = new UnprocessableEntityObjectResult("Failed deserializing question");

@@ -13,35 +13,34 @@ namespace MVC.Controllers
 			_logger = logger;
 		}
 		
-		[HttpGet("Solve/{questionName}")]
-        public IActionResult Index(string questionName)
+		[HttpGet("/Question/Solve/{questionName}")]
+        public IActionResult Solve(string questionName)
         {
-            var questionModel = APIHelper.Get<BaseQuestionModel>($"api/SolveAPI/GetQuestion/{questionName}", out var err);
+            var questionModel = APIHelper.Get<BaseQuestionModel>($"api/QuestionAPI/GetQuestion/{questionName}", out var err);
 			if(err != null)
 			{
 				_logger.LogError($"Failure: {err.Status} {err.Message}");
 				return View("Error");
 			}
 
-            ViewData["QuestionName"] = questionName; // TODO I don't like this
+            ViewData["QuestionName"] = questionName;
             return View(questionModel);
         }
 
         [HttpGet]
         public IActionResult Create()
         {
-            var questionModel = new BaseQuestionModel();
+            var questionModel = new BaseQuestionWithAnswerModel();
 
             return View(questionModel);
         }
 
         [HttpPost]
-        public IActionResult Create(IVerifiable sm)
+        public IActionResult Create(BaseQuestionWithAnswerModel sm)
         {
-            var questionModel = (BaseQuestionModel)sm;
-            ViewBag.Title = questionModel.Question;
+            ViewBag.Title = sm.Question;
 
-            var response = APIHelper.Post<IVerifiable, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
+            var response = APIHelper.Post<BaseQuestionWithAnswerModel, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
 
             if (error == null)
             {

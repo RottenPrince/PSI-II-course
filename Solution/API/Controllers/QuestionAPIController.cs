@@ -24,10 +24,8 @@ namespace API.Controllers
         [HttpGet("GetQuestion/{question}")]
         public IActionResult GetQuestion(string question)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithAnswer(question, out var error);
-            if (error != null) return error;
-            var mappedModel = questionModel.MapToWithoutAnswer(_mapper);
-            return Ok(mappedModel);
+            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(question, _mapper, out var error);
+            return Ok(questionModel);
         }
 
         [HttpGet("GetRandomQuestionName")]
@@ -51,7 +49,7 @@ namespace API.Controllers
         [HttpPost("CheckAnswer")]
         public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.Name, out var error);
+            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.QuestionName, out var error);
             if (error != null)
                 return error;
 
