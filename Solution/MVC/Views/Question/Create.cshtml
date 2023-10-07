@@ -1,95 +1,47 @@
 ﻿@model SharedModels.Question.QuestionModelWithAnswer
+@{
+    ViewData["Title"] = "Create New Question";
+}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create New Question</title>
-    <style>
-        th, td{
-            padding: 15px;
-        }
-        .answerOption{
-            margin: 10px;
-        }
-    </style>
-</head>
-<body>
+@section Stylesheets {
+    <link rel="stylesheet" href="~/css/Question/Create.css" asp-append-version="true" />
+}
 
-    <h3><strong>Create New Question</strong></h3>
+@section Scripts {
+    <script src="~/js/Question/Create.js"></script>
+}
 
-    @using (Html.BeginForm("Create", "Question", FormMethod.Post))
-    {
-        <table>
-            <tr>
-                <td>Title: @Html.TextBoxFor(m => m.Question)</td>
-            </tr>
-            <tr>
-                <td>Answer Options:</td>
-            </tr>
-            <tr>
-                <td>
-                    <div id="answerOptionsContainer">                        
-                        @* useless for Create, could be used for Update *@
+<h3><strong>Create New Question</strong></h3>
 
-                        @* @for (int i = 0; i < Model.AnswerOptions.Count; i++) 
-                        {
-                            <div class="answerOption">
-                                <input style="display:inline-block" type="radio" name="CorrectAnswerIndex" value="@i" @(Model.CorrectAnswerIndex == i ? "checked" : "") />
-                                <input style="display:inline-block" type="text" name="AnswerOptions[@i]" value="@Model.AnswerOptions[i]" />
-                                <button style="display:inline-block" type="button" class="removeOption">Remove</button>
-                            </div>
-                        } *@
-                    </div>
-                    <button type="button" id="addOption">Add Answer Option</button>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2"><input type="submit" value="Submit Question" /></td>
-            </tr>
-        </table>
-        <div id="submit-check"></div>
-    }
+@using (Html.BeginForm("Create", "Question", FormMethod.Post))
+{
+    <table>
+        <tr>
+            <td>Title: @Html.TextBoxFor(m => m.Question)</td>
+        </tr>
+        <tr>
+            <td>Answer Options:</td>
+        </tr>
+        <tr>
+            <td>
+                <div id="answerOptionsContainer">                        
+                    @* useless for Create, could be used for Update *@
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            // Add Answer Option
-            $("#addOption").click(function () {
-                var optionCount = $("input[type='radio'][name^='CorrectAnswerIndex']").length;
-
-                var optionHtml = `
-                <div class="answerOption">
-                    <input type="radio" name="CorrectAnswerIndex" value="${optionCount}" />
-                    <input type="text" name="AnswerOptions[]" value="" />
-                    <button type="button" class="removeOption">Remove</button>
-                </div>`;
-
-                $("#answerOptionsContainer").append(optionHtml);
-
-                // Update the values of existing radio buttons
-                $("input[type='radio'][name^='CorrectAnswerIndex']").each(function (index) {
-                    $(this).val(index);
-                });
-            });
-
-            // Delete
-            $("#answerOptionsContainer").on("click", ".removeOption", function () {
-                $(this).parent().remove();
-
-                $("input[type='radio'][name^='CorrectAnswerIndex']").each(function (index) {
-                    $(this).val(index);
-                });
-            });
-
-            $("form").submit(function (e) {
-                var selectedRadio = $("input[name='CorrectAnswerIndex']:checked");
-                if (selectedRadio.length === 0) {
-                    e.preventDefault();
-                    $("#submit-check").html("Please select a correct answer.");
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+                    @* @for (int i = 0; i < Model.AnswerOptions.Count; i++) 
+                    {
+                        <div class="answerOption">
+                            <input style="display:inline-block" type="radio" name="CorrectAnswerIndex" value="@i" @(Model.CorrectAnswerIndex == i ? "checked" : "") />
+                            <input style="display:inline-block" type="text" name="AnswerOptions[@i]" value="@Model.AnswerOptions[i]" />
+                            <button style="display:inline-block" type="button" class="removeOption">Remove</button>
+                        </div>
+                    } *@
+                </div>
+                <button type="button" id="addOption">Add Answer Option</button>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="submit" value="Submit Question" /></td>
+        </tr>
+    </table>
+    <div id="submit-check"></div>
+}
