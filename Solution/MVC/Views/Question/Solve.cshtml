@@ -1,63 +1,48 @@
 ﻿@model SharedModels.Question.QuestionModel
+@{
+    ViewData["Title"] = "Question Page";
+}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Question Page</title>
-    <link rel="stylesheet" href="~/css/Question.Solve.css">
-</head>
-<body>
-    <div id="questionTitle">
-        <h1>@Model.Question</h1>
+@section Stylesheets {
+    <link rel="stylesheet" href="~/css/Question/Solve.css">
+}
+
+@section Scripts {
+    <script src="~/js/Question/Solve.js"></script>
+}
+
+<div id="questionTitle">
+    <h1>@Model.Question</h1>
+</div>
+
+@if(Model.ImageName != null)
+{
+    <div id="questionImage">
+        <img src="~/img/@Model.ImageName" alt="Question Image" />
     </div>
+}
 
-    @if(Model.ImageName != null)
-    {
-        <div id="questionImage">
-            <img src="~/img/@Model.ImageName" alt="Question Image" />
-        </div>
+<div id="form">
+    <form id="choiceForm">
+        @foreach(var (idx, option) in Model.AnswerOptions.WithIndex())
+        {
+            <label class="option">
+                <input type="radio" name="answer" value="@idx" /> @option
+            </label>
+            <br />
+        }
+
+        <button type="button" id="submitButton">Submit</button>
+        <div id="answerMessage"></div>
+    </form>
+</div>
+
+<script>
+    function getRoomName() {
+        return "@ViewData["Room"]";
     }
 
-    <div id="form">
-        <form id="choiceForm">
-            @foreach(var (idx, option) in Model.AnswerOptions.WithIndex())
-            {
-                <label class="option">
-                    <input type="radio" name="answer" value="@idx" /> @option
-                </label>
-                <br />
-            }
-
-            <button type="button" id="submitButton">Submit</button>
-            <div id="answerMessage"></div>
-        </form>
-    </div>
-    <div>@ViewBag.Title</div>
-
-  
-
-    <script>
-        document.getElementById("submitButton").addEventListener("click", function () {
-            var selectedAnswer = document.querySelector("input[name='answer']:checked").getAttribute("value");
-
-            if (selectedAnswer !== null) {
-                $.ajax({
-                    type: "POST",
-                    url: "https://localhost:7016/api/QuestionAPI/CheckAnswer",
-                    data: JSON.stringify({ room: "@ViewData["Room"]", name: "@ViewData["QuestionName"]", answer: parseInt(selectedAnswer) }),
-                    success: function (data) {
-                        if(data === true) {
-                            document.getElementById("answerMessage").textContent = "You are Right!";
-                        } else {
-                            document.getElementById("answerMessage").textContent = "WRONG!";
-                        }
-                        console.log(data);
-                    }, // TODO error handling
-                    contentType: "application/json",
-                    dataType: "json"
-                });
-            }
-        });
-    </script>
-</body>
-</html>
+    function getQuestionName() {
+        return "@ViewData["QuestionName"]";
+    }
+</script>
