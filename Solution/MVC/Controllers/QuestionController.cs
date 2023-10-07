@@ -1,5 +1,6 @@
 using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace MVC.Controllers
 {
@@ -13,9 +14,7 @@ namespace MVC.Controllers
             var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{room}", out _);
             var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{room}/{questionName}", out _);
 
-            ViewData["QuestionName"] = questionName; // TODO I don't like this
-            ViewData["Room"] = room; // You don't like it, but here's more
-            return View(questionModel);
+            return View(new SolveDisplayModel(questionModel, questionName, room));
         }
 
         [HttpGet]
@@ -30,7 +29,7 @@ namespace MVC.Controllers
         public IActionResult Create(string id, QuestionModelWithAnswer questionModel)
         {
             string room = id;
-            ViewBag.Title = questionModel.Question;
+            ViewBag.Title = questionModel.Title;
 
             var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{room}", questionModel, out APIError? error);
 

@@ -9,37 +9,37 @@ namespace API.Databases
         private static readonly string _questionsFolder = "../../questions";
         private static readonly string _questionDBExtension = ".json";
 
-        public static QuestionModel? GetQuestionWithoutAnswer(string roomName, string questionName, out ActionResult? error)
+        public static QuestionModel? GetQuestionWithoutAnswer(string room, string questionName, out ActionResult? error)
         {
-            return ParseQuestionFromDatabase<QuestionModel>(roomName, questionName, out error);
+            return ParseQuestionFromDatabase<QuestionModel>(room, questionName, out error);
         }
         
-        public static QuestionModelWithAnswer? GetQuestionWithAnswer(string roomName, string questionName, out ActionResult? error)
+        public static QuestionModelWithAnswer? GetQuestionWithAnswer(string room, string questionName, out ActionResult? error)
         {
-            return ParseQuestionFromDatabase<QuestionModelWithAnswer>(roomName, questionName, out error);
+            return ParseQuestionFromDatabase<QuestionModelWithAnswer>(room, questionName, out error);
         }
 
-        public static string[] GetAllQuestionNames(string roomName)
+        public static string[] GetAllQuestionNames(string room)
         {
-            DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder + "/" + roomName);
+            DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder + "/" + room);
             return (from file in dirinfo.GetFiles()
                     where file.Name.EndsWith(_questionDBExtension)
                     select file.Name.Substring(0, file.Name.Length - _questionDBExtension.Length))
                 .ToArray();
         }
 
-        public static void CreateNewQuestion(string roomName, string questionName, QuestionModelWithAnswer questionModel)
+        public static void CreateNewQuestion(string room, string questionName, QuestionModelWithAnswer questionModel)
         {
             string jsonQuestion = JsonConvert.SerializeObject(questionModel);
             string fileName = $"{questionName}{_questionDBExtension}";
 
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, roomName, fileName)))
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, room, fileName)))
             {
                 outputFile.Write(jsonQuestion);
             }
         }
 
-        private static T? ParseQuestionFromDatabase<T>(string roomName, string question, out ActionResult? error) where T: QuestionModel
+        private static T? ParseQuestionFromDatabase<T>(string room, string question, out ActionResult? error) where T: QuestionModel
         {
             if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
             {
@@ -47,7 +47,7 @@ namespace API.Databases
                 return null;
             }
 
-            string questionModelFile = Path.Combine(_questionsFolder, roomName, question + ".json");
+            string questionModelFile = Path.Combine(_questionsFolder, room, question + ".json");
 
             if (!System.IO.File.Exists(questionModelFile))
             {

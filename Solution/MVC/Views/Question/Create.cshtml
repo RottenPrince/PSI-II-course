@@ -21,7 +21,7 @@
     {
         <table>
             <tr>
-                <td>Title: @Html.TextBoxFor(m => m.Question)</td>
+                <td>Title: @Html.TextBoxFor(m => m.Title)</td>
             </tr>
             <tr>
                 <td>Answer Options:</td>
@@ -84,9 +84,15 @@
 
             $("form").submit(function (e) {
                 var selectedRadio = $("input[name='CorrectAnswerIndex']:checked");
-                if (selectedRadio.length === 0) {
+                var answerTextBoxes = $("input[name='AnswerOptions[]']");
+
+                var isAnyAnswerEmpty = answerTextBoxes.toArray().some(function (textBox) {
+                    return textBox.value.trim() === "";
+                });
+
+                if (selectedRadio.length === 0 || isAnyAnswerEmpty) {
                     e.preventDefault();
-                    $("#submit-check").html("Please select a correct answer.");
+                    $("#submit-check").html("Please fill in all answer fields and select a correct answer.");
                 }
             });
         });
