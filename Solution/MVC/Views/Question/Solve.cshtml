@@ -1,4 +1,4 @@
-﻿@model SharedModels.Question.QuestionModel
+﻿@model MVC.Models.QuestionSolveViewModel
 @{
     ViewData["Title"] = "Question Page";
 }
@@ -12,19 +12,19 @@
 }
 
 <div id="questionTitle">
-    <h1>@Model.Question</h1>
+    <h1>@Model.QuestionModel.Question</h1>
 </div>
 
-@if(Model.ImageName != null)
+@if(Model.QuestionModel.ImageName != null)
 {
     <div id="questionImage">
-        <img src="~/img/@Model.ImageName" alt="Question Image" />
+        <img src="~/img/@Model.QuestionModel.ImageName" alt="Question Image" />
     </div>
 }
 
 <div id="form">
     <form id="choiceForm">
-        @foreach(var (idx, option) in Model.AnswerOptions.WithIndex())
+        @foreach(var (idx, option) in Model.QuestionModel.AnswerOptions.WithIndex())
         {
             <label class="option">
                 <input type="radio" name="answer" value="@idx" /> @option
@@ -39,10 +39,10 @@
 
 <script>
     function getRoomName() {
-        return "@ViewData["Room"]";
+        return "@Model.RoomName";
     }
 
     function getQuestionName() {
-        return "@ViewData["QuestionName"]";
+        return "@Model.QuestionName";
     }
 </script>

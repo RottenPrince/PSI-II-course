@@ -1,39 +1,41 @@
 using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
+using MVC.Models;
 
 namespace MVC.Controllers
 {
-    [Route("[controller]/[action]/{id}")]
+    [Route("[controller]/[action]")]
     public class QuestionController : Controller
     {
-        [HttpGet]
-        public IActionResult Solve(string id)
+        [HttpGet("{roomName}")]
+        public IActionResult Solve(string roomName)
         {
-            string room = id;
-            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{room}", out _);
-            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{room}/{questionName}", out _);
+            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomName}", out _);
+            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomName}/{questionName}", out _);
 
-            ViewData["QuestionName"] = questionName; // TODO I don't like this
-            ViewData["Room"] = room; // You don't like it, but here's more
-            return View(questionModel);
+            return View(new QuestionSolveViewModel
+            {
+                QuestionName = questionName,
+                RoomName = roomName,
+                QuestionModel = questionModel,
+            });
         }
 
         [HttpGet]
-        public IActionResult Create(string id)
+        public IActionResult Create()
         {
             var questionModel = new QuestionModelWithAnswer();
 
             return View(questionModel);
         }
 
-        [HttpPost]
-        public IActionResult Create(string id, QuestionModelWithAnswer questionModel)
+        [HttpGet("{roomName}")]
+        public IActionResult Create(string roomName, QuestionModelWithAnswer questionModel)
         {
-            string room = id;
             ViewBag.Title = questionModel.Question;
 
-            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{room}", questionModel, out APIError? error);
+            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{roomName}", questionModel, out APIError? error);
 
             if (error == null)
             {
