@@ -13,7 +13,7 @@
 
 <h3><strong>Create New Question</strong></h3>
 
-@using (Html.BeginForm("Create", "Question", FormMethod.Post))
+@using (Html.BeginForm("Create", "Question", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <table>
         <tr>
@@ -37,6 +37,13 @@
                     } *@
                 </div>
                 <button type="button" id="addOption">Add Answer Option</button>
+            </td>
+        </tr>
+        
+        <tr>
+            <td colspan="2">
+                <label>Question image: </label>
+                <input type="file" name="image">
             </td>
         </tr>
         <tr>
