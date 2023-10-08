@@ -8,21 +8,21 @@ namespace MVC.Controllers
     [Route("[controller]/[action]")]
     public class QuestionController : Controller
     {
-        [HttpGet("{roomName}")]
-        public IActionResult Solve(string roomName)
+        [HttpGet("{roomId}")]
+        public IActionResult Solve(string roomId)
         {
-            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomName}", out _);
-            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomName}/{questionName}", out _);
+            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
+            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
 
             return View(new QuestionSolveViewModel
             {
                 QuestionName = questionName,
-                RoomName = roomName,
+                RoomId = roomId,
                 QuestionModel = questionModel,
             });
         }
 
-        [HttpGet]
+        [HttpGet("{roomId}")]
         public IActionResult Create()
         {
             var questionModel = new QuestionModelWithAnswer();
@@ -30,12 +30,12 @@ namespace MVC.Controllers
             return View(questionModel);
         }
 
-        [HttpGet("{roomName}")]
-        public IActionResult Create(string roomName, QuestionModelWithAnswer questionModel)
+        [HttpPost("{roomId}")]
+        public IActionResult Create(string roomId, QuestionModelWithAnswer questionModel)
         {
             ViewBag.Title = questionModel.Question;
 
-            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{roomName}", questionModel, out APIError? error);
+            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{roomId}", questionModel, out APIError? error);
 
             if (error == null)
             {
