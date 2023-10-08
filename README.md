@@ -1,18 +1,17 @@
 # Exam preparation app
-This is an app that helps you prepare for an exam. Created for PSI course in Vilnius University.
+App that helps you prepare for an exam. Created for PSI course in Vilnius University.
 
-### TODO
-- [ ] Problemsets
-    - [ ] Storage
-    - [ ] Displaying problems to users
-    - [ ] Displaying problemsets to users
-    - [ ] Making problemsets public/private
-    - [ ] Creating new problems/problemsets
-    - [ ] Checking whether user-provided answers are correct
+### Features
+- [ ] Questionset
+    - [ ] Question creation/editing page
+    - [ ] Making questionsets public or joinable with a code
+        - [ ] (Simple) search
+    - [ ] Question tagging (e.g. calculus, geometry, ...)
+    - [ ] Answer checking
         - [ ] Multiple choice
         - [ ] Text input
-    - [ ] Problem tagging (e.g. calculus, geometry, ...)
 - [ ] Practice runs
-    - [ ] Solve random tasks without any time limit
-    - [ ] Solve fixed amount of problems as fast as possible
+    - [ ] Solving without time limits
+    - [ ] Solve fixed amount of questions as fast as possible
+    - [ ] Filter questions by tags
     - [ ] Reviewing past practice runs
