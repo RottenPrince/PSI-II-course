@@ -1,37 +1,36 @@
 using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using MVC.Helpers.API;
+using MVC.Models;
 
 namespace MVC.Controllers
 {
-    [Route("[controller]/[action]/{id}")]
+    [Route("[controller]/[action]")]
     public class QuestionController : Controller
     {
-        [HttpGet]
-        public IActionResult Solve(string id)
+        [HttpGet("{roomId}")]
+        public IActionResult Solve(string roomId)
         {
-            string room = id;
-            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{room}", out _);
-            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{room}/{questionName}", out _);
+            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
+            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
 
-            return View(new SolveDisplayModel(questionModel, questionName, room));
+            return View(new SolveViewModel(questionModel, questionName, roomId));
         }
 
-        [HttpGet]
-        public IActionResult Create(string id)
+        [HttpGet("{roomId}")]
+        public IActionResult Create()
         {
             var questionModel = new QuestionModelWithAnswer();
 
             return View(questionModel);
         }
 
-        [HttpPost]
-        public IActionResult Create(string id, QuestionModelWithAnswer questionModel)
+        [HttpPost("{roomId}")]
+        public IActionResult Create(string roomId, QuestionModelWithAnswer questionModel)
         {
-            string room = id;
             ViewBag.Title = questionModel.Title;
 
-            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{room}", questionModel, out APIError? error);
+            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{roomId}", questionModel, out APIError? error);
 
             if (error == null)
             {

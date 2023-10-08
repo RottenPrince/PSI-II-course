@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace MVC
+namespace MVC.Helpers.API
 {
     public class APIError
     {

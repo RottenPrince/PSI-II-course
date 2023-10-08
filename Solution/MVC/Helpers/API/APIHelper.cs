@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace MVC
+namespace MVC.Helpers.API
 {
     public static class APIHelper
     {

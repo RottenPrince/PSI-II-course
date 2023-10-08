@@ -1,8 +1,10 @@
-﻿namespace SharedModels.Question
+﻿using SharedModels.Question;
+
+namespace MVC.Models
 {
-    public class SolveDisplayModel
+    public class SolveViewModel
     {
-        public SolveDisplayModel(QuestionModel questionModel, string questionName, string room)
+        public SolveViewModel(QuestionModel questionModel, string questionName, string room)
         {
             Question = questionModel;
             QuestionName = questionName;
