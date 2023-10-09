@@ -25,6 +25,7 @@ input[type="text"] {
 }
 
 .answerOption {
+    display: flex;
     margin-bottom: 10px;
 }
 
