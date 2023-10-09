@@ -10,7 +10,7 @@ body {
 
 #questionImage, #questionTitle {
     text-align: center;
-    background-color: white; 
+    background-color: none; 
     padding: 5px;
 }
 
