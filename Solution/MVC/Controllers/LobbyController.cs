@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
+using SharedModels.Question;
 
 namespace MVC.Controllers
 {
@@ -23,6 +24,19 @@ namespace MVC.Controllers
 
 
             return View(); ;
+        }
+
+        [HttpGet]
+        public IActionResult Test()
+        {
+            var rooms = APIHelper.Get<List<RoomModel>>("LobbyAPI/GetAllRooms", out _);
+
+            string ats = "";
+            foreach(var r in rooms)
+            {
+                ats += $"ID: '{r.Id}' Name: '{r.Name}'\n";
+            }
+            return Ok(ats);
         }
     }
 }
