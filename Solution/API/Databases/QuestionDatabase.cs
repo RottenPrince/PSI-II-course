@@ -13,10 +13,10 @@ namespace API.Databases
         {
             return ParseQuestionFromDatabase<QuestionModel>(room, questionName, out error);
         }
-        
-        public static QuestionModelWithAnswer? GetQuestionWithAnswer(string room, string questionName, out ActionResult? error)
+
+        public static QuestionModelWithAnswer? GetQuestionWithAnswer(string roomId, string questionName, out ActionResult? error)
         {
-            return ParseQuestionFromDatabase<QuestionModelWithAnswer>(room, questionName, out error);
+            return ParseQuestionFromDatabase<QuestionModelWithAnswer>(roomId, questionName, out error);
         }
 
         public static string[] GetAllQuestionNames(string room)
