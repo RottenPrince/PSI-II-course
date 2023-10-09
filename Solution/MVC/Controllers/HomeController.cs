@@ -5,7 +5,6 @@ using System.Diagnostics;
 
 namespace MVC.Controllers
 {
-    [Route("[controller]/[action]")]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -17,25 +16,6 @@ namespace MVC.Controllers
 
         public IActionResult Index()
         {
-            return View();
-        }
-
-        [HttpGet("{room}")]
-        public IActionResult Lobby(string room)
-        {
-            var roomName = APIHelper.Get<string>($"LobbyAPI/GetRoomName/{room}", out APIError? error);
-
-            if(error == null)
-            {
-                ViewBag.RoomName = roomName;
-                ViewBag.Room = room;
-            }
-            else
-            {
-                ViewBag.ErrorMessage = error.Message;
-            }
-            
-
             return View();
         }
 
