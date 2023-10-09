@@ -14,7 +14,17 @@ namespace MVC.Controllers
             var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
             var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
 
-            return View(new SolveViewModel(questionModel, questionName, roomId));
+            return View(new SolveViewModel(questionModel, questionName));
+        }
+
+        [HttpPost("{roomId}")]
+        public IActionResult Solve(string roomId, string questionName, int selectedOption)
+        {
+            var questionModel = APIHelper.Post<QuestionLocationModel, QuestionModelWithAnswer>("api/QuestionAPI/GetFullQuestion", new QuestionLocationModel(questionName, roomId), out APIError? error);
+
+            //TODO Error handling
+
+            return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId, selectedOption));
         }
 
         [HttpGet("{roomId}")]

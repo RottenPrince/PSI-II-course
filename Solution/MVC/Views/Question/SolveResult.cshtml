@@ -1,0 +1,43 @@
+﻿@model MVC.Models.SolveResultViewModel
+@{
+    ViewData["Title"] = "Question Page";
+}
+
+@section Stylesheets {
+    <link rel="stylesheet" href="~/css/Question/Solve.css"> @* add separate css or modify Solve.css *@
+}
+
+<div id="questionTitle">
+    <h1>@Model.Question.Title</h1>
+</div>
+
+@if (Model.Question.ImageName != null)
+{
+    <div id="questionImage">
+        <img src="~/img/@Model.Question.ImageName" alt="Question Image" />
+    </div>
+}
+
+<div>
+    @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
+    {
+        @if (idx == Model.Question.CorrectAnswerIndex)
+        {
+            
+            <div class="right" style="background-color:green">@option</div>
+                 
+        }
+        else if (idx == Model.SelectedOption)
+        {
+            <div class="selected" style="background-color:red">@option</div>
+        }
+        else
+        {
+            <div>@option</div>
+        }
+    }
+</div>
+
+<a asp-controller="Question" asp-action="Solve" class=" btn btn-primary">Next Random Question</a>
+<a asp-controller="Home" asp-action="Lobby" asp-route-id="@Model.RoomId" class=" btn btn-primary">Room Lobby</a>
+@*  asp-route-id="@ViewBag.Room" *@
