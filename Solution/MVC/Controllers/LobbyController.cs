@@ -14,7 +14,7 @@ namespace MVC.Controllers
             if (error == null)
             {
                 ViewBag.RoomName = roomName;
-                ViewBag.Room = roomId;
+                ViewBag.RoomId = roomId;
             }
             else
             {
@@ -22,7 +22,7 @@ namespace MVC.Controllers
             }
 
 
-            return View(); ;
+            return View();
         }
     }
 }

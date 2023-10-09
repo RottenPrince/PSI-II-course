@@ -4,7 +4,7 @@
 }
 
 @section Stylesheets {
-    <link rel="stylesheet" href="~/css/Question/Solve.css"> @* add separate css or modify Solve.css *@
+    <link rel="stylesheet" href="~/css/Question/Solve.css">
 }
 
 <div id="questionTitle">
@@ -40,4 +40,3 @@
 
 <a asp-controller="Question" asp-action="Solve" class=" btn btn-primary">Next Random Question</a>
 <a asp-controller="Lobby" asp-action="Room" asp-route-id="@Model.RoomId" class=" btn btn-primary">Room Lobby</a>
-@*  asp-route-id="@ViewBag.Room" *@
