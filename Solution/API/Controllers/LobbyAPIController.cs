@@ -1,6 +1,7 @@
 ﻿using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using API.Databases;
+using SharedModels.Lobby;
 
 namespace API.Controllers
 {
@@ -15,6 +16,16 @@ namespace API.Controllers
                 return error;
 
             return Ok(roomName);
+        }
+
+        [HttpGet("{roomId}")]
+        public IActionResult GetRoomContent(string roomId)
+        {
+            var roomModel = QuestionDatabase.GetRoomContent(roomId, out var error);
+            if (error != null)
+                return error;
+
+            return Ok(roomModel);
         }
     }
 }

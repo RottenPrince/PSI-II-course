@@ -44,6 +44,7 @@ namespace MVC.Controllers
 
             if (error == null)
             {
+                ViewBag.RoomId = roomId;
                 return View("CreateSuccess");
             }
             else

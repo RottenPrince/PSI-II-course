@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SharedModels.Question;
+using SharedModels.Lobby;
 
 namespace API.Databases
 {
@@ -80,6 +81,27 @@ namespace API.Databases
 
             error = null;
             return  System.IO.File.ReadAllText(roomNameFile);
+        }
+
+        public static RoomContentModel? GetRoomContent(string room, out ActionResult? error)
+        {
+            string roomNameFile = Path.Combine(_questionsFolder, room, "room.txt");
+
+            if (!System.IO.File.Exists(roomNameFile))
+            {
+                error = new NotFoundObjectResult("Room name file not found");
+                return null;
+            }
+
+            error = null;
+
+            string roomName = System.IO.File.ReadAllText(roomNameFile);
+            
+            string roomPath = Path.Combine(_questionsFolder, room);
+            string[] questionFiles = Directory.GetFiles(roomPath, "question*.json");
+            int questionAmount = questionFiles.Length;
+
+            return new RoomContentModel(questionAmount, roomName);
         }
     }
 }
