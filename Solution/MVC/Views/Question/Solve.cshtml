@@ -26,33 +26,20 @@
                 </div>
             }
 
-            <div id="form" class="mt-2">
-                <form id="choiceForm">
-                    @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
-                    {
-                     <div class="form-check">
-                    <label class="option">
-                        <input type="radio" name="answer" value="@idx" /> @option
-                    </label>
-                    </div>
-                    }
+<div id="form">
+    @using (Html.BeginForm("Solve", "Question", FormMethod.Post))
+    {
+        <input type="hidden" name="questionName" value="@Model.QuestionName" />
+        
+        @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
+        {
+            <label class="option">
+                <input type="radio" name="selectedOption" value="@idx" /> @option
+            </label>
+            <br />
+        }
 
-                    <button type="button" id="submitButton" class="btn btn-primary mt-3">Submit</button>
-                    <div id="answerMessage" class="mt-3"></div>
-                </form>
-            </div>
-        </div>
-    </div>
+        <button type="submit" id="submitButton">Submit</button>
+        <div id="answerMessage"></div>
+    }
 </div>
-
-
-
-<script>
-    function getRoomName() {
-        return "@Model.Room";
-    }
-
-    function getQuestionName() {
-        return "@Model.QuestionName";
-    }
-</script>

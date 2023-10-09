@@ -42,14 +42,14 @@ namespace API.Controllers
             return Ok(selectionQuestion);
         }
 
-        [HttpPost("CheckAnswer")]
-        public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
+        [HttpPost("{roomId}")]
+        public IActionResult GetFullQuestion([FromBody] QuestionLocationModel model)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.Room, model.Name, out var error);
+            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.RoomId, model.Name, out var error);
             if (error != null)
                 return error;
 
-            return Ok(questionModel.CorrectAnswerIndex == model.Answer);
+            return Ok(questionModel);
         }
 
         [HttpPost("SaveQuestion/{room}")]

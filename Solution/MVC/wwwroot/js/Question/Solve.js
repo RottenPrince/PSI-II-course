@@ -1,20 +1,19 @@
-﻿document.getElementById("submitButton").addEventListener("click", function () {
-    var selectedAnswer = $("input[name='answer']:checked").attr("value");
+﻿document.addEventListener("DOMContentLoaded", function () {
+    
+    var form = document.getElementById("form");
 
-    if (selectedAnswer !== null) {
-        $.ajax({
-            type: "POST",
-            url: "https://localhost:7016/api/QuestionAPI/CheckAnswer",
-            data: JSON.stringify({
-                room: getRoomName(),
-                name: getQuestionName(),
-                answer: parseInt(selectedAnswer)
-            }),
-            success: function (data) {
-                $("#answerMessage").text(data === true ? "You are Right!" : "WRONG!");
-            }, // TODO error handling
-            contentType: "application/json",
-            dataType: "json"
+    form.addEventListener("submit", function (event) {
+        var radioButtons = document.querySelectorAll("input[name='selectedOption']");
+
+        var isAnyChecked = Array.from(radioButtons).some(function (radioButton) {
+            return radioButton.checked;
         });
-    }
+
+        if (!isAnyChecked) {
+            var errorMessage = document.getElementById("answerMessage");
+            errorMessage.textContent = "Please select the Answer.";
+
+            event.preventDefault();
+        }
+    });
 });

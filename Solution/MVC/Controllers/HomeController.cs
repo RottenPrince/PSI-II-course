@@ -19,25 +19,6 @@ namespace MVC.Controllers
             return View();
         }
 
-        [HttpGet("Lobby/{room}")]
-        public IActionResult Lobby(string room)
-        {
-            var roomName = APIHelper.Get<string>($"LobbyAPI/GetRoomName/{room}", out APIError? error);
-
-            if(error == null)
-            {
-                ViewBag.RoomName = roomName;
-                ViewBag.Room = room;
-            }
-            else
-            {
-                ViewBag.ErrorMessage = error.Message;
-            }
-            
-
-            return View();
-        }
-
         public IActionResult Privacy()
         {
             return View();
