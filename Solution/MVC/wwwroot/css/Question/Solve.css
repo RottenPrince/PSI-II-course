@@ -69,5 +69,9 @@ input[type="radio"] {
     display: inline-block;
     font-size: 25px;
     font-weight: 900;
+    background-color: white;
+    padding: 0px;
+    border-radius: 10px; 
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
