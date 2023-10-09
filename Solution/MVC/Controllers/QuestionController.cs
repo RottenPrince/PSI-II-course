@@ -35,6 +35,13 @@ namespace MVC.Controllers
         [HttpPost("{roomId}")]
         public IActionResult Create(string roomId, IFormFile image, QuestionModelWithAnswer questionModel)
         {
+            if(!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).ToList();
+                ViewBag.ErrorMessage = errors.First().ErrorMessage;
+                return View("CreateError");
+            }
+
             if(image != null)
             {
                 string extension = Path.GetExtension(image.FileName);
