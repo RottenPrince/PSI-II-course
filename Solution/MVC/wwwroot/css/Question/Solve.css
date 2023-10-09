@@ -8,9 +8,13 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#questionImage, #questionTitle {
+#questionTitle {
     text-align: center;
-    background-color: none; 
+    background-color: #ff6a00;
+    color: white;
+    border-radius: 10px;
+    display: block;
+    margin: 10px 0;
     padding: 5px;
 }
 
@@ -32,17 +36,18 @@ body {
 
 label {
     display: block;
-    margin: 5px 0;
-    padding: 5px 0;
+    margin: 10px 0;
+    padding: 15px;
     font-size: 20px;
     width: 100%;
-    height: 50px;
     border-radius: 10px;
     color: white;
     background-color: #007FFF;
-    filter: drop-shadow(1px 1px 2px gray);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: background-color 0.3s ease;
+    text-align: left;
+    line-height: 1.5;
 }
 
 input[type="radio"] {
@@ -51,8 +56,7 @@ input[type="radio"] {
 
 #submitButton {
     display: inline-block;
-    background-color: #005bb7;
-    color: #fff;
+    background-color: #007FFF;
     border: none;
     margin: 0 20px 20px 0;
     padding: 10px 20px;
@@ -66,12 +70,13 @@ input[type="radio"] {
 }
 
 #answerMessage {
-    display: inline-block;
-    font-size: 25px;
+    display: block;
+    font-size: 15px;
     font-weight: 900;
-    background-color: white;
-    padding: 0px;
-    border-radius: 10px; 
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    color: white;
+    background-color: #ff6a00;
+    margin: 0 20px 20px 0;
+    padding: 10px 20px;
+    border-radius: 10px;
 }
 

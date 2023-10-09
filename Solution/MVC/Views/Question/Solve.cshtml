@@ -31,11 +31,10 @@
                     @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
                     {
                      <div class="form-check">
-                       <label class="form-check-label" for="option@idx">
-                        <input type="radio" id="option@idx" name="answer" value="@idx" class="form-check-input" />
-                        @(idx + 1). @option
+                    <label class="option">
+                        <input type="radio" name="answer" value="@idx" /> @option
                     </label>
-                     </div>
+                    </div>
                     }
 
                     <button type="button" id="submitButton" class="btn btn-primary mt-3">Submit</button>
