@@ -1,0 +1,24 @@
+﻿@using SharedModels.Question
+@model List<RoomModel>
+@{
+    ViewData["Title"] = "Available rooms";
+}
+
+@section Stylesheets {
+    <link rel="stylesheet" href="~/css/Question/Create.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script src="~/js/Question/Create.js"></script>
+}
+
+<div>
+    <ul>
+        @foreach (RoomModel room in Model)
+        {
+            <li>
+                <a class="nav-link text-dark" asp-area="" asp-controller="Lobby" asp-action="Room" asp-route-roomId="@room.Id">@room.Name</a>
+            </li>
+        }
+    </ul>
+</div>

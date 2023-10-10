@@ -23,20 +23,14 @@ namespace MVC.Controllers
             }
 
 
-            return View(); ;
+            return View();
         }
 
         [HttpGet]
-        public IActionResult Test()
+        public IActionResult AllRooms()
         {
             var rooms = APIHelper.Get<List<RoomModel>>("LobbyAPI/GetAllRooms", out _);
-
-            string ats = "";
-            foreach(var r in rooms)
-            {
-                ats += $"ID: '{r.Id}' Name: '{r.Name}'\n";
-            }
-            return Ok(ats);
+            return View(rooms);
         }
     }
 }
