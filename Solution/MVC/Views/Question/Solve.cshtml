@@ -10,19 +10,17 @@
 @section Scripts {
     <script src="~/js/Question/Solve.js"></script>
 }
-
 <a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class=" btn btn-secondary">Return</a>
-
 <div id="questionTitle">
     <h1>@Model.Question.Title</h1>
 </div>
 
-@if(Model.Question.ImageName != null)
-{
-    <div id="questionImage">
-        <img src="~/img/@Model.Question.ImageName" alt="Question Image" />
-    </div>
-}
+    @if (Model.Question.ImageName != null)
+    {
+        <div id="questionImage" class="text-center mt-5">
+            <img src="~/img/@Model.Question.ImageName" alt="Question Image" class="img-fluid" />
+        </div>
+    }
 
 <div id="form">
     @using (Html.BeginForm("Solve", "Question", FormMethod.Post))
@@ -32,9 +30,9 @@
         @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
         {
             <label class="option">
-                <input type="radio" name="selectedOption" value="@idx" /> @option
+                <input type="radio" name="selectedOption" value="@idx" />
+                <span class="option-text">@option</span>
             </label>
-            <br />
         }
 
         <button type="submit" id="submitButton">Submit</button>

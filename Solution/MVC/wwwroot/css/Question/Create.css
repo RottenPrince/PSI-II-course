@@ -1,6 +1,72 @@
-﻿th, td{
-    padding: 15px;
+﻿table {
+    border-collapse: collapse;
+    margin: 0 auto;
 }
-.answerOption{
-    margin: 10px;
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+h3 {
+    text-align: center;
+    font-size: 24px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#answerOptionsContainer {
+    margin-top: 10px;
+}
+
+.answerOption {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.answerOptionBox {
+    margin-left: 10px;
+}
+
+#addOption {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.removeOption {
+    background-color: darkorange;
+    color: #fff;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-left: 5px;
+}
+
+input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+#submit-check {
+    font-weight: bold;
+    text-align: center;
+    color: darkorange;
+}
+
+.return-button {
+    float: right;
 }

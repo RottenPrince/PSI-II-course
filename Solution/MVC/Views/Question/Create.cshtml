@@ -11,15 +11,14 @@
     <script src="~/js/Question/Create.js"></script>
 }
 
-<a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class=" btn btn-secondary">Return</a>
 
 <h3><strong>Create New Question</strong></h3>
 
-@using (Html.BeginForm("Create", "Question", FormMethod.Post))
+@using (Html.BeginForm("Create", "Question", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <table>
         <tr>
-            <td>Title: @Html.TextBoxFor(m => m.Title,  new { name = "Title" })</td>
+            <td colspan="2">Title: @Html.TextBoxFor(m => m.Title,  new { name = "Title" })</td>
         </tr>
         <tr>
             <td>Answer Options:</td>
@@ -32,8 +31,20 @@
                 <button type="button" id="addOption">Add Answer Option</button>
             </td>
         </tr>
+        
         <tr>
-            <td colspan="2"><input type="submit" value="Submit Question" /></td>
+            <td colspan="2">
+                <label>Question image: </label>
+                <input type="file" name="image">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" value="Submit Question" />
+            </td>
+            <td>
+                <a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class="return-button btn btn-secondary">Return</a>
+            </td>
         </tr>
     </table>
     <div id="submit-check"></div>

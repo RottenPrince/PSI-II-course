@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
+using SharedModels.Question;
 using SharedModels.Lobby;
 
 namespace MVC.Controllers
@@ -25,6 +26,13 @@ namespace MVC.Controllers
 
 
             return View();
+        }
+
+        [HttpGet]
+        public IActionResult AllRooms()
+        {
+            var rooms = APIHelper.Get<List<RoomModel>>("LobbyAPI/GetAllRooms", out _);
+            return View(rooms);
         }
     }
 }

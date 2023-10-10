@@ -6,7 +6,7 @@
         var optionHtml = `
                 <div class="answerOption">
                     <input type="radio" name="CorrectAnswerIndex" value="${optionCount}" />
-                    <input type="text" name="AnswerOptions[]" value="" />
+                    <input type="text" class="answerOptionBox" name="AnswerOptions[]" value="" />
                     <button type="button" class="removeOption">Remove</button>
                 </div>`;
 
