@@ -1,37 +1,54 @@
 using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
+using MVC.Helpers.API;
+using MVC.Models;
 
 namespace MVC.Controllers
 {
+    [Route("[controller]/[action]")]
     public class QuestionController : Controller
     {
-        public IActionResult Solve()
+        [HttpGet("{roomId}")]
+        public IActionResult Solve(string roomId)
         {
-            var questionName = APIHelper.Get<string>("api/QuestionAPI/GetRandomQuestionName", out _);
-            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{questionName}", out _);
+            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
+            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
 
-            ViewData["QuestionName"] = questionName; // TODO I don't like this
-            return View(questionModel);
+            ViewBag.RoomId = roomId;
+
+            return View(new SolveViewModel(questionModel, questionName));
         }
 
-        [HttpGet]
-        public IActionResult Create()
+        [HttpPost("{roomId}")]
+        public IActionResult Solve(string roomId, string questionName, int selectedOption)
+        {
+            var questionModel = APIHelper.Post<QuestionLocationModel, QuestionModelWithAnswer>("api/QuestionAPI/GetFullQuestion", new QuestionLocationModel(questionName, roomId), out APIError? error);
+
+            //TODO Error handling
+
+            return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId, selectedOption));
+        }
+
+        [HttpGet("{roomId}")]
+        public IActionResult Create(string roomId)
         {
             var questionModel = new QuestionModelWithAnswer();
 
+            ViewBag.RoomId = roomId;
+
             return View(questionModel);
         }
 
-        [HttpPost]
-        public IActionResult Create(QuestionModelWithAnswer sm)
+        [HttpPost("{roomId}")]
+        public IActionResult Create(string roomId, QuestionModelWithAnswer questionModel)
         {
-            
-            ViewBag.Title = sm.Question;
+            ViewBag.Title = questionModel.Title;
 
-            var response = APIHelper.Post<QuestionModelWithAnswer, string>("api/QuestionAPI/SaveQuestion", sm, out APIError? error);
+            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{roomId}", questionModel, out APIError? error);
 
             if (error == null)
             {
+                ViewBag.RoomId = roomId;
                 return View("CreateSuccess");
             }
             else

@@ -16,18 +16,18 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetQuestion/{question}")]
-        public IActionResult GetQuestion(string question)
+        [HttpGet("GetQuestion/{room}/{question}")]
+        public IActionResult GetQuestion(string room, string question)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(question, out var error);
+            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(room, question, out var error);
             if (error != null) return error;
             return Ok(questionModel);
         }
 
-        [HttpGet("GetRandomQuestionName")]
-        public IActionResult GetRandomQuestionName()
+        [HttpGet("GetRandomQuestionName/{room}")]
+        public IActionResult GetRandomQuestionName(string room)
         {
-            string[] questionFiles = QuestionDatabase.GetAllQuestionNames();
+            string[] questionFiles = QuestionDatabase.GetAllQuestionNames(room);
 
             if(questionFiles.Length == 0)
                 return NotFound("No questions found");
@@ -42,18 +42,18 @@ namespace API.Controllers
             return Ok(selectionQuestion);
         }
 
-        [HttpPost("CheckAnswer")]
-        public IActionResult CheckAnswer([FromBody] CheckAnswerModel model)
+        [HttpPost("{roomId}")]
+        public IActionResult GetFullQuestion([FromBody] QuestionLocationModel model)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.Name, out var error);
+            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.RoomId, model.Name, out var error);
             if (error != null)
                 return error;
 
-            return Ok(questionModel.CorrectAnswerIndex == model.Answer);
+            return Ok(questionModel);
         }
 
-        [HttpPost("SaveQuestion")]
-        public IActionResult SaveQuestion([FromBody] QuestionModelWithAnswer questionModel)
+        [HttpPost("SaveQuestion/{room}")]
+        public IActionResult SaveQuestion(string room, [FromBody] QuestionModelWithAnswer questionModel)
         {
             if (questionModel == null)
             {
@@ -62,7 +62,7 @@ namespace API.Controllers
 
             string uniqueIdentifier = Guid.NewGuid().ToString();
             string questionName = $"question_{uniqueIdentifier}";
-            QuestionDatabase.CreateNewQuestion(questionName, questionModel);
+            QuestionDatabase.CreateNewQuestion(room, questionName, questionModel);
 
             return Ok("Question created successfully.");
         }
