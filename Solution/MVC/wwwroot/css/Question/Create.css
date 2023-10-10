@@ -59,12 +59,14 @@ input[type="submit"] {
     padding: 8px 16px;
     cursor: pointer;
     border-radius: 4px;
-    margin-top: 10px;
 }
 
 #submit-check {
-    margin-top: 10px;
     font-weight: bold;
     text-align: center;
     color: darkorange;
+}
+
+.return-button {
+    float: right;
 }

@@ -11,7 +11,6 @@
     <script src="~/js/Question/Create.js"></script>
 }
 
-<a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class=" btn btn-secondary">Return</a>
 
 <h3><strong>Create New Question</strong></h3>
 
@@ -19,7 +18,7 @@
 {
     <table>
         <tr>
-            <td>Title: @Html.TextBoxFor(m => m.Title,  new { name = "Title" })</td>
+            <td colspan="2">Title: @Html.TextBoxFor(m => m.Title,  new { name = "Title" })</td>
         </tr>
         <tr>
             <td>Answer Options:</td>
@@ -40,7 +39,12 @@
             </td>
         </tr>
         <tr>
-            <td colspan="2"><input type="submit" value="Submit Question" /></td>
+            <td>
+                <input type="submit" value="Submit Question" />
+            </td>
+            <td>
+                <a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class="return-button btn btn-secondary">Return</a>
+            </td>
         </tr>
     </table>
     <div id="submit-check"></div>
