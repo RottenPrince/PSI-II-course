@@ -96,10 +96,8 @@ namespace API.Databases
             error = null;
 
             string roomName = System.IO.File.ReadAllText(roomNameFile);
-            
-            string roomPath = Path.Combine(_questionsFolder, room);
-            string[] questionFiles = Directory.GetFiles(roomPath, "question*.json");
-            int questionAmount = questionFiles.Length;
+
+            int questionAmount = GetAllQuestionNames(room).Length;
 
             return new RoomContentModel(questionAmount, roomName);
         }
