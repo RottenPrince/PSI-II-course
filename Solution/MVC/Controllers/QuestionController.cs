@@ -8,6 +8,13 @@ namespace MVC.Controllers
     [Route("[controller]/[action]")]
     public class QuestionController : Controller
     {
+        private readonly IWebHostEnvironment _host;
+
+        public QuestionController(IWebHostEnvironment host)
+        {
+            _host = host;
+        }
+
         [HttpGet("{roomId}")]
         public IActionResult Solve(string roomId)
         {
@@ -36,8 +43,29 @@ namespace MVC.Controllers
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult Create(string roomId, QuestionModelWithAnswer questionModel)
+        public IActionResult Create(string roomId, IFormFile image, QuestionModelWithAnswer questionModel)
         {
+            if(!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).ToList();
+                ViewBag.ErrorMessage = errors.First().ErrorMessage;
+                return View("CreateError");
+            }
+
+            if(image != null)
+            {
+                string extension = Path.GetExtension(image.FileName);
+                string guid = Guid.NewGuid().ToString();
+                string filename = $"{guid}.{extension}";
+                string savedImagePath = Path.Combine(_host.WebRootPath, "img", filename);
+                questionModel.ImageName = filename;
+
+                using(FileStream fs = System.IO.File.Create(savedImagePath))
+                {
+                    image.CopyTo(fs);
+                }
+            }
+
             ViewBag.Title = questionModel.Title;
 
             var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{roomId}", questionModel, out APIError? error);
