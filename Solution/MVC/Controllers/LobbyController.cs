@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
 using SharedModels.Question;
+using SharedModels.Lobby;
 
 namespace MVC.Controllers
 {
@@ -10,12 +11,13 @@ namespace MVC.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Room(string roomId)
         {
-            var roomName = APIHelper.Get<string>($"LobbyAPI/GetRoomName/{roomId}", out APIError? error);
+            var roomModel = APIHelper.Get<RoomContentModel>($"LobbyAPI/GetRoomContent/{roomId}", out APIError? error);
 
             if (error == null)
             {
-                ViewBag.RoomName = roomName;
-                ViewBag.Room = roomId;
+                ViewBag.RoomName = roomModel.RoomName;
+                ViewBag.QuestionAmount = roomModel.QuestionAmount;
+                ViewBag.RoomId = roomId;
             }
             else
             {
