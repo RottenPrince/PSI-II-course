@@ -47,7 +47,7 @@ namespace MVC.Controllers
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult Create(string roomId, IFormFile image, QuestionModelWithAnswer questionModel)
+        public IActionResult Create(string roomId, IFormFile? image, QuestionModelWithAnswer questionModel)
         {
             if(!ModelState.IsValid)
             {
