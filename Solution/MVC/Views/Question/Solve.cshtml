@@ -11,6 +11,8 @@
     <script src="~/js/Question/Solve.js"></script>
 }
 
+<a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class=" btn btn-secondary">Return</a>
+
 <div id="questionTitle">
     <h1>@Model.Question.Title</h1>
 </div>

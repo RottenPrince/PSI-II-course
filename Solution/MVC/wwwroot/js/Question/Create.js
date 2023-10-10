@@ -30,14 +30,15 @@
     $("form").submit(function (e) {
         var selectedRadio = $("input[name='CorrectAnswerIndex']:checked");
         var answerTextBoxes = $("input[name='AnswerOptions[]']");
+        var titleTextBox = $("input[name='Title']");
 
         var isAnyAnswerEmpty = answerTextBoxes.toArray().some(function (textBox) {
             return textBox.value.trim() === "";
         });
 
-        if (selectedRadio.length === 0 || isAnyAnswerEmpty) {
+        if (selectedRadio.length === 0 || isAnyAnswerEmpty || titleTextBox.val().trim() === "") {
             e.preventDefault();
-            $("#submit-check").html("Please fill in all answer fields and select a correct answer.");
+            $("#submit-check").html("Please fill in all fields and select a correct answer.");
         }
     });
 });

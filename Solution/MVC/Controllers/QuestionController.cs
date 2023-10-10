@@ -14,6 +14,8 @@ namespace MVC.Controllers
             var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
             var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
 
+            ViewBag.RoomId = roomId;
+
             return View(new SolveViewModel(questionModel, questionName));
         }
 
@@ -28,9 +30,11 @@ namespace MVC.Controllers
         }
 
         [HttpGet("{roomId}")]
-        public IActionResult Create()
+        public IActionResult Create(string roomId)
         {
             var questionModel = new QuestionModelWithAnswer();
+
+            ViewBag.RoomId = roomId;
 
             return View(questionModel);
         }
