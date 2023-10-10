@@ -29,6 +29,10 @@ input[type="text"] {
     margin-bottom: 10px;
 }
 
+.answerOptionBox {
+    margin-left: 10px;
+}
+
 #addOption {
     background-color: #007bff;
     color: #fff;

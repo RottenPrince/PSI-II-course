@@ -11,13 +11,9 @@
     <script src="~/js/Question/Solve.js"></script>
 }
 
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <div id="questionTitle" class="text-center mt-4">
-                    <h1>@Model.Question.Title</h1>
-            </div>
-        </div>
-    </div>
+<div id="questionTitle">
+    <h1>@Model.Question.Title</h1>
+</div>
 
     @if (Model.Question.ImageName != null)
     {
