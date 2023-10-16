@@ -24,6 +24,12 @@ namespace API.Controllers
             return Ok(QuestionDatabase.GetAllRooms());
         }
 
+        [HttpGet("GetAllQuestions/{room}")]
+        public IActionResult GetAllQuestions(string room)
+        {
+            return Ok(QuestionDatabase.GetAllQuestions(room));
+        }
+
         [HttpGet("{roomId}")]
         public IActionResult GetRoomContent(string roomId)
         {

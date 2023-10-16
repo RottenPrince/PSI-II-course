@@ -29,6 +29,16 @@ namespace API.Databases
                 .ToArray();
         }
 
+        public static List<QuestionModelWithAnswer?> GetAllQuestions(string room)
+        {
+            var questions = GetAllQuestionNames(room)
+                            .Select(x => GetQuestionWithAnswer(room, x, out _))
+                            .ToList();
+
+            questions.Sort();
+            return questions;
+        }
+
         public static int GetQuestionCountInRoom(string room)
         {
             return GetAllQuestionNames(room).Length;
