@@ -29,8 +29,16 @@ namespace API.Databases
                 .ToArray();
         }
 
+        public static int GetQuestionCountInRoom(string room)
+        {
+            return GetAllQuestionNames(room).Length;
+        }
+
         public static void CreateNewQuestion(string room, string questionName, QuestionModelWithAnswer questionModel)
         {
+            int newQuestionIndex = GetQuestionCountInRoom(room);
+            questionModel.QuestionIndex = newQuestionIndex;
+
             string jsonQuestion = JsonConvert.SerializeObject(questionModel);
             string fileName = $"{questionName}{_questionDBExtension}";
 
@@ -79,7 +87,7 @@ namespace API.Databases
 
             string roomName = System.IO.File.ReadAllText(roomNameFile);
 
-            int questionAmount = GetAllQuestionNames(room).Length;
+            int questionAmount = GetQuestionCountInRoom(room);
 
             return new RoomContentModel(questionAmount, roomName);
         }
