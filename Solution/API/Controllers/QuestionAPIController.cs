@@ -1,6 +1,6 @@
 ﻿using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using API.Databases;
+using API.Managers;
 
 namespace API.Controllers
 {
@@ -19,7 +19,7 @@ namespace API.Controllers
         [HttpGet("GetQuestion/{room}/{question}")]
         public IActionResult GetQuestion(string room, string question)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithoutAnswer(room, question, out var error);
+            var questionModel = QuestionManager.GetQuestionWithoutAnswer(room, question, out var error);
             if (error != null) return error;
             return Ok(questionModel);
         }
@@ -27,7 +27,7 @@ namespace API.Controllers
         [HttpGet("GetRandomQuestionName/{room}")]
         public IActionResult GetRandomQuestionName(string room)
         {
-            string[] questionFiles = QuestionDatabase.GetAllQuestionNames(room);
+            string[] questionFiles = QuestionManager.GetAllQuestionNames(room);
 
             if(questionFiles.Length == 0)
                 return NotFound("No questions found");
@@ -45,7 +45,7 @@ namespace API.Controllers
         [HttpPost("{roomId}")]
         public IActionResult GetFullQuestion([FromBody] QuestionLocationModel model)
         {
-            var questionModel = QuestionDatabase.GetQuestionWithAnswer(model.RoomId, model.Name, out var error);
+            var questionModel = QuestionManager.GetQuestionWithAnswer(model.RoomId, model.Name, out var error);
             if (error != null)
                 return error;
 
@@ -62,7 +62,7 @@ namespace API.Controllers
 
             string uniqueIdentifier = Guid.NewGuid().ToString();
             string questionName = $"question_{uniqueIdentifier}";
-            QuestionDatabase.CreateNewQuestion(room, questionName, questionModel);
+            QuestionManager.CreateNewQuestion(room, questionName, questionModel);
 
             return Ok("Question created successfully.");
         }

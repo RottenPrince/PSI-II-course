@@ -1,6 +1,6 @@
 ﻿using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using API.Databases;
+using API.Managers;
 using SharedModels.Lobby;
 
 namespace API.Controllers
@@ -11,7 +11,7 @@ namespace API.Controllers
         [HttpGet ("{room}")]
         public IActionResult GetRoomName(string room)
         {
-            var roomName = QuestionDatabase.GetRoomName(room, out var error);
+            var roomName = QuestionManager.GetRoomName(room, out var error);
             if (error != null)
                 return error;
 
@@ -21,19 +21,19 @@ namespace API.Controllers
         [HttpGet]
         public IActionResult GetAllRooms()
         {
-            return Ok(QuestionDatabase.GetAllRooms());
+            return Ok(QuestionManager.GetAllRooms());
         }
 
-        [HttpGet("GetAllQuestions/{room}")]
+        [HttpGet("{room}")]
         public IActionResult GetAllQuestions(string room)
         {
-            return Ok(QuestionDatabase.GetAllQuestions(room));
+            return Ok(QuestionManager.GetAllQuestions(room));
         }
 
         [HttpGet("{roomId}")]
         public IActionResult GetRoomContent(string roomId)
         {
-            var roomModel = QuestionDatabase.GetRoomContent(roomId, out var error);
+            var roomModel = QuestionManager.GetRoomContent(roomId, out var error);
             if (error != null)
                 return error;
 

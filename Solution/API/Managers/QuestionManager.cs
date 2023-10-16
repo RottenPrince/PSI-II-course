@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 using SharedModels.Question;
 using SharedModels.Lobby;
 
-namespace API.Databases
+namespace API.Managers
 {
-    public static class QuestionDatabase
+    public static class QuestionManager
     {
         private static readonly string _questionsFolder = "../../questions";
         private static readonly string _questionDBExtension = ".json";
