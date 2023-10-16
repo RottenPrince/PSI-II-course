@@ -1,8 +1,8 @@
 ﻿namespace SharedModels.Lobby
 {
-    public class RoomContentModel
+    public struct RoomContentStruct
     {
-        public RoomContentModel(int questionAmount, string roomName)
+        public RoomContentStruct(int questionAmount, string roomName)
         {
             QuestionAmount = questionAmount;
             RoomName = roomName;

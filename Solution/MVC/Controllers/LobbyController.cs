@@ -11,12 +11,12 @@ namespace MVC.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Room(string roomId)
         {
-            var roomModel = APIHelper.Get<RoomContentModel>($"LobbyAPI/GetRoomContent/{roomId}", out APIError? error);
+            var roomContent = APIHelper.Get<RoomContentStruct>($"LobbyAPI/GetRoomContent/{roomId}", out APIError? error);
 
             if (error == null)
             {
-                ViewBag.RoomName = roomModel.RoomName;
-                ViewBag.QuestionAmount = roomModel.QuestionAmount;
+                ViewBag.RoomName = roomContent.RoomName;
+                ViewBag.QuestionAmount = roomContent.QuestionAmount;
                 ViewBag.RoomId = roomId;
             }
             else
