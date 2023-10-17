@@ -33,8 +33,8 @@ namespace API.Managers
         public static List<QuestionModelWithAnswer?> GetAllQuestions(string room)
         {
             var questions = GetAllQuestionNames(room)
-                            .Select(x => GetQuestionWithAnswer(room, x, out _))
-                            .ToList();
+                .Select(x => GetQuestionWithAnswer(room, x, out _))
+                .ToList();
 
             questions.Sort();
             return questions;
@@ -78,10 +78,10 @@ namespace API.Managers
             DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder);
             return dirinfo.GetDirectories()
                 .Select(d => new RoomModel
-                {
-                    Id = d.Name,
-                    Name = File.ReadAllText(Path.Combine(d.FullName, "room.txt")).Trim()
-                });
+                        {
+                        Id = d.Name,
+                        Name = File.ReadAllText(Path.Combine(d.FullName, "room.txt")).Trim()
+                        });
         }
 
         public static RoomContentModel? GetRoomContent(string room, out ActionResult? error)
@@ -107,7 +107,7 @@ namespace API.Managers
         {
             if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
             {
-				error = QuestionParsingError.DisallowedCharacterInName;
+                error = QuestionParsingError.DisallowedCharacterInName;
                 return null;
             }
 
@@ -115,7 +115,7 @@ namespace API.Managers
 
             if (!System.IO.File.Exists(questionModelFile))
             {
-				error = QuestionParsingError.QuestionNotFound;
+                error = QuestionParsingError.QuestionNotFound;
                 return null;
             }
 
@@ -124,7 +124,7 @@ namespace API.Managers
             var questionModel = JsonConvert.DeserializeObject<T>(questionModelText);
             if(questionModel == null)
             {
-				error = QuestionParsingError.FailedDeserialization;
+                error = QuestionParsingError.FailedDeserialization;
                 return null;
             }
 
