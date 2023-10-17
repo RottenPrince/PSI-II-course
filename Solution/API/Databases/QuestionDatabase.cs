@@ -43,15 +43,17 @@ namespace API.Databases
         public static string? GetRoomName(string room, out ActionResult? error)
         {
             string roomNameFile = Path.Combine(_questionsFolder, room, "room.txt");
-
             if (!System.IO.File.Exists(roomNameFile))
             {
                 error = new NotFoundObjectResult("Room name file not found");
                 return null;
             }
 
-            error = null;
-            return  System.IO.File.ReadAllText(roomNameFile);
+            using (StreamReader reader = new StreamReader(roomNameFile))
+            {
+                error = null;
+                return reader.ReadToEnd();
+            }
         }
 
         public static IEnumerable<RoomModel> GetAllRooms()
