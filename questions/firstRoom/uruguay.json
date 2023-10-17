@@ -4,8 +4,9 @@
 		"Monterey",
 		"New Uruguay",
 		"Montevideo",
-		"Panama City",
+		"Panama City"
 	],
 	"correctAnswerIndex": 2,
 	"imageName": "uruguay.jpg",
+	"questionIndex": 0
 }

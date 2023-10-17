@@ -2,20 +2,21 @@
 using Newtonsoft.Json;
 using SharedModels.Question;
 using SharedModels.Lobby;
+using API.Enums.QuestionManager;
 
-namespace API.Databases
+namespace API.Managers
 {
-    public static class QuestionDatabase
+    public static class QuestionManager
     {
         private static readonly string _questionsFolder = "../../questions";
         private static readonly string _questionDBExtension = ".json";
 
-        public static QuestionModel? GetQuestionWithoutAnswer(string room, string questionName, out ActionResult? error)
+        public static QuestionModel? GetQuestionWithoutAnswer(string room, string questionName, out QuestionParsingError? error)
         {
             return ParseQuestionFromDatabase<QuestionModel>(room, questionName, out error);
         }
 
-        public static QuestionModelWithAnswer? GetQuestionWithAnswer(string roomId, string questionName, out ActionResult? error)
+        public static QuestionModelWithAnswer? GetQuestionWithAnswer(string roomId, string questionName, out QuestionParsingError? error)
         {
             return ParseQuestionFromDatabase<QuestionModelWithAnswer>(roomId, questionName, out error);
         }
@@ -29,8 +30,26 @@ namespace API.Databases
                 .ToArray();
         }
 
+        public static List<QuestionModelWithAnswer?> GetAllQuestions(string room)
+        {
+            var questions = GetAllQuestionNames(room)
+                .Select(x => GetQuestionWithAnswer(room, x, out _))
+                .ToList();
+
+            questions.Sort();
+            return questions;
+        }
+
+        public static int GetQuestionCountInRoom(string room)
+        {
+            return GetAllQuestionNames(room).Length;
+        }
+
         public static void CreateNewQuestion(string room, string questionName, QuestionModelWithAnswer questionModel)
         {
+            int newQuestionIndex = GetQuestionCountInRoom(room);
+            questionModel.QuestionIndex = newQuestionIndex;
+
             string jsonQuestion = JsonConvert.SerializeObject(questionModel);
             string fileName = $"{questionName}{_questionDBExtension}";
 
@@ -61,10 +80,10 @@ namespace API.Databases
             DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder);
             return dirinfo.GetDirectories()
                 .Select(d => new RoomModel
-                {
-                    Id = d.Name,
-                    Name = File.ReadAllText(Path.Combine(d.FullName, "room.txt")).Trim()
-                });
+                        {
+                        Id = d.Name,
+                        Name = File.ReadAllText(Path.Combine(d.FullName, "room.txt")).Trim()
+                        });
         }
 
         public static RoomContentStruct? GetRoomContent(string room, out ActionResult? error)
@@ -81,16 +100,16 @@ namespace API.Databases
 
             string roomName = System.IO.File.ReadAllText(roomNameFile);
 
-            int questionAmount = GetAllQuestionNames(room).Length;
+            int questionAmount = GetQuestionCountInRoom(room);
 
             return new RoomContentStruct(questionAmount, roomName);
         }
 
-        private static T? ParseQuestionFromDatabase<T>(string room, string question, out ActionResult? error) where T: QuestionModel
+        private static T? ParseQuestionFromDatabase<T>(string room, string question, out QuestionParsingError? error) where T: QuestionModel
         {
             if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
             {
-                error = new BadRequestObjectResult("Question name should only contain alphanumeric characters, dashes and underscores");
+                error = QuestionParsingError.DisallowedCharacterInName;
                 return null;
             }
 
@@ -98,7 +117,7 @@ namespace API.Databases
 
             if (!System.IO.File.Exists(questionModelFile))
             {
-                error = new NotFoundObjectResult("Question not found with given name");
+                error = QuestionParsingError.QuestionNotFound;
                 return null;
             }
 
@@ -107,7 +126,7 @@ namespace API.Databases
             var questionModel = JsonConvert.DeserializeObject<T>(questionModelText);
             if(questionModel == null)
             {
-                error = new UnprocessableEntityObjectResult("Failed deserializing question");
+                error = QuestionParsingError.FailedDeserialization;
                 return null;
             }
 
