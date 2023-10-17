@@ -65,7 +65,7 @@ namespace API.Databases
                 });
         }
 
-        public static RoomContentModel? GetRoomContent(string room, out ActionResult? error)
+        public static RoomContentStruct? GetRoomContent(string room, out ActionResult? error)
         {
             string roomNameFile = Path.Combine(_questionsFolder, room, "room.txt");
 
@@ -81,7 +81,7 @@ namespace API.Databases
 
             int questionAmount = GetAllQuestionNames(room).Length;
 
-            return new RoomContentModel(questionAmount, roomName);
+            return new RoomContentStruct(questionAmount, roomName);
         }
 
         private static T? ParseQuestionFromDatabase<T>(string room, string question, out ActionResult? error) where T: QuestionModel
