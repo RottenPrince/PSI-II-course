@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace SharedModels.Question
 {
-    public class RoomModel
+    public record class RoomModel
     {
-        public string Name { get; set; }
-        public string Id { get; set; }
+        public string Name { get; init; }
+        public string Id { get; init; }
     }
 }
