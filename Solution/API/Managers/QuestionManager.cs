@@ -62,15 +62,17 @@ namespace API.Managers
         public static string? GetRoomName(string room, out ActionResult? error)
         {
             string roomNameFile = Path.Combine(_questionsFolder, room, "room.txt");
-
             if (!System.IO.File.Exists(roomNameFile))
             {
                 error = new NotFoundObjectResult("Room name file not found");
                 return null;
             }
 
-            error = null;
-            return  System.IO.File.ReadAllText(roomNameFile);
+            using (StreamReader reader = new StreamReader(roomNameFile))
+            {
+                error = null;
+                return reader.ReadToEnd();
+            }
         }
 
         public static IEnumerable<RoomModel> GetAllRooms()
@@ -84,7 +86,7 @@ namespace API.Managers
                         });
         }
 
-        public static RoomContentModel? GetRoomContent(string room, out ActionResult? error)
+        public static RoomContentStruct? GetRoomContent(string room, out ActionResult? error)
         {
             string roomNameFile = Path.Combine(_questionsFolder, room, "room.txt");
 
@@ -100,7 +102,7 @@ namespace API.Managers
 
             int questionAmount = GetQuestionCountInRoom(room);
 
-            return new RoomContentModel(questionAmount, roomName);
+            return new RoomContentStruct(questionAmount, roomName);
         }
 
         private static T? ParseQuestionFromDatabase<T>(string room, string question, out QuestionParsingError? error) where T: QuestionModel

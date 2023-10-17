@@ -32,6 +32,11 @@ namespace MVC.Controllers
             var questionModel = APIHelper.Post<QuestionLocationModel, QuestionModelWithAnswer>("api/QuestionAPI/GetFullQuestion", new QuestionLocationModel(questionName, roomId), out APIError? error);
 
             //TODO Error handling
+            if(questionModel.CorrectAnswerIndex == selectedOption)
+            {
+                return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId));
+
+            }
 
             return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId, selectedOption));
         }

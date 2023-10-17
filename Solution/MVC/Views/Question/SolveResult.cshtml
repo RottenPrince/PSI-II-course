@@ -18,13 +18,17 @@
     </div>
 }
 
+
+
 <div>
-    @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
-    {
-        <div class="answer-option @((idx == Model.Question.CorrectAnswerIndex) ? "correct" : (idx == Model.SelectedOption) ? "selected" : "")">
-            @option
-        </div>
-    }
+
+<div>
+        @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
+        {
+            <div class="answer-option @((idx == Model.Question.CorrectAnswerIndex) ? "correct" : (Model.WrongAnswerIndex.HasValue && idx == Model.WrongAnswerIndex) ? "selected" : "")">
+                @option
+            </div>
+        }
 </div>
 
 
