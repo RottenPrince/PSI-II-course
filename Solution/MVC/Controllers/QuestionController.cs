@@ -38,7 +38,7 @@ namespace MVC.Controllers
 
             }
 
-            return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId, selectedOption));
+            return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId, wrongAnswerIndex: selectedOption));
         }
 
         [HttpGet("{roomId}")]
