@@ -1,6 +1,17 @@
+using API.Data;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// ONE WAY TO DEFINE DB PATH
+//var connectionString = builder.Configuration.GetConnectionString("SqLiteConnection");
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseSqlite(connectionString));
+
+builder.Services.AddDbContext<AppDbContext>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
