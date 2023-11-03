@@ -2,9 +2,9 @@
 
 namespace SharedModels.Question
 {
-    public class QuestionModel : IComparable<QuestionModel>
+    public class QuestionTransferModel : IComparable<QuestionTransferModel>
     {
-        public QuestionModel()
+        public QuestionTransferModel()
         {
             AnswerOptions = new List<string>();
         }
@@ -17,7 +17,7 @@ namespace SharedModels.Question
         public int QuestionIndex { get; set; }
         public string? ImageName { get; set; }
 
-        public int CompareTo(QuestionModel? other)
+        public int CompareTo(QuestionTransferModel? other)
         {
             if(other == null)
             {

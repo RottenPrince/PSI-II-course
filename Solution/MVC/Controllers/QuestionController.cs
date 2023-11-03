@@ -19,7 +19,7 @@ namespace MVC.Controllers
         public IActionResult Solve(string roomId)
         {
             var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
-            var questionModel = APIHelper.Get<QuestionModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
+            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
 
             ViewBag.RoomId = roomId;
 
@@ -29,7 +29,7 @@ namespace MVC.Controllers
         [HttpPost("{roomId}")]
         public IActionResult Solve(string roomId, string questionName, int selectedOption)
         {
-            var questionModel = APIHelper.Post<QuestionLocationModel, QuestionModelWithAnswer>("api/QuestionAPI/GetFullQuestion", new QuestionLocationModel(questionName, roomId), out APIError? error);
+            var questionModel = APIHelper.Post<QuestionLocationTransferModel, QuestionWithAnswerTransferModel>("api/QuestionAPI/GetFullQuestion", new QuestionLocationTransferModel(questionName, roomId), out APIError? error);
 
             //TODO Error handling
             if(questionModel.CorrectAnswerIndex == selectedOption)
@@ -44,7 +44,7 @@ namespace MVC.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Create(string roomId)
         {
-            var questionModel = new QuestionModelWithAnswer();
+            var questionModel = new QuestionWithAnswerTransferModel();
 
             ViewBag.RoomId = roomId;
 
@@ -52,7 +52,7 @@ namespace MVC.Controllers
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult Create(string roomId, IFormFile? image, QuestionModelWithAnswer questionModel)
+        public IActionResult Create(string roomId, IFormFile? image, QuestionWithAnswerTransferModel questionModel)
         {
             if(!ModelState.IsValid)
             {
@@ -77,7 +77,7 @@ namespace MVC.Controllers
 
             ViewBag.Title = questionModel.Title;
 
-            var response = APIHelper.Post<QuestionModelWithAnswer, string>($"api/QuestionAPI/SaveQuestion/{roomId}", questionModel, out APIError? error);
+            var response = APIHelper.Post<QuestionWithAnswerTransferModel, string>($"api/QuestionAPI/SaveQuestion/{roomId}", questionModel, out APIError? error);
 
             if (error == null)
             {

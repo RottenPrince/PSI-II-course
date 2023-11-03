@@ -1,26 +1,30 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SharedModels.Database;
+using API.Models;
 
 namespace API.Data
 {
     public class AppDbContext : DbContext
     {
+        public AppDbContext() : base()
+        {
+        }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
-        public DbSet<Room> Rooms { get; set; }
-        public DbSet<Question> Questions { get; set; }
-        public DbSet<AnswerOption> AnswerOptions { get; set; }
+        public DbSet<RoomModel> Rooms { get; set; }
+        public DbSet<QuestionModel> Questions { get; set; }
+        public DbSet<AnswerOptionModel> AnswerOptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Room>()
+            modelBuilder.Entity<RoomModel>()
                 .HasMany(room => room.Questions)
                 .WithOne(question => question.Room)
                 .HasForeignKey(question => question.RoomId);
 
-            modelBuilder.Entity<Question>()
+            modelBuilder.Entity<QuestionModel>()
                 .HasMany(question => question.AnswerOptions)
                 .WithOne(option => option.Question)
                 .HasForeignKey(option => option.QuestionId);

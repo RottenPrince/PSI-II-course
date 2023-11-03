@@ -31,7 +31,7 @@ namespace MVC.Controllers
         [HttpGet]
         public IActionResult AllRooms()
         {
-            var rooms = APIHelper.Get<List<RoomModel>>("LobbyAPI/GetAllRooms", out _);
+            var rooms = APIHelper.Get<List<RoomTransferModel>>("LobbyAPI/GetAllRooms", out _);
             return View(rooms);
         }
     }

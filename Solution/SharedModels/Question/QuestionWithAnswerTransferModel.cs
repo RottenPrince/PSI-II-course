@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace SharedModels.Question
 {
-    public class QuestionModelWithAnswer : QuestionModel
+    public class QuestionWithAnswerTransferModel : QuestionTransferModel
     {
-        public QuestionModelWithAnswer() : base() { }
+        public QuestionWithAnswerTransferModel() : base() { }
 
         [Required]
-        public int? CorrectAnswerIndex { get; set; }
+        public int CorrectAnswerIndex { get; set; }
     }
 }

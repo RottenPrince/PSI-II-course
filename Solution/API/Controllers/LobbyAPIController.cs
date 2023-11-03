@@ -8,13 +8,10 @@ namespace API.Controllers
     [Route("[controller]/[action]")]
     public class LobbyAPIController : Controller
     {
-        [HttpGet ("{room}")]
-        public IActionResult GetRoomName(string room)
+        [HttpGet ("{roomId}")]
+        public IActionResult GetRoomName(int roomId)
         {
-            var roomName = QuestionManager.GetRoomName(room, out var error);
-            if (error != null)
-                return error;
-
+            var roomName = QuestionManager.GetRoomName(roomId);
             return Ok(roomName);
         }
 
@@ -24,19 +21,16 @@ namespace API.Controllers
             return Ok(QuestionManager.GetAllRooms());
         }
 
-        [HttpGet("{room}")]
-        public IActionResult GetAllQuestions(string room)
+        [HttpGet("{roomId}")]
+        public IActionResult GetAllQuestions(int roomId)
         {
-            return Ok(QuestionManager.GetAllQuestions(room));
+            return Ok(QuestionManager.GetAllQuestions(roomId));
         }
 
         [HttpGet("{roomId}")]
-        public IActionResult GetRoomContent(string roomId)
+        public IActionResult GetRoomContent(int roomId)
         {
-            var roomModel = QuestionManager.GetRoomContent(roomId, out var error);
-            if (error != null)
-                return error;
-
+            var roomModel = QuestionManager.GetRoomContent(roomId);
             return Ok(roomModel);
         }
     }

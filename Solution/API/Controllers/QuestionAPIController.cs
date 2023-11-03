@@ -1,7 +1,6 @@
 ﻿using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using API.Managers;
-using API.Enums.QuestionManager;
 
 namespace API.Controllers
 {
@@ -17,79 +16,48 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetQuestion/{room}/{question}")]
-        public IActionResult GetQuestion(string room, string question)
+        [HttpGet("GetQuestion/{roomId}/{questionId}")]
+        public IActionResult GetQuestion(int roomId, int questionInd)
         {
-            var questionModel = QuestionManager.GetQuestionWithoutAnswer(room, question, out QuestionParsingError? error);
-            if (error != null) {
-                return ConvertErrorToResponse(error.Value);
-            }
-
+            var questionModel = QuestionManager.GetQuestionWithAnswer(roomId);
             return Ok(questionModel);
         }
 
-        [HttpGet("GetRandomQuestionName/{room}")]
-        public IActionResult GetRandomQuestionName(string room)
+        [HttpGet("GetRandomQuestionName/{roomId}")]
+        public IActionResult GetRandomQuestionName(int roomId)
         {
-            string[] questionFiles = QuestionManager.GetAllQuestionNames(room);
+            int[] questionIds = QuestionManager.GetAllQuestionIds(roomId);
 
-            if(questionFiles.Length == 0)
+            if(questionIds.Length == 0)
                 return NotFound("No questions found");
 
             int randomIndex;
             lock(random)
             {
-                randomIndex = random.Next(0, questionFiles.Length);
+                randomIndex = random.Next(0, questionIds.Length);
             }
 
-            string selectionQuestion = questionFiles[randomIndex];
+            int selectionQuestion = questionIds[randomIndex];
             return Ok(selectionQuestion);
         }
 
-        [HttpPost("{roomId}")]
-        public IActionResult GetFullQuestion([FromBody] QuestionLocationModel model)
+        [HttpPost("{questionId}")]
+        public IActionResult GetFullQuestion([FromBody] int questionId)
         {
-            var questionModel = QuestionManager.GetQuestionWithAnswer(model.RoomId, model.Name, out var error);
-            if (error != null) {
-                return ConvertErrorToResponse(error.Value);
-            }
-
+            var questionModel = QuestionManager.GetQuestionWithAnswer(questionId);
             return Ok(questionModel);
         }
 
-        [HttpPost("SaveQuestion/{room}")]
-        public IActionResult SaveQuestion(string room, [FromBody] QuestionModelWithAnswer questionModel)
+        [HttpPost("SaveQuestion/{roomId}")]
+        public IActionResult SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
         {
             if (questionModel == null)
             {
                 return BadRequest("Question data is null.");
             }
 
-            string uniqueIdentifier = Guid.NewGuid().ToString();
-            string questionName = $"question_{uniqueIdentifier}";
-            QuestionManager.CreateNewQuestion(room, questionName, questionModel);
-
+            QuestionManager.CreateNewQuestion(roomId, questionModel);
             return Ok("Question created successfully.");
-        }
-
-        private IActionResult ConvertErrorToResponse(QuestionParsingError error)
-        {
-            switch(error) {
-                case QuestionParsingError.DisallowedCharacterInName:
-                    {
-                        return BadRequest("Question name should only contain alphanumeric characters, dashes and underscores");
-                    }
-                case QuestionParsingError.QuestionNotFound:
-                    {
-                        return NotFound("Question not found.");
-                    }
-                case QuestionParsingError.FailedDeserialization:
-                    {
-                        return UnprocessableEntity("Question name should only contain alphanumeric characters, dashes and underscores");
-                    }
-                default:
-                    throw new Exception("Not all enum cases are handled");
-            }
         }
     }
 }
