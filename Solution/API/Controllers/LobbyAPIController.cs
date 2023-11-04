@@ -4,6 +4,8 @@ using API.Managers;
 using SharedModels.Lobby;
 using API.Data;
 using API.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace API.Controllers
 {
@@ -28,14 +30,18 @@ namespace API.Controllers
         {
             using(var db = new AppDbContext())
             {
-                var newModel = new RoomModel { Name = roomName };
-                if(db.Rooms.Where(r => r.Name == roomName).Count() != 0)
-                {
-                    return BadRequest("Name already taken");
-                }
-
                 db.Rooms.Add(new RoomModel { Name = roomName });
-                db.SaveChanges();
+                try
+                {
+                    db.SaveChanges();
+                } catch (DbUpdateException ex) {
+                    var message = ex.InnerException.Message;
+                    var errorCode = Regex.Match(message, "^.*Error (\\d+):.*$");
+                    if(!errorCode.Success || errorCode.Groups.Count < 2) { throw ex; }
+                    var errorCodeInt = int.Parse(errorCode.Groups[1].Value);
+                    if(errorCodeInt == 19) { return BadRequest("Name already in use"); }
+                    else { throw ex; }
+                }
                 return Ok("Room successfully added");
             }
         }

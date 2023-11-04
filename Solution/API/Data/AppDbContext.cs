@@ -24,6 +24,10 @@ namespace API.Data
                 .WithOne(question => question.Room)
                 .HasForeignKey(question => question.RoomId);
 
+            modelBuilder.Entity<RoomModel>()
+                .HasIndex(room => room.Name)
+                .IsUnique();
+
             modelBuilder.Entity<QuestionModel>()
                 .HasMany(question => question.AnswerOptions)
                 .WithOne(option => option.Question)
