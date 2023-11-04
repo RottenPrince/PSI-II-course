@@ -2,6 +2,10 @@
 {
     public class QuestionModel
     {
+        public QuestionModel()
+        {
+            AnswerOptions = new List<AnswerOptionModel>();
+        }
         public int Id { get; set; }
 
         public string Title { get; set; }

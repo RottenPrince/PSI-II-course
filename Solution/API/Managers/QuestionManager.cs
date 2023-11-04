@@ -20,7 +20,7 @@ namespace API.Managers
         {
             using(var db = new AppDbContext())
             {
-                var roomModel = db.Rooms.Find(roomId);
+                var roomModel = db.Rooms.Include(q => q.Questions).First(q => q.Id == roomId);
                 return roomModel?.Questions.Select(q => q.Id).ToArray();
             }
         }
@@ -29,7 +29,7 @@ namespace API.Managers
         {
             using(var db = new AppDbContext())
             {
-                var roomModel = db.Rooms.Find(roomId);
+                var roomModel = db.Rooms.Include(q => q.Questions).First(q => q.Id == roomId);
                 return roomModel.Questions.Select(q => new QuestionWithAnswerTransferModel
                 {
                     Title = q.Title,
@@ -102,7 +102,7 @@ namespace API.Managers
         {
             using(var db = new AppDbContext())
             {
-                var roomModel = await db.Rooms.FindAsync(roomId);
+                var roomModel = await db.Rooms.Include(q => q.Questions).Where(q => q.Id == roomId).FirstAsync();
                 if(roomModel == null)
                 {
                     return null;

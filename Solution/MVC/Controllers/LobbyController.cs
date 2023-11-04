@@ -34,5 +34,24 @@ namespace MVC.Controllers
             var rooms = APIHelper.Get<List<RoomTransferModel>>("LobbyAPI/GetAllRooms", out _);
             return View(rooms);
         }
+
+        [HttpGet]
+        public IActionResult CreateRoom()
+        {
+            return View("Create");
+        }
+
+        [HttpPost]
+        public IActionResult CreateRoom(string roomName)
+        {
+            APIHelper.Post<string, string>("LobbyAPI/CreateRoom", roomName, out var error);
+            ViewBag.RoomName = roomName;
+            if(error != null)
+            {
+                ViewBag.ErrorMessage = error.Message;
+                return View("CreateError");
+            }
+            return View("CreateSuccess");
+        }
     }
 }
