@@ -17,9 +17,9 @@ namespace API.Controllers
         }
 
         [HttpGet("GetQuestion/{roomId}/{questionId}")]
-        public IActionResult GetQuestion(int roomId, int questionInd)
+        public IActionResult GetQuestion(int questionId)
         {
-            var questionModel = QuestionManager.GetQuestionWithAnswer(roomId);
+            var questionModel = QuestionManager.GetQuestionWithAnswer(questionId);
             return Ok(questionModel);
         }
 
@@ -37,8 +37,8 @@ namespace API.Controllers
                 randomIndex = random.Next(0, questionIds.Length);
             }
 
-            int selectionQuestion = questionIds[randomIndex];
-            return Ok(selectionQuestion);
+            int selectionQuestionId = questionIds[randomIndex];
+            return Ok(selectionQuestionId);
         }
 
         [HttpPost("{questionId}")]

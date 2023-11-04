@@ -18,27 +18,27 @@ namespace MVC.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Solve(string roomId)
         {
-            var questionName = APIHelper.Get<string>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
-            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/QuestionAPI/GetQuestion/{roomId}/{questionName}", out _);
+            var questionId = APIHelper.Get<int>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
+            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/QuestionAPI/GetQuestion/{questionId}", out _);
 
             ViewBag.RoomId = roomId;
 
-            return View(new SolveViewModel(questionModel, questionName));
+            return View(new SolveViewModel(questionModel, questionId));
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult Solve(string roomId, string questionName, int selectedOption)
+        public IActionResult Solve(string roomId, int questionId, int selectedOption)
         {
-            var questionModel = APIHelper.Post<QuestionLocationTransferModel, QuestionWithAnswerTransferModel>("api/QuestionAPI/GetFullQuestion", new QuestionLocationTransferModel(questionName, roomId), out APIError? error);
+            var questionModel = APIHelper.Post<int, QuestionWithAnswerTransferModel>("api/QuestionAPI/GetFullQuestion", questionId, out APIError? error);
 
             //TODO Error handling
             if(questionModel.CorrectAnswerIndex == selectedOption)
             {
-                return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId));
+                return View("SolveResult", new SolveResultViewModel(questionModel, questionId, roomId)); //questionId possibly not needed
 
             }
 
-            return View("SolveResult", new SolveResultViewModel(questionModel, questionName, roomId, wrongAnswerIndex: selectedOption));
+            return View("SolveResult", new SolveResultViewModel(questionModel, questionId, roomId, wrongAnswerIndex: selectedOption));
         }
 
         [HttpGet("{roomId}")]

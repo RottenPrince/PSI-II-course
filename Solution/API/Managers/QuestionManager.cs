@@ -86,13 +86,15 @@ namespace API.Managers
 
         public static IEnumerable<RoomTransferModel> GetAllRooms()
         {
-            using(var db = new AppDbContext())
+            using (var db = new AppDbContext())
             {
-                return db.Rooms.Select(r => new RoomTransferModel
-                {
-                    Id = r.Id,
-                    Name = r.Name,
-                });
+                return db.Rooms
+                         .Select(r => new RoomTransferModel
+                         {
+                             Id = r.Id,
+                             Name = r.Name,
+                         })
+                         .ToList();
             }
         }
 

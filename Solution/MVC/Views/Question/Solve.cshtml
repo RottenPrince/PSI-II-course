@@ -25,7 +25,7 @@
 <div id="form">
     @using (Html.BeginForm("Solve", "Question", FormMethod.Post))
     {
-        <input type="hidden" name="questionName" value="@Model.QuestionName" />
+        <input type="hidden" name="questionId" value="@Model.QuestionId" />
         
         @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
         {
