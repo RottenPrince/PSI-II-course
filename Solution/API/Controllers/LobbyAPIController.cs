@@ -7,26 +7,13 @@ using API.Models;
 
 namespace API.Controllers
 {
-    [Route("[controller]/[action]")]
+    [Route("api/Lobby/[action]")]
     public class LobbyAPIController : Controller
     {
-        [HttpGet ("{roomId}")]
-        public IActionResult GetRoomName(int roomId)
-        {
-            var roomName = QuestionManager.GetRoomName(roomId);
-            return Ok(roomName);
-        }
-
         [HttpGet]
         public IActionResult GetAllRooms()
         {
             return Ok(QuestionManager.GetAllRooms());
-        }
-
-        [HttpGet("{roomId}")]
-        public IActionResult GetAllQuestions(int roomId)
-        {
-            return Ok(QuestionManager.GetAllQuestions(roomId));
         }
 
         [HttpGet("{roomId}")]

@@ -4,7 +4,7 @@ using API.Managers;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Question/[action]")]
     [ApiController]
     public class QuestionAPIController : ControllerBase
     {
@@ -16,14 +16,14 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetQuestion/{questionId}")]
+        [HttpGet("{questionId}")]
         public async Task<IActionResult> GetQuestion(int questionId)
         {
             var questionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
             return Ok(questionModel);
         }
 
-        [HttpGet("GetRandomQuestionId/{roomId}")]
+        [HttpGet("{roomId}")]
         public IActionResult GetRandomQuestionId(int roomId)
         {
             int[] questionIds = QuestionManager.GetAllQuestionIds(roomId);
@@ -48,7 +48,7 @@ namespace API.Controllers
             return Ok(questionModel);
         }
 
-        [HttpPost("SaveQuestion/{roomId}")]
+        [HttpPost("{roomId}")]
         public IActionResult SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
         {
             if (questionModel == null)

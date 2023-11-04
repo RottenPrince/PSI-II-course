@@ -18,8 +18,8 @@ namespace MVC.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Solve(int roomId)
         {
-            var questionId = APIHelper.Get<int>($"api/QuestionAPI/GetRandomQuestionId/{roomId}", out _);
-            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/QuestionAPI/GetQuestion/{questionId}", out _);
+            var questionId = APIHelper.Get<int>($"api/Question/GetRandomQuestionId/{roomId}", out _);
+            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/Question/GetQuestion/{questionId}", out _);
 
             ViewBag.RoomId = roomId;
 
@@ -29,7 +29,7 @@ namespace MVC.Controllers
         [HttpPost("{roomId}")]
         public IActionResult Solve(string roomId, int questionId, int selectedOption)
         {
-            var questionModel = APIHelper.Post<int, QuestionWithAnswerTransferModel>("api/QuestionAPI/GetFullQuestion", questionId, out APIError? error);
+            var questionModel = APIHelper.Post<int, QuestionWithAnswerTransferModel>("api/Question/GetFullQuestion", questionId, out APIError? error);
 
             //TODO Error handling
             if(questionModel.CorrectAnswerIndex == selectedOption)
@@ -77,7 +77,7 @@ namespace MVC.Controllers
 
             ViewBag.Title = questionModel.Title;
 
-            var response = APIHelper.Post<QuestionWithAnswerTransferModel, string>($"api/QuestionAPI/SaveQuestion/{roomId}", questionModel, out APIError? error);
+            var response = APIHelper.Post<QuestionWithAnswerTransferModel, string>($"api/Question/SaveQuestion/{roomId}", questionModel, out APIError? error);
 
             if (error == null)
             {

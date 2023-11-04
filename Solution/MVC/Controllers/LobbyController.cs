@@ -11,7 +11,7 @@ namespace MVC.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Room(string roomId)
         {
-            var roomContent = APIHelper.Get<RoomContentStruct>($"LobbyAPI/GetRoomContent/{roomId}", out APIError? error);
+            var roomContent = APIHelper.Get<RoomContentStruct>($"api/Lobby/GetRoomContent/{roomId}", out APIError? error);
 
             if (error == null)
             {
@@ -31,7 +31,7 @@ namespace MVC.Controllers
         [HttpGet]
         public IActionResult AllRooms()
         {
-            var rooms = APIHelper.Get<List<RoomTransferModel>>("LobbyAPI/GetAllRooms", out _);
+            var rooms = APIHelper.Get<List<RoomTransferModel>>("api/Lobby/GetAllRooms", out _);
             return View(rooms);
         }
 
@@ -44,7 +44,7 @@ namespace MVC.Controllers
         [HttpPost]
         public IActionResult CreateRoom(string roomName)
         {
-            APIHelper.Post<string, string>("LobbyAPI/CreateRoom", roomName, out var error);
+            APIHelper.Post<string, string>("api/Lobby/CreateRoom", roomName, out var error);
             ViewBag.RoomName = roomName;
             if(error != null)
             {
