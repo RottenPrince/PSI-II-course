@@ -120,7 +120,7 @@ namespace API.Managers
         {
             using(var db = new AppDbContext())
             {
-                var questionModel = await db.Questions.FindAsync(questionId);
+                var questionModel = await db.Questions.Include(q => q.AnswerOptions).Where(q => q.Id == questionId).FirstAsync();
                 var result = new QuestionWithAnswerTransferModel
                 {
                     Title = questionModel.Title,

@@ -16,15 +16,15 @@ namespace API.Controllers
             _logger = logger;
         }
 
-        [HttpGet("GetQuestion/{roomId}/{questionId}")]
-        public IActionResult GetQuestion(int questionId)
+        [HttpGet("GetQuestion/{questionId}")]
+        public async Task<IActionResult> GetQuestion(int questionId)
         {
-            var questionModel = QuestionManager.GetQuestionWithAnswer(questionId);
+            var questionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
             return Ok(questionModel);
         }
 
-        [HttpGet("GetRandomQuestionName/{roomId}")]
-        public IActionResult GetRandomQuestionName(int roomId)
+        [HttpGet("GetRandomQuestionId/{roomId}")]
+        public IActionResult GetRandomQuestionId(int roomId)
         {
             int[] questionIds = QuestionManager.GetAllQuestionIds(roomId);
 
@@ -42,9 +42,9 @@ namespace API.Controllers
         }
 
         [HttpPost("{questionId}")]
-        public IActionResult GetFullQuestion([FromBody] int questionId)
+        public async Task<IActionResult> GetFullQuestion([FromBody] int questionId)
         {
-            var questionModel = QuestionManager.GetQuestionWithAnswer(questionId);
+            var questionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
             return Ok(questionModel);
         }
 

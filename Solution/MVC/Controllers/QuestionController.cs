@@ -16,9 +16,9 @@ namespace MVC.Controllers
         }
 
         [HttpGet("{roomId}")]
-        public IActionResult Solve(string roomId)
+        public IActionResult Solve(int roomId)
         {
-            var questionId = APIHelper.Get<int>($"api/QuestionAPI/GetRandomQuestionName/{roomId}", out _);
+            var questionId = APIHelper.Get<int>($"api/QuestionAPI/GetRandomQuestionId/{roomId}", out _);
             var questionModel = APIHelper.Get<QuestionTransferModel>($"api/QuestionAPI/GetQuestion/{questionId}", out _);
 
             ViewBag.RoomId = roomId;
