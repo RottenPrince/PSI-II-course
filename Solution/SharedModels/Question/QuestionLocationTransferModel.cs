@@ -1,4 +1,4 @@
-﻿namespace SharedModels.Question
+namespace SharedModels.Question
 {
     public record class QuestionLocationTransferModel
     {

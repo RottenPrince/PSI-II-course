@@ -1,4 +1,4 @@
-﻿using SharedModels.Question;
+using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using API.Managers;
 using SharedModels.Lobby;

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
 using SharedModels.Question;
 using SharedModels.Lobby;

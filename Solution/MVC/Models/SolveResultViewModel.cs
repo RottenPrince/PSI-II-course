@@ -1,4 +1,4 @@
-﻿using SharedModels.Question;
+using SharedModels.Question;
 
 namespace MVC.Models
 {
