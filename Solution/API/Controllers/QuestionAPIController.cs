@@ -54,15 +54,21 @@ namespace API.Controllers
             return Ok(questionModel);
         }
 
-        [HttpGet("{roomId}/{questionAmount}")]
-        public IActionResult GetQuestionList(int roomId, int questionAmount)
+        [HttpGet("{roomId}")]
+        public IActionResult GetQuestionList(int roomId)
         {
-            var questions = QuestionManager.GetQuestionsForRun(roomId, questionAmount);
+            var questions = QuestionManager.GetQuestionsForRun(roomId);
             if (questions == null || questions.Count == 0)
             {
                 return NoContent();
             }
-            return Ok(questions);
+            return Ok(questions.Select(q => new QuestionTransferModel
+            {
+                Id = q.Id,
+                Title = q.Title,
+                AnswerOptions = { },
+                ImageName = q.ImageSource,
+            }));
         }
 
         [HttpPost("{roomId}")]

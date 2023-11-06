@@ -16,6 +16,8 @@ namespace API.Data
         public DbSet<RoomModel> Rooms { get; set; }
         public DbSet<QuestionModel> Questions { get; set; }
         public DbSet<AnswerOptionModel> AnswerOptions { get; set; }
+        public DbSet<SolveRunModel> SolveRunModels { get; set; }
+        // public DbSet<QuestionSolveRunModel> QuestionSolveRunModels { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +34,16 @@ namespace API.Data
                 .HasMany(question => question.AnswerOptions)
                 .WithOne(option => option.Question)
                 .HasForeignKey(option => option.QuestionId);
+
+            modelBuilder.Entity<SolveRunModel>()
+                .HasOne(model => model.Room)
+                .WithMany(model => model.SolveRuns)
+                .HasForeignKey(model => model.RoomId)
+                .IsRequired();
+
+            modelBuilder.Entity<SolveRunModel>()
+                .HasMany(model => model.QuestionRun)
+                .WithMany(model => model.SolveRuns);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

@@ -11,5 +11,6 @@ namespace API.Models
         public string Name { get; set; }
 
         public List<QuestionModel> Questions { get; set; }
+        public List<SolveRunModel> SolveRuns { get; set; }
     }
 }
