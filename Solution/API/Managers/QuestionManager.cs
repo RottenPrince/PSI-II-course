@@ -116,6 +116,25 @@ namespace API.Managers
             }
         }
 
+        public static List<int> GetQuestionsForRun(int roomId, int questionAmount)
+        {
+            var questionIds = GetAllQuestionIds(roomId);
+            if (questionIds == null || questionIds.Length == 0)
+            {
+                return null;
+            }
+
+            if (questionAmount <= 0)
+            {
+                return null;
+            }
+
+            var random = new Random();
+            var shuffledIds = questionIds.OrderBy(x => random.Next()).ToList();
+
+            return shuffledIds.Take(questionAmount).ToList();
+        }
+
         private async static Task<QuestionWithAnswerTransferModel> GetQuestionFromDatabase(int questionId)
         {
             using(var db = new AppDbContext())

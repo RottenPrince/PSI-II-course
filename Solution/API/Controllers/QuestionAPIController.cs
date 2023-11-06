@@ -54,6 +54,17 @@ namespace API.Controllers
             return Ok(questionModel);
         }
 
+        [HttpGet("{roomId}/{questionAmount}")]
+        public IActionResult GetQuestionList(int roomId, int questionAmount)
+        {
+            var questions = QuestionManager.GetQuestionsForRun(roomId, questionAmount);
+            if (questions == null || questions.Count == 0)
+            {
+                return NoContent();
+            }
+            return Ok(questions);
+        }
+
         [HttpPost("{roomId}")]
         public IActionResult SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
         {

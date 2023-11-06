@@ -2,6 +2,7 @@ using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
 using MVC.Models;
+using System.Text.Json;
 
 namespace MVC.Controllers
 {
@@ -15,29 +16,64 @@ namespace MVC.Controllers
             _host = host;
         }
 
-        [HttpGet("{roomId}")]
-        public IActionResult Solve(int roomId)
+        //[HttpPost("{roomId}")]
+        //public IActionResult Solve(string roomId, int questionId, int selectedOption)
+        //{
+        //    var questionModel = APIHelper.Get<QuestionWithAnswerTransferModel>($"api/Question/GetFullQuestion/{questionId}", out APIError? error);
+        //    //TODO Error handling
+
+        //    if(questionModel.CorrectAnswerIndex == selectedOption)
+        //    {
+        //        return View("SolveResult", new SolveResultViewModel(questionModel, questionId, roomId)); //questionId possibly not needed
+
+        //    }
+
+        //    return View("SolveResult", new SolveResultViewModel(questionModel, questionId, roomId, wrongAnswerIndex: selectedOption));
+        //}
+
+        [HttpPost]
+        public IActionResult Solve(int roomId, int currentQuestionIndex, string questionsIdJson, string answersJson, int selectedOption)
         {
-            var questionId = APIHelper.Get<int>($"api/Question/GetRandomQuestionId/{roomId}", out _);
-            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/Question/GetQuestion/{questionId}", out _);
+            var questionsId = JsonSerializer.Deserialize<List<int>>(questionsIdJson);
+            var answers = JsonSerializer.Deserialize<List<int>>(answersJson);
+
+            if (questionsId.Count == 0)
+                return View("NoQuestionsAvailable");
+            SolveRunModel runModel = new SolveRunModel(questionsId);
+            runModel.answers = answers;
+            runModel.answers.Add(selectedOption);
+            runModel.currentQuestionIndex = ++currentQuestionIndex;
+            
+            if (runModel.currentQuestionIndex == runModel.questionsId.Count)
+                return View("NoQuestionsAvailable");
+
+            var newQuestionModel = APIHelper.Get<QuestionTransferModel>($"api/Question/GetQuestion/{runModel.questionsId[runModel.currentQuestionIndex]}", out _);
+            runModel.currentQuestion = newQuestionModel;
 
             ViewBag.RoomId = roomId;
-            return View(new SolveViewModel(questionModel, questionId));
+            return View("Solve", runModel);
         }
 
-        [HttpPost("{roomId}")]
-        public IActionResult Solve(string roomId, int questionId, int selectedOption)
+
+        [HttpGet("{roomId}/{questionAmount}")]
+        public IActionResult StartRun(int roomId, int questionAmount)
         {
-            var questionModel = APIHelper.Get<QuestionWithAnswerTransferModel>($"api/Question/GetFullQuestion/{questionId}", out APIError? error);
-            //TODO Error handling
-
-            if(questionModel.CorrectAnswerIndex == selectedOption)
+            var questionsForRun = APIHelper.Get<List<int>>($"api/Question/GetQuestionList/{roomId}/{questionAmount}", out _);
+            
+            if(questionsForRun == null || questionsForRun.Count == 0)
             {
-                return View("SolveResult", new SolveResultViewModel(questionModel, questionId, roomId)); //questionId possibly not needed
-
+                ViewBag.RoomId = roomId;
+                return View("NoQuestionsAvailable");
             }
 
-            return View("SolveResult", new SolveResultViewModel(questionModel, questionId, roomId, wrongAnswerIndex: selectedOption));
+            SolveRunModel runModel = new SolveRunModel(questionsForRun);
+
+            var currentQuestion = APIHelper.Get<QuestionTransferModel>($"api/Question/GetQuestion/{questionsForRun[0]}", out _);
+
+            runModel.currentQuestion = currentQuestion;
+            ViewBag.RoomId = roomId;
+
+            return View("Solve", runModel);
         }
 
         [HttpGet("{roomId}")]
