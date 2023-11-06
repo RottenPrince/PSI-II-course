@@ -19,7 +19,13 @@ namespace API.Controllers
         [HttpGet("{questionId}")]
         public async Task<IActionResult> GetQuestion(int questionId)
         {
-            var questionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
+            var fullQuestionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
+            var questionModel = new QuestionTransferModel
+            {
+                Title = fullQuestionModel.Title,
+                AnswerOptions = fullQuestionModel.AnswerOptions,
+                ImageName = fullQuestionModel.ImageName
+            };
             return Ok(questionModel);
         }
 
@@ -41,8 +47,8 @@ namespace API.Controllers
             return Ok(selectionQuestionId);
         }
 
-        [HttpPost("{questionId}")]
-        public async Task<IActionResult> GetFullQuestion([FromBody] int questionId)
+        [HttpGet("{questionId}")]
+        public async Task<IActionResult> GetFullQuestion(int questionId)
         {
             var questionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
             return Ok(questionModel);

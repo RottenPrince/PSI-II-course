@@ -22,16 +22,15 @@ namespace MVC.Controllers
             var questionModel = APIHelper.Get<QuestionTransferModel>($"api/Question/GetQuestion/{questionId}", out _);
 
             ViewBag.RoomId = roomId;
-
             return View(new SolveViewModel(questionModel, questionId));
         }
 
         [HttpPost("{roomId}")]
         public IActionResult Solve(string roomId, int questionId, int selectedOption)
         {
-            var questionModel = APIHelper.Post<int, QuestionWithAnswerTransferModel>("api/Question/GetFullQuestion", questionId, out APIError? error);
-
+            var questionModel = APIHelper.Get<QuestionWithAnswerTransferModel>($"api/Question/GetFullQuestion/{questionId}", out APIError? error);
             //TODO Error handling
+
             if(questionModel.CorrectAnswerIndex == selectedOption)
             {
                 return View("SolveResult", new SolveResultViewModel(questionModel, questionId, roomId)); //questionId possibly not needed
