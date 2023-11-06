@@ -102,6 +102,8 @@ namespace MVC.Controllers
 
             if (reviewModel.currentQuestionIndex == reviewModel.questionsId.Count)
             {
+                if (reviewModel.questionsId.Count == 1)
+                    return RedirectToAction("Room", "Lobby", new { roomId = roomId });
                 ViewBag.RoomId = roomId;
                 return View("ReviewTotal", reviewModel);
             }
