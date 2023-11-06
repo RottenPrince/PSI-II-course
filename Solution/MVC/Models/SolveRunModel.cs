@@ -2,17 +2,11 @@
 
 namespace MVC.Models
 {
-    public class SolveRunModel
+    public class SolveRunModel : BaseSolveRunModel
     {
-        public SolveRunModel(List<int> questions) {
-            questionsId = questions;
-            answers = new List<int>();
-            currentQuestionIndex = 0;
+        public SolveRunModel(List<int> questions) : base(questions)
+        {
         }
-
-        public List<int> questionsId { get; set; }
-        public List<int> answers { get;set; }
-        public int currentQuestionIndex {  get; set; }
 
         public QuestionTransferModel? currentQuestion { get; set; }
     }

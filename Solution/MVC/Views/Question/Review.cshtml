@@ -1,0 +1,43 @@
+﻿@using System.Text.Json;
+@model MVC.Models.ReviewRunModel
+@{
+    ViewData["Title"] = "Question Page";
+}
+
+@section Stylesheets {
+    <link rel="stylesheet" href="~/css/Question/Solve.css">
+}
+
+<div id="questionTitle">
+    <h1>@Model.currentQuestion.Title</h1>
+</div>
+
+@if (Model.currentQuestion.ImageName != null)
+{
+    <div id="questionImage" class="text-center mt-5">
+        <img src="~/img/@Model.currentQuestion.ImageName" alt="Question Image" />
+    </div>
+}
+
+
+
+
+
+<div>
+        @foreach (var (idx, option) in Model.currentQuestion.AnswerOptions.WithIndex())
+        {
+            <div class="answer-option @((idx == Model.currentQuestion.CorrectAnswerIndex) ? "correct" : (idx == Model.answers[Model.currentQuestionIndex]) ? "selected" : "")">
+                @option
+            </div>
+        }
+</div>
+
+<form asp-controller="Question" asp-action="Review" method="post">
+    <input type="hidden" name="roomId" value="@ViewBag.RoomId" />
+    <input type="hidden" name="currentQuestionIndex" value="@Model.currentQuestionIndex" />
+    <input type="hidden" name="correctAnswersCount" value="@Model.correctAnswersCount" />
+    <input type="hidden" name="questionsIdJson" value='@JsonSerializer.Serialize(Model.questionsId)' />
+    <input type="hidden" name="answersJson" value='@JsonSerializer.Serialize(Model.answers)' />
+
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>
