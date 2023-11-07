@@ -37,7 +37,7 @@ namespace MVC.Controllers
             var questionModel = APIHelper.Get<QuestionTransferModel>($"api/Lobby/GetNextQuestionInRun/{runId}", out var error);
             if(questionModel == null)
             {
-                return RedirectToAction("StartReview", new { runId = runId });
+                return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = 0 });
             }
             ViewBag.runId = runId;
             return View("Solve", questionModel);
@@ -50,40 +50,11 @@ namespace MVC.Controllers
             return RedirectToAction("Solve", new { runId = runId });
         }
 
-        public IActionResult StartReview(int roomId, string questionsIdJson, string answersJson)
-        {
-            return Ok();
-        }
-
         [HttpPost]
-        public IActionResult Review(int roomId, int currentQuestionIndex, int correctAnswersCount, string questionsIdJson, string answersJson)
+        public IActionResult Review(int runId, int selectedQuestion)
         {
+            var questions = APIHelper.Get<List<QuestionRunTransferModel>>($"api/Lobby/GetAllQuestionInfo/{runId}", out var error);
             return Ok();
-            //var questionsId = JsonSerializer.Deserialize<List<int>>(questionsIdJson);
-            //var answers = JsonSerializer.Deserialize<List<int>>(answersJson);
-
-            //ReviewRunModel reviewModel = new ReviewRunModel(questionsId);
-            //reviewModel.answers = answers;
-            //reviewModel.currentQuestionIndex = ++currentQuestionIndex;
-            //reviewModel.correctAnswersCount = correctAnswersCount;
-
-
-            //if (reviewModel.currentQuestionIndex == reviewModel.questionsId.Count)
-            //{
-            //    if (reviewModel.questionsId.Count == 1)
-            //        return RedirectToAction("Room", "Lobby", new { roomId = roomId });
-            //    ViewBag.RoomId = roomId;
-            //    return View("ReviewTotal", reviewModel);
-            //}
-
-            //var currentQuestionModel = APIHelper.Get<QuestionWithAnswerTransferModel>($"api/Question/GetFullQuestion/{reviewModel.questionsId[reviewModel.currentQuestionIndex]}", out _);
-            //reviewModel.currentQuestion = currentQuestionModel;
-
-            //if (reviewModel.currentQuestion.CorrectAnswerIndex == reviewModel.answers[currentQuestionIndex])
-            //    reviewModel.correctAnswersCount++;
-
-            //ViewBag.RoomId = roomId;
-            //return View("Review", reviewModel);
         }
 
         [HttpGet("{roomId}")]

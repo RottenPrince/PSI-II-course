@@ -81,6 +81,22 @@ namespace API.Managers
             }
         }
 
+        public static async Task<List<QuestionSolveRunJoinModel>> GetAllQuestionRunInfo(AppDbContext db, int runId)
+        {
+            var questions = await db.QuestionSolveRunJoinModels
+                .Include(srm => srm.Question)
+                .ThenInclude(m => m.AnswerOptions)
+                .Where(srm => srm.SolveRunModelID == runId)
+                .ToListAsync();
+            try
+            {
+                return questions;
+            } catch (InvalidOperationException)
+            {
+                return null;
+            }
+        }
+
         public static async Task<int> CreateNewSolveRun(AppDbContext db, Random rng, int roomId)
         {
             var roomModel = await db.Rooms

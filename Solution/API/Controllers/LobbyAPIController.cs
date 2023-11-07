@@ -94,5 +94,13 @@ namespace API.Controllers
             _context.SaveChanges();
             return Ok();
         }
+
+        [HttpGet("{runId}")]
+        public async Task<IActionResult> GetAllQuestionRunInfo(int runId)
+        {
+            var questions = await QuestionManager.GetAllQuestionRunInfo(_context, runId);
+            if (questions.Any(x => x.SelectedAnswerOption == null)) return Unauthorized();
+            return Ok(_mapper.Map<List<QuestionRunTransferModel>>(questions));
+        }
     }
 }
