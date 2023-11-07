@@ -124,10 +124,10 @@ namespace API.Managers
             var questionIds = GetAllQuestionIds(roomId);
             using(var db = new AppDbContext())
             {
-                var questions = db.Rooms.Include(room => room.Questions).Where(room => room.Id == roomId).First().Questions;
                 lock(_rng)
                 {
-                    return questions.OrderBy(x => _rng.Next()).ToList();
+                    //return questions.OrderBy(x => _rng.Next()).ToList();
+                    return null;
                 }
             }
         }

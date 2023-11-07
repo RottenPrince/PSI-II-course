@@ -8,5 +8,6 @@
 
         public RoomModel Room { get; set; }
         public List<QuestionModel> QuestionRun { get; set; }
+        public List<QuestionSolveRunJoinModel> SolveRunJoin { get; set; }
     }
 }

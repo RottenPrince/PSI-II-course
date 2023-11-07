@@ -17,7 +17,7 @@ namespace API.Data
         public DbSet<QuestionModel> Questions { get; set; }
         public DbSet<AnswerOptionModel> AnswerOptions { get; set; }
         public DbSet<SolveRunModel> SolveRunModels { get; set; }
-        // public DbSet<QuestionSolveRunModel> QuestionSolveRunModels { get; set; }
+        public DbSet<QuestionSolveRunJoinModel> QuestionSolveRunJoinModels { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,9 +41,20 @@ namespace API.Data
                 .HasForeignKey(model => model.RoomId)
                 .IsRequired();
 
-            modelBuilder.Entity<SolveRunModel>()
-                .HasMany(model => model.QuestionRun)
-                .WithMany(model => model.SolveRuns);
+            modelBuilder.Entity<QuestionSolveRunJoinModel>()
+                .HasOne(model => model.SelectedAnswerOption)
+                .WithMany()
+                .HasForeignKey(model => model.AnswerOptionModelID);
+
+            modelBuilder.Entity<QuestionSolveRunJoinModel>()
+                .HasOne(model => model.Question)
+                .WithMany(model => model.Joins)
+                .HasForeignKey(model => model.QuestionModelID);
+
+            modelBuilder.Entity<QuestionSolveRunJoinModel>()
+                .HasOne(model => model.SolveRun)
+                .WithMany(model => model.SolveRunJoin)
+                .HasForeignKey(model => model.SolveRunModelID);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

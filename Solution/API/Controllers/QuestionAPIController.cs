@@ -1,6 +1,7 @@
 using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using API.Managers;
+using AutoMapper;
 
 namespace API.Controllers
 {
@@ -9,11 +10,13 @@ namespace API.Controllers
     public class QuestionAPIController : ControllerBase
     {
         private readonly ILogger<QuestionAPIController> _logger;
+        private readonly IMapper _mapper;
         private static Random random = new Random();
 
-        public QuestionAPIController(ILogger<QuestionAPIController> logger)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper)
         {
             _logger = logger;
+            _mapper = mapper;
         }
 
         [HttpGet("{questionId}")]
@@ -52,23 +55,6 @@ namespace API.Controllers
         {
             var questionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
             return Ok(questionModel);
-        }
-
-        [HttpGet("{roomId}")]
-        public IActionResult GetQuestionList(int roomId)
-        {
-            var questions = QuestionManager.GetQuestionsForRun(roomId);
-            if (questions == null || questions.Count == 0)
-            {
-                return NoContent();
-            }
-            return Ok(questions.Select(q => new QuestionTransferModel
-            {
-                Id = q.Id,
-                Title = q.Title,
-                AnswerOptions = { },
-                ImageName = q.ImageSource,
-            }));
         }
 
         [HttpPost("{roomId}")]

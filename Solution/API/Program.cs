@@ -10,7 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddDbContext<AppDbContext>(options =>
 //    options.UseSqlite(connectionString));
 
-builder.Services.AddDbContext<AppDbContext>();
+builder.Services.AddLogging(loggingBuilder => {
+    loggingBuilder.AddConsole()
+        .AddFilter(DbLoggerCategory.Database.Command.Name, LogLevel.Information);
+    loggingBuilder.AddDebug();
+});
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    options.EnableSensitiveDataLogging(true);
+});
 
 
 builder.Services.AddControllers();
@@ -26,6 +35,7 @@ builder.Services.AddCors(options =>
               .AllowAnyOrigin();
     });
 });
+builder.Services.AddAutoMapper(m => m.AddProfile(new AutoMappingProfile()));
 
 var app = builder.Build();
 
