@@ -36,7 +36,7 @@ namespace API.Managers
                 return roomModel.Questions.Select(q => new QuestionWithAnswerTransferModel
                 {
                     Title = q.Title,
-                    AnswerOptions = q.AnswerOptions.Select(o => o.OptionText).ToList(),
+                    AnswerOptions = { }, //q.AnswerOptions.Select(o => o.OptionText).ToList(),
                     CorrectAnswerIndex = q.AnswerOptions.FindIndex(o => o.IsCorrect),
                     ImageName = q.ImageSource
                 }).ToList();
@@ -66,7 +66,7 @@ namespace API.Managers
                     Room = roomModel,
                     AnswerOptions = model.AnswerOptions.Select(o => new AnswerOptionModel
                     {
-                        OptionText = o,
+                        OptionText = o.OptionText,
                         IsCorrect = false,
                     }).ToList(),
                 };
@@ -140,7 +140,7 @@ namespace API.Managers
                 var result = new QuestionWithAnswerTransferModel
                 {
                     Title = questionModel.Title,
-                    AnswerOptions = questionModel.AnswerOptions.Select(o => o.OptionText).ToList(),
+                    AnswerOptions = { }, // questionModel.AnswerOptions.Select(o => o.OptionText).ToList(),
                     CorrectAnswerIndex = questionModel.AnswerOptions.FindIndex(o => o.IsCorrect),
                     ImageName = questionModel.ImageSource
                 };

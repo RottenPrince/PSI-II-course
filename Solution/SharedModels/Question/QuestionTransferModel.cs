@@ -6,7 +6,7 @@ namespace SharedModels.Question
     {
         public QuestionTransferModel()
         {
-            AnswerOptions = new List<string>();
+            AnswerOptions = new List<AnswerOptionTransferModel>();
         }
 
         [Required]
@@ -14,7 +14,7 @@ namespace SharedModels.Question
         [Required]
         public string? Title { get; set; }
         [Required]
-        public List<string>? AnswerOptions { get; set; }
+        public List<AnswerOptionTransferModel>? AnswerOptions { get; set; }
         public string? ImageName { get; set; }
     }
 }

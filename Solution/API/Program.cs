@@ -35,7 +35,10 @@ builder.Services.AddCors(options =>
               .AllowAnyOrigin();
     });
 });
-builder.Services.AddAutoMapper(m => m.AddProfile(new AutoMappingProfile()));
+builder.Services.AddAutoMapper(m =>
+{
+    m.AddProfile(new AutoMappingProfile());
+});
 
 var app = builder.Build();
 

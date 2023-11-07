@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
 using MVC.Models;
 using System.Text.Json;
+using Microsoft.Identity.Client;
 
 namespace MVC.Controllers
 {
@@ -10,112 +11,79 @@ namespace MVC.Controllers
     public class QuestionController : Controller
     {
         private readonly IWebHostEnvironment _host;
+        private readonly ILogger<QuestionController> _logger;
 
-        public QuestionController(IWebHostEnvironment host)
+        public QuestionController(IWebHostEnvironment host, ILogger<QuestionController> logger)
         {
             _host = host;
+            _logger = logger;
         }
 
-
-        [HttpGet("{roomId}/{questionAmount}")]
-        public IActionResult StartRun(int roomId, int questionAmount)
+        [HttpGet("{roomId}")]
+        public IActionResult StartRun(int roomId)
         {
-            var questionsForRun = APIHelper.Get<List<int>>($"api/Question/GetQuestionList/{roomId}/{questionAmount}", out _);
-            
-            if(questionsForRun == null || questionsForRun.Count == 0)
+            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateSolveRun/{roomId}", out var error);
+            if(error != null)
             {
-                ViewBag.RoomId = roomId;
-                return View("NoQuestionsAvailable");
+                throw new Exception(); // TODO something normal
             }
 
-            SolveRunModel runModel = new SolveRunModel(questionsForRun);
+            return RedirectToAction("Solve", new { runId = newRunId });
+        }
 
-            var currentQuestion = APIHelper.Get<QuestionTransferModel>($"api/Question/GetQuestion/{questionsForRun[0]}", out _);
-
-            runModel.currentQuestion = currentQuestion;
-            ViewBag.RoomId = roomId;
-
-            return View("Solve", runModel);
+        [HttpGet]
+        public IActionResult Solve(int runId)
+        {
+            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/Lobby/GetNextQuestionInRun/{runId}", out var error);
+            if(questionModel == null)
+            {
+                return RedirectToAction("StartReview", new { runId = runId });
+            }
+            ViewBag.runId = runId;
+            return View("Solve", questionModel);
         }
 
         [HttpPost]
-        public IActionResult Solve(int roomId, int currentQuestionIndex, string questionsIdJson, string answersJson, int selectedOption)
+        public IActionResult Solve(int runId, int selectedOption)
         {
-            var questionsId = JsonSerializer.Deserialize<List<int>>(questionsIdJson);
-            var answers = JsonSerializer.Deserialize<List<int>>(answersJson);
-
-            if (questionsId.Count == 0)
-                return View("NoQuestionsAvailable");
-            SolveRunModel runModel = new SolveRunModel(questionsId);
-            runModel.answers = answers;
-            runModel.answers.Add(selectedOption);
-            runModel.currentQuestionIndex = ++currentQuestionIndex;
-
-            if (runModel.currentQuestionIndex == runModel.questionsId.Count)
-                return RedirectToAction("StartReview", new
-                {
-                    roomId,
-                    questionsIdJson = JsonSerializer.Serialize(runModel.questionsId),
-                    answersJson = JsonSerializer.Serialize(answers)
-                });
-
-            var newQuestionModel = APIHelper.Get<QuestionTransferModel>($"api/Question/GetQuestion/{runModel.questionsId[runModel.currentQuestionIndex]}", out _);
-            runModel.currentQuestion = newQuestionModel;
-
-            ViewBag.RoomId = roomId;
-            return View("Solve", runModel);
+            APIHelper.Post<object, string>($"api/Lobby/SubmitAnswer/{runId}/{selectedOption}", new { }, out var error);
+            return RedirectToAction("Solve", new { runId = runId });
         }
 
         public IActionResult StartReview(int roomId, string questionsIdJson, string answersJson)
         {
-            var questionsId = JsonSerializer.Deserialize<List<int>>(questionsIdJson);
-            var answers = JsonSerializer.Deserialize<List<int>>(answersJson);
-
-            ReviewRunModel reviewModel = new ReviewRunModel(questionsId);
-            reviewModel.answers = answers;
-            reviewModel.currentQuestionIndex = 0;
-            reviewModel.correctAnswersCount = 0;
-
-            var currentQuestion = APIHelper.Get<QuestionWithAnswerTransferModel>($"api/Question/GetFullQuestion/{reviewModel.questionsId[0]}", out APIError? error);
-
-            reviewModel.currentQuestion = currentQuestion;
-
-            if (reviewModel.currentQuestion.CorrectAnswerIndex == reviewModel.answers[reviewModel.currentQuestionIndex])
-                reviewModel.correctAnswersCount++;
-
-            ViewBag.RoomId = roomId;
-
-            return View("Review", reviewModel);
+            return Ok();
         }
 
         [HttpPost]
         public IActionResult Review(int roomId, int currentQuestionIndex, int correctAnswersCount, string questionsIdJson, string answersJson)
         {
-            var questionsId = JsonSerializer.Deserialize<List<int>>(questionsIdJson);
-            var answers = JsonSerializer.Deserialize<List<int>>(answersJson);
+            return Ok();
+            //var questionsId = JsonSerializer.Deserialize<List<int>>(questionsIdJson);
+            //var answers = JsonSerializer.Deserialize<List<int>>(answersJson);
 
-            ReviewRunModel reviewModel = new ReviewRunModel(questionsId);
-            reviewModel.answers = answers;
-            reviewModel.currentQuestionIndex = ++currentQuestionIndex;
-            reviewModel.correctAnswersCount = correctAnswersCount;
+            //ReviewRunModel reviewModel = new ReviewRunModel(questionsId);
+            //reviewModel.answers = answers;
+            //reviewModel.currentQuestionIndex = ++currentQuestionIndex;
+            //reviewModel.correctAnswersCount = correctAnswersCount;
 
 
-            if (reviewModel.currentQuestionIndex == reviewModel.questionsId.Count)
-            {
-                if (reviewModel.questionsId.Count == 1)
-                    return RedirectToAction("Room", "Lobby", new { roomId = roomId });
-                ViewBag.RoomId = roomId;
-                return View("ReviewTotal", reviewModel);
-            }
+            //if (reviewModel.currentQuestionIndex == reviewModel.questionsId.Count)
+            //{
+            //    if (reviewModel.questionsId.Count == 1)
+            //        return RedirectToAction("Room", "Lobby", new { roomId = roomId });
+            //    ViewBag.RoomId = roomId;
+            //    return View("ReviewTotal", reviewModel);
+            //}
 
-            var currentQuestionModel = APIHelper.Get<QuestionWithAnswerTransferModel>($"api/Question/GetFullQuestion/{reviewModel.questionsId[reviewModel.currentQuestionIndex]}", out _);
-            reviewModel.currentQuestion = currentQuestionModel;
+            //var currentQuestionModel = APIHelper.Get<QuestionWithAnswerTransferModel>($"api/Question/GetFullQuestion/{reviewModel.questionsId[reviewModel.currentQuestionIndex]}", out _);
+            //reviewModel.currentQuestion = currentQuestionModel;
 
-            if (reviewModel.currentQuestion.CorrectAnswerIndex == reviewModel.answers[currentQuestionIndex])
-                reviewModel.correctAnswersCount++;
+            //if (reviewModel.currentQuestion.CorrectAnswerIndex == reviewModel.answers[currentQuestionIndex])
+            //    reviewModel.correctAnswersCount++;
 
-            ViewBag.RoomId = roomId;
-            return View("Review", reviewModel);
+            //ViewBag.RoomId = roomId;
+            //return View("Review", reviewModel);
         }
 
         [HttpGet("{roomId}")]

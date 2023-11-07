@@ -1,5 +1,5 @@
 ﻿@using System.Text.Json
-@model MVC.Models.SolveRunModel
+@model SharedModels.Question.QuestionTransferModel
 @{
     ViewData["Title"] = "Question Page";
 }
@@ -13,30 +13,25 @@
 }
 <a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class=" btn btn-secondary">Return</a>
 <div id="questionTitle">
-    <h1>@Model.currentQuestion.Title</h1>
+    <h1>@Model.Title</h1>
 </div>
 
-    @if (Model.currentQuestion.ImageName != null)
+    @if (Model.ImageName != null)
     {
         <div id="questionImage" class="text-center mt-5">
-            <img src="~/img/@Model.currentQuestion.ImageName" alt="Question Image" class="img-fluid" />
+            <img src="~/img/@Model.ImageName" alt="Question Image" class="img-fluid" />
         </div>
     }
 
 <div id="form">
     @using (Html.BeginForm("Solve", "Question", FormMethod.Post))
     {
-        <input type="hidden" name="roomId" value="@ViewBag.RoomId" />
-        <input type="hidden" name="currentQuestionIndex" value="@Model.currentQuestionIndex" />
-        <input type="hidden" name="questionsIdJson" value='@JsonSerializer.Serialize(Model.questionsId)' />
-        <input type="hidden" name="answersJson" value='@JsonSerializer.Serialize(Model.answers)' />
-        
-        
-        @foreach (var (idx, option) in Model.currentQuestion.AnswerOptions.WithIndex())
+        <input type="hidden" name="runId" value="@ViewBag.runId"/>
+        @foreach (var (idx, option) in Model.AnswerOptions.WithIndex())
         {
             <label class="option">
                 <input type="radio" name="selectedOption" value="@idx" />
-                <span class="option-text">@option</span>
+                <span class="option-text">@option.OptionText</span>
             </label>
         }
 

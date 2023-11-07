@@ -16,8 +16,6 @@ namespace API.Models
         public RoomModel Room { get; set; }
 
         public List<AnswerOptionModel> AnswerOptions { get; set; }
-        public int SolveRunJoinID { get; set; }
-        public List<SolveRunModel> SolveRuns { get; set; }
         public List<QuestionSolveRunJoinModel> Joins { get; set; }
     }
 }
