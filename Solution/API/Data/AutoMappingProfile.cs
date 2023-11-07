@@ -10,6 +10,7 @@ namespace API.Data
         {
             CreateMap<AnswerOptionModel, AnswerOptionTransferModel>();
             CreateMap<QuestionModel, QuestionTransferModel>();
+            CreateMap<RoomModel, RoomTransferModel>();
         }
     }
 }

@@ -2,6 +2,7 @@ using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using API.Managers;
 using AutoMapper;
+using API.Data;
 
 namespace API.Controllers
 {
@@ -10,51 +11,31 @@ namespace API.Controllers
     public class QuestionAPIController : ControllerBase
     {
         private readonly ILogger<QuestionAPIController> _logger;
+        private Random _random;
         private readonly IMapper _mapper;
-        private static Random random = new Random();
+        private readonly AppDbContext _context;
 
-        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper, AppDbContext context)
         {
             _logger = logger;
             _mapper = mapper;
+            _context = context;
         }
 
         [HttpGet("{questionId}")]
         public async Task<IActionResult> GetQuestion(int questionId)
         {
-            var fullQuestionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
-            var questionModel = new QuestionTransferModel
-            {
-                Title = fullQuestionModel.Title,
-                AnswerOptions = fullQuestionModel.AnswerOptions,
-                ImageName = fullQuestionModel.ImageName
-            };
-            return Ok(questionModel);
-        }
-
-        [HttpGet("{roomId}")]
-        public IActionResult GetRandomQuestionId(int roomId)
-        {
-            int[] questionIds = QuestionManager.GetAllQuestionIds(roomId);
-
-            if(questionIds.Length == 0)
-                return NotFound("No questions found");
-
-            int randomIndex;
-            lock(random)
-            {
-                randomIndex = random.Next(0, questionIds.Length);
-            }
-
-            int selectionQuestionId = questionIds[randomIndex];
-            return Ok(selectionQuestionId);
+            var questionModel = await QuestionManager.GetQuestionWithAnswer(_context, questionId);
+            if (questionModel == null) return NotFound();
+            return Ok(_mapper.Map<QuestionTransferModel>(questionModel));
         }
 
         [HttpGet("{questionId}")]
         public async Task<IActionResult> GetFullQuestion(int questionId)
         {
-            var questionModel = await QuestionManager.GetQuestionWithAnswer(questionId);
-            return Ok(questionModel);
+            var questionModel = await QuestionManager.GetQuestionWithAnswer(_context, questionId);
+            if (questionModel == null) return NotFound();
+            return Ok(_mapper.Map<QuestionWithAnswerTransferModel>(questionModel));
         }
 
         [HttpPost("{roomId}")]
@@ -62,10 +43,10 @@ namespace API.Controllers
         {
             if (questionModel == null)
             {
-                return BadRequest("Question data is null.");
+                return BadRequest("Question data is invalid");
             }
 
-            QuestionManager.CreateNewQuestion(roomId, questionModel);
+            QuestionManager.CreateNewQuestion(_context, roomId, questionModel);
             return Ok("Question created successfully.");
         }
     }

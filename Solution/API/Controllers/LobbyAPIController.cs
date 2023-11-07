@@ -15,26 +15,33 @@ namespace API.Controllers
     public class LobbyAPIController : Controller
     {
         private Random _random;
-        private IMapper _mapper;
+        private readonly IMapper _mapper;
+        private readonly AppDbContext _context;
 
-        public LobbyAPIController(IMapper mapper)
+        public LobbyAPIController(IMapper mapper, AppDbContext context)
         {
             _random = new Random();
             _mapper = mapper;
-            // _mapper.ConfigurationProvider.AssertConfigurationIsValid();
+            _context = context;
         }
 
         [HttpGet]
-        public IActionResult GetAllRooms()
+        public async Task<IActionResult> GetAllRooms()
         {
-            return Ok(QuestionManager.GetAllRooms());
+            var rooms = await QuestionManager.GetAllRooms(_context);
+            return Ok(rooms.Select(r => _mapper.Map<RoomTransferModel>(r)));
         }
 
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
-            var roomModel = await QuestionManager.GetRoomContent(roomId);
-            return Ok(roomModel);
+            RoomModel? room = await QuestionManager.GetRoomContent(_context, roomId);
+            if (room == null) return NotFound();
+            return Ok(new RoomContentStruct
+            {
+                RoomName = room.Name,
+                QuestionAmount = room.Questions.Count,
+            });
         }
 
         [HttpPost]
@@ -59,78 +66,33 @@ namespace API.Controllers
         }
 
         [HttpGet("{roomId}")]
-        public IActionResult CreateSolveRun(int roomId)
+        public async Task<IActionResult> CreateSolveRun(int roomId)
         {
-            using (var db = new AppDbContext())
-            {
-                var roomModel = db.Rooms
-                                .Include(room => room.Questions)
-                                .Where(room => room.Id == roomId)
-                                .First();
-                var questions = roomModel.Questions;
-                lock (_random)
-                {
-                    questions = questions.OrderBy(x => _random.Next()).ToList();
-                }
-                db.Rooms.Attach(roomModel);
-                db.Questions.AttachRange(questions);
-                var newModel = new SolveRunModel
-                {
-                    StartTime = DateTime.UtcNow,
-                    Room = roomModel,
-                };
-                foreach (var q in questions)
-                {
-                    db.QuestionSolveRunJoinModels.Add(new QuestionSolveRunJoinModel
-                    {
-                        SolveRun = newModel,
-                        Question = q,
-                    });
-                }
-                db.SolveRunModels.Add(newModel);
-                db.SaveChanges();
-                return Ok(newModel.Id);
-            }
-        }
-
-        private QuestionSolveRunJoinModel GetNextQuestionFromDB(AppDbContext db, int runId)
-        {
-            var questions = db.QuestionSolveRunJoinModels
-                .Include(srm => srm.Question)
-                .ThenInclude(m => m.AnswerOptions)
-                .Where(srm => srm.SolveRunModelID == runId)
-                .ToList();
             try
             {
-                return questions.First(m => m.SelectedAnswerOption == null);
+                return Ok(await QuestionManager.CreateNewSolveRun(_context, _random, roomId));
             } catch (InvalidOperationException)
             {
-                return null;
+                return NotFound();
             }
         }
 
         [HttpGet("{runId}")]
-        public IActionResult GetNextQuestionInRun(int runId)
+        public async Task<IActionResult> GetNextQuestionInRun(int runId)
         {
-            using (var db = new AppDbContext())
-            {
-                var model = GetNextQuestionFromDB(db, runId);
-                if (model == null) return NoContent();
-                return Ok(_mapper.Map<QuestionTransferModel>(model.Question));
-            }
+            var model = await QuestionManager.GetNextQuestionInRun(_context, runId);
+            if (model == null) return NoContent();
+            return Ok(_mapper.Map<QuestionTransferModel>(model.Question));
         }
 
         [HttpPost("{runId}/{answerId}")]
-        public IActionResult SubmitAnswer(int runId, int answerId)
+        public async Task<IActionResult> SubmitAnswer(int runId, int answerId)
         {
-            using(var db = new AppDbContext())
-            {
-                var model = GetNextQuestionFromDB(db, runId);
-                if (model == null) return BadRequest();
-                model.SelectedAnswerOption = model.Question.AnswerOptions[answerId];
-                db.SaveChanges();
-                return Ok();
-            }
+            var model = await QuestionManager.GetNextQuestionInRun(_context, runId);
+            if (model == null) return BadRequest();
+            model.SelectedAnswerOption = model.Question.AnswerOptions[answerId];
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }

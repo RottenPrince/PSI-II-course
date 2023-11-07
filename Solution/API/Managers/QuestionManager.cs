@@ -12,140 +12,112 @@ namespace API.Managers
 {
     public static class QuestionManager
     {
-        private static Random _rng = new Random();
-
-        public async static Task<QuestionWithAnswerTransferModel?> GetQuestionWithAnswer(int questionId)
+        public static async Task<QuestionModel?> GetQuestionWithAnswer(AppDbContext db, int questionId)
         {
-            return await GetQuestionFromDatabase(questionId);
+            return await GetQuestionFromDatabase(db, questionId);
         }
 
-        public static int[] GetAllQuestionIds(int roomId)
+        public static bool CreateNewQuestion(AppDbContext db, int roomId, QuestionWithAnswerTransferModel model)
         {
-            using(var db = new AppDbContext())
+            var roomModel = db.Rooms.Find(roomId);
+
+            if(roomModel == null)
             {
-                var roomModel = db.Rooms.Include(q => q.Questions).First(q => q.Id == roomId);
-                return roomModel?.Questions.Select(q => q.Id).ToArray();
+                return false;
             }
-        }
 
-        public static List<QuestionWithAnswerTransferModel?> GetAllQuestions(int roomId)
-        {
-            using(var db = new AppDbContext())
+            var newQuestionModel = new QuestionModel
             {
-                var roomModel = db.Rooms.Include(q => q.Questions).First(q => q.Id == roomId);
-                return roomModel.Questions.Select(q => new QuestionWithAnswerTransferModel
+                Title = model.Title,
+                ImageSource = model.ImageName,
+                Room = roomModel,
+                AnswerOptions = model.AnswerOptions.Select(o => new AnswerOptionModel
                 {
-                    Title = q.Title,
-                    AnswerOptions = { }, //q.AnswerOptions.Select(o => o.OptionText).ToList(),
-                    CorrectAnswerIndex = q.AnswerOptions.FindIndex(o => o.IsCorrect),
-                    ImageName = q.ImageSource
-                }).ToList();
-            }
+                    OptionText = o.OptionText,
+                    IsCorrect = false,
+                }).ToList(),
+            };
+
+            newQuestionModel.AnswerOptions[model.CorrectAnswerIndex].IsCorrect = true;
+
+            db.Add(newQuestionModel);
+            db.SaveChanges();
+            return true;
         }
 
-        public static int GetQuestionCountInRoom(int roomId)
+        public static async Task<List<RoomModel>> GetAllRooms(AppDbContext db)
         {
-            return GetAllQuestionIds(roomId).Length;
+            return await db.Rooms.ToListAsync();
         }
 
-        public static bool CreateNewQuestion(int roomId, QuestionWithAnswerTransferModel model)
+        public static async Task<RoomModel?> GetRoomContent(AppDbContext db, int roomId)
         {
-            using(var db = new AppDbContext())
+            var roomModel = await db.Rooms
+                            .Include(q => q.Questions)
+                            .Include(q => q.SolveRuns)
+                            .Where(q => q.Id == roomId)
+                            .FirstOrDefaultAsync();
+            if(roomModel == null)
             {
-                var roomModel = db.Rooms.Find(roomId);
+                return null;
+            }
 
-                if(roomModel == null)
-                {
-                    return false;
-                }
+            return roomModel;
+        }
 
-                var newQuestionModel = new QuestionModel
-                {
-                    Title = model.Title,
-                    ImageSource = model.ImageName,
-                    Room = roomModel,
-                    AnswerOptions = model.AnswerOptions.Select(o => new AnswerOptionModel
-                    {
-                        OptionText = o.OptionText,
-                        IsCorrect = false,
-                    }).ToList(),
-                };
-
-                newQuestionModel.AnswerOptions[model.CorrectAnswerIndex].IsCorrect = true;
-
-                db.Add(newQuestionModel);
-                db.SaveChanges();
-                return true;
+        public static async Task<QuestionSolveRunJoinModel> GetNextQuestionInRun(AppDbContext db, int runId)
+        {
+            var questions = await db.QuestionSolveRunJoinModels
+                .Include(srm => srm.Question)
+                .ThenInclude(m => m.AnswerOptions)
+                .Where(srm => srm.SolveRunModelID == runId)
+                .ToListAsync();
+            try
+            {
+                return questions.First(m => m.SelectedAnswerOption == null);
+            } catch (InvalidOperationException)
+            {
+                return null;
             }
         }
 
-        public static string? GetRoomName(int roomId)
+        public static async Task<int> CreateNewSolveRun(AppDbContext db, Random rng, int roomId)
         {
-            using(var db = new AppDbContext())
+            var roomModel = await db.Rooms
+                            .Include(room => room.Questions)
+                            .Where(room => room.Id == roomId)
+                            .FirstAsync();
+            var questions = roomModel.Questions;
+            lock (rng)
             {
-                return db.Rooms.Find(roomId)?.Name;
+                questions = questions.OrderBy(x => rng.Next()).ToList();
             }
+            db.Rooms.Attach(roomModel);
+            db.Questions.AttachRange(questions);
+            var newModel = new SolveRunModel
+            {
+                StartTime = DateTime.UtcNow,
+                Room = roomModel,
+            };
+            foreach (var q in questions)
+            {
+                db.QuestionSolveRunJoinModels.Add(new QuestionSolveRunJoinModel
+                {
+                    SolveRun = newModel,
+                    Question = q,
+                });
+            }
+            db.SolveRunModels.Add(newModel);
+            db.SaveChanges();
+            return newModel.Id;
         }
 
-        public static IEnumerable<RoomTransferModel> GetAllRooms()
+        private static async Task<QuestionModel?> GetQuestionFromDatabase(AppDbContext db, int questionId)
         {
-            using (var db = new AppDbContext())
-            {
-                return db.Rooms
-                         .Select(r => new RoomTransferModel
-                         {
-                             Id = r.Id,
-                             Name = r.Name,
-                         })
-                         .ToList();
-            }
-        }
-
-        public async static Task<RoomContentStruct?> GetRoomContent(int roomId)
-        {
-            using(var db = new AppDbContext())
-            {
-                var roomModel = await db.Rooms.Include(q => q.Questions).Where(q => q.Id == roomId).FirstAsync();
-                if(roomModel == null)
-                {
-                    return null;
-                }
-
-                return new RoomContentStruct
-                {
-                    RoomName = roomModel.Name,
-                    QuestionAmount = roomModel.Questions.Count,
-                };
-            }
-        }
-
-        public static List<QuestionModel> GetQuestionsForRun(int roomId)
-        {
-            var questionIds = GetAllQuestionIds(roomId);
-            using(var db = new AppDbContext())
-            {
-                lock(_rng)
-                {
-                    //return questions.OrderBy(x => _rng.Next()).ToList();
-                    return null;
-                }
-            }
-        }
-
-        private async static Task<QuestionWithAnswerTransferModel> GetQuestionFromDatabase(int questionId)
-        {
-            using(var db = new AppDbContext())
-            {
-                var questionModel = await db.Questions.Include(q => q.AnswerOptions).Where(q => q.Id == questionId).FirstAsync();
-                var result = new QuestionWithAnswerTransferModel
-                {
-                    Title = questionModel.Title,
-                    AnswerOptions = { }, // questionModel.AnswerOptions.Select(o => o.OptionText).ToList(),
-                    CorrectAnswerIndex = questionModel.AnswerOptions.FindIndex(o => o.IsCorrect),
-                    ImageName = questionModel.ImageSource
-                };
-                return result;
-            }
+            return await db.Questions
+                                .Include(q => q.AnswerOptions)
+                                .Where(q => q.Id == questionId)
+                                .FirstOrDefaultAsync();
         }
     }
 }
