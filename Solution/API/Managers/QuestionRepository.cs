@@ -12,7 +12,7 @@ namespace API.Managers
 {
     public class QuestionRepository : Repository<QuestionModel>
     {
-        public override IQueryable<QuestionModel> Query => _context.Questions;
+        public override IQueryable<QuestionModel> Query => _context.Questions.Include(q => q.AnswerOptions);
 
         public QuestionRepository(AppDbContext context) : base(context) { }
 

@@ -42,7 +42,7 @@ builder.Services.AddAutoMapper(m =>
     m.AddProfile(new AutoMappingProfile());
 });
 
-builder.Services.AddSingleton<IRepository<QuestionModel>, QuestionRepository>();
+builder.Services.AddScoped<IRepository<QuestionModel>, QuestionRepository>();
 // builder.Services.AddSingleton<IRepository<RoomModel>, RoomRepository>();
 
 var app = builder.Build();
