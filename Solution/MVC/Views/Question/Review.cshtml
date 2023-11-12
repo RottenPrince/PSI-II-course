@@ -1,5 +1,5 @@
 ﻿@using System.Text.Json;
-@model SharedModels.Question.QuestionRunTransferModel
+@model MVC.Models.ReviewRunModel
 @{
     ViewData["Title"] = "Question Page";
 }
@@ -9,13 +9,13 @@
 }
 
 <div id="questionTitle">
-    <h1>@Model.Question.Title</h1>
+    <h1>@Model.currentQuestion.Title</h1>
 </div>
 
-@if (Model.Question.ImageName != null)
+@if (Model.currentQuestion.ImageName != null)
 {
     <div id="questionImage" class="text-center mt-5">
-        <img src="~/img/@Model.Question.ImageName" alt="Question Image" />
+        <img src="~/img/@Model.currentQuestion.ImageName" alt="Question Image" />
     </div>
 }
 
@@ -24,9 +24,9 @@
 
 
 <div>
-        @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
+        @foreach (var (idx, option) in Model.currentQuestion.AnswerOptions.WithIndex())
         {
-            <div class="answer-option @((idx == Model.Question.CorrectAnswerIndex) ? "correct" : (idx == Model.answers[Model.currentQuestionIndex]) ? "selected" : "")">
+            <div class="answer-option @((idx == Model.currentQuestion.CorrectAnswerIndex) ? "correct" : (idx == Model.answers[Model.currentQuestionIndex]) ? "selected" : "")">
                 @option
             </div>
         }

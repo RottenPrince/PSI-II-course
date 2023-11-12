@@ -44,13 +44,14 @@ namespace MVC.Controllers
         [HttpPost]
         public IActionResult CreateRoom(string roomName)
         {
-            APIHelper.Post<string, string>("api/Lobby/CreateRoom", roomName, out var error);
-            ViewBag.RoomName = roomName;
-            if(error != null)
+            ViewBag.RoomId = APIHelper.Post<string, int>("api/Lobby/CreateRoom", roomName, out var error);
+            if (error != null)
             {
                 ViewBag.ErrorMessage = error.Message;
                 return View("CreateError");
             }
+            ViewBag.RoomName = roomName;
+
             return View("CreateSuccess");
         }
     }

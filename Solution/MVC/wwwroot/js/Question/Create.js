@@ -6,7 +6,7 @@
         var optionHtml = `
                 <div class="answerOption">
                     <input type="radio" name="CorrectAnswerIndex" value="${optionCount}" />
-                    <input type="text" class="answerOptionBox" name="AnswerOptions[]" value="" />
+                    <input type="text" class="answerOptionBox" name="AnswerOptions[${optionCount}].OptionText" value="" />
                     <button type="button" class="removeOption">Remove</button>
                 </div>`;
 
@@ -29,7 +29,7 @@
 
     $("form").submit(function (e) {
         var selectedRadio = $("input[name='CorrectAnswerIndex']:checked");
-        var answerTextBoxes = $("input[name='AnswerOptions[]']");
+        var answerTextBoxes = $("input[name^='AnswerOptions'][name$='OptionText']");
         var titleTextBox = $("input[name='Title']");
 
         var isAnyAnswerEmpty = answerTextBoxes.toArray().some(function (textBox) {

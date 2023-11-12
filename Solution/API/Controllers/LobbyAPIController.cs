@@ -49,7 +49,8 @@ namespace API.Controllers
         {
             using (var db = new AppDbContext())
             {
-                db.Rooms.Add(new RoomModel { Name = roomName });
+                var newRoom = new RoomModel { Name = roomName };
+                db.Rooms.Add(newRoom);
                 try
                 {
                     db.SaveChanges();
@@ -61,7 +62,7 @@ namespace API.Controllers
                     if (errorCodeInt == 19) { return BadRequest("Name already in use"); }
                     else { throw ex; }
                 }
-                return Ok("Room successfully added");
+                return Ok(newRoom.Id);
             }
         }
 

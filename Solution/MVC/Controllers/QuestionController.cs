@@ -70,6 +70,8 @@ namespace MVC.Controllers
         [HttpPost("{roomId}")]
         public IActionResult Create(string roomId, IFormFile? image, QuestionWithAnswerTransferModel questionModel)
         {
+            Console.WriteLine(questionModel.AnswerOptions.Count);
+
             if(!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).ToList();
