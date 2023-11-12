@@ -28,14 +28,14 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllRooms()
         {
-            var rooms = await QuestionManager.GetAllRooms(_context);
+            var rooms = await QuestionRepository.GetAllRooms(_context);
             return Ok(rooms.Select(r => _mapper.Map<RoomTransferModel>(r)));
         }
 
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
-            RoomModel? room = await QuestionManager.GetRoomContent(_context, roomId);
+            RoomModel? room = await QuestionRepository.GetRoomContent(_context, roomId);
             if (room == null) return NotFound();
             return Ok(new RoomContentStruct
             {
@@ -70,7 +70,7 @@ namespace API.Controllers
         {
             try
             {
-                return Ok(await QuestionManager.CreateNewSolveRun(_context, _random, roomId));
+                return Ok(await QuestionRepository.CreateNewSolveRun(_context, _random, roomId));
             } catch (InvalidOperationException)
             {
                 return NotFound();
@@ -80,7 +80,7 @@ namespace API.Controllers
         [HttpGet("{runId}")]
         public async Task<IActionResult> GetNextQuestionInRun(int runId)
         {
-            var model = await QuestionManager.GetNextQuestionInRun(_context, runId);
+            var model = await QuestionRepository.GetNextQuestionInRun(_context, runId);
             if (model == null) return NoContent();
             return Ok(_mapper.Map<QuestionTransferModel>(model.Question));
         }
@@ -88,7 +88,7 @@ namespace API.Controllers
         [HttpPost("{runId}/{answerId}")]
         public async Task<IActionResult> SubmitAnswer(int runId, int answerId)
         {
-            var model = await QuestionManager.GetNextQuestionInRun(_context, runId);
+            var model = await QuestionRepository.GetNextQuestionInRun(_context, runId);
             if (model == null) return BadRequest();
             model.SelectedAnswerOption = model.Question.AnswerOptions[answerId];
             _context.SaveChanges();
@@ -98,7 +98,7 @@ namespace API.Controllers
         [HttpGet("{runId}")]
         public async Task<IActionResult> GetAllQuestionRunInfo(int runId)
         {
-            var questions = await QuestionManager.GetAllQuestionRunInfo(_context, runId);
+            var questions = await QuestionRepository.GetAllQuestionRunInfo(_context, runId);
             if (questions.Any(x => x.SelectedAnswerOption == null)) return Unauthorized();
             return Ok(_mapper.Map<List<QuestionRunTransferModel>>(questions));
         }

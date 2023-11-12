@@ -10,14 +10,18 @@ using System;
 
 namespace API.Managers
 {
-    public static class QuestionManager
+    public class QuestionRepository : Repository<QuestionModel>
     {
-        public static async Task<QuestionModel?> GetQuestionWithAnswer(AppDbContext db, int questionId)
+        public override IQueryable<QuestionModel> Query => _context.Questions;
+
+        public QuestionRepository(AppDbContext context) : base(context) { }
+
+        public override Task<QuestionModel?> GetById(int id)
         {
-            return await GetQuestionFromDatabase(db, questionId);
+            return Query.FirstOrDefaultAsync(q => q.Id == id);
         }
 
-        public static bool CreateNewQuestion(AppDbContext db, int roomId, QuestionWithAnswerTransferModel model)
+        public bool CreateNewQuestion(AppDbContext db, int roomId, QuestionWithAnswerTransferModel model)
         {
             var roomModel = db.Rooms.Find(roomId);
 
@@ -45,12 +49,12 @@ namespace API.Managers
             return true;
         }
 
-        public static async Task<List<RoomModel>> GetAllRooms(AppDbContext db)
+        public async Task<List<RoomModel>> GetAllRooms(AppDbContext db)
         {
             return await db.Rooms.ToListAsync();
         }
 
-        public static async Task<RoomModel?> GetRoomContent(AppDbContext db, int roomId)
+        public async Task<RoomModel?> GetRoomContent(AppDbContext db, int roomId)
         {
             var roomModel = await db.Rooms
                             .Include(q => q.Questions)
@@ -65,7 +69,7 @@ namespace API.Managers
             return roomModel;
         }
 
-        public static async Task<QuestionSolveRunJoinModel> GetNextQuestionInRun(AppDbContext db, int runId)
+        public async Task<QuestionSolveRunJoinModel> GetNextQuestionInRun(AppDbContext db, int runId)
         {
             var questions = await db.QuestionSolveRunJoinModels
                 .Include(srm => srm.Question)
@@ -81,7 +85,7 @@ namespace API.Managers
             }
         }
 
-        public static async Task<List<QuestionSolveRunJoinModel>> GetAllQuestionRunInfo(AppDbContext db, int runId)
+        public async Task<List<QuestionSolveRunJoinModel>> GetAllQuestionRunInfo(AppDbContext db, int runId)
         {
             var questions = await db.QuestionSolveRunJoinModels
                 .Include(srm => srm.Question)
@@ -97,7 +101,7 @@ namespace API.Managers
             }
         }
 
-        public static async Task<int> CreateNewSolveRun(AppDbContext db, Random rng, int roomId)
+        public async Task<int> CreateNewSolveRun(AppDbContext db, Random rng, int roomId)
         {
             var roomModel = await db.Rooms
                             .Include(room => room.Questions)
@@ -128,12 +132,13 @@ namespace API.Managers
             return newModel.Id;
         }
 
-        private static async Task<QuestionModel?> GetQuestionFromDatabase(AppDbContext db, int questionId)
+        private async Task<QuestionModel?> GetQuestionFromDatabase(AppDbContext db, int questionId)
         {
             return await db.Questions
                                 .Include(q => q.AnswerOptions)
                                 .Where(q => q.Id == questionId)
                                 .FirstOrDefaultAsync();
         }
+
     }
 }
