@@ -41,7 +41,7 @@ namespace API.Controllers
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
+        public async Task<IActionResult> SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
         {
             if (questionModel == null)
             {
@@ -49,8 +49,9 @@ namespace API.Controllers
             }
 
             var dbModel = _mapper.Map<QuestionModel>(questionModel);
+            dbModel.RoomId = roomId;
             _questions.Add(dbModel);
-            _questions.Save();
+            await _questions.Save();
             return Ok("Question created successfully.");
         }
     }

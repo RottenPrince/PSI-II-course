@@ -16,7 +16,12 @@ namespace API.Data
                 {
                     b.CorrectAnswerIndex = a.AnswerOptions.FindIndex(x => x.IsCorrect);
                 });
-            CreateMap<QuestionWithAnswerTransferModel, QuestionModel>();
+            CreateMap<QuestionWithAnswerTransferModel, QuestionModel>()
+                .AfterMap((a, b) =>
+                {
+                    b.AnswerOptions[a.CorrectAnswerIndex].IsCorrect = true;
+                    b.AnswerOptions.ForEach(o => o.Question = b);
+                });
             CreateMap<QuestionSolveRunJoinModel, QuestionRunTransferModel>()
                 .ForMember(x => x.SelectedAnswerOption, opt => opt.Ignore())
                 .AfterMap((a, b) =>
