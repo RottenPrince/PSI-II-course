@@ -17,18 +17,21 @@ namespace API.Controllers
         private Random _random;
         private readonly IMapper _mapper;
         private readonly AppDbContext _context;
+        private readonly RoomRepository _rooms;
 
-        public LobbyAPIController(IMapper mapper, AppDbContext context)
+        public LobbyAPIController(IMapper mapper, AppDbContext context, RoomRepository rooms)
         {
             _random = new Random();
             _mapper = mapper;
             _context = context;
+            _rooms = rooms;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllRooms()
         {
-            var rooms = await QuestionRepository.GetAllRooms(_context);
+            var rooms = await _rooms.GetAll();
+            // TODO turbut jeigu yra mapping T->U, tai bus ir List<T>->List<U>
             return Ok(rooms.Select(r => _mapper.Map<RoomTransferModel>(r)));
         }
 

@@ -21,39 +21,6 @@ namespace API.Managers
             return Query.FirstOrDefaultAsync(q => q.Id == id);
         }
 
-        public bool CreateNewQuestion(AppDbContext db, int roomId, QuestionWithAnswerTransferModel model)
-        {
-            var roomModel = db.Rooms.Find(roomId);
-
-            if(roomModel == null)
-            {
-                return false;
-            }
-
-            var newQuestionModel = new QuestionModel
-            {
-                Title = model.Title,
-                ImageSource = model.ImageName,
-                Room = roomModel,
-                AnswerOptions = model.AnswerOptions.Select(o => new AnswerOptionModel
-                {
-                    OptionText = o.OptionText,
-                    IsCorrect = false,
-                }).ToList(),
-            };
-
-            newQuestionModel.AnswerOptions[model.CorrectAnswerIndex].IsCorrect = true;
-
-            db.Add(newQuestionModel);
-            db.SaveChanges();
-            return true;
-        }
-
-        public async Task<List<RoomModel>> GetAllRooms(AppDbContext db)
-        {
-            return await db.Rooms.ToListAsync();
-        }
-
         public async Task<RoomModel?> GetRoomContent(AppDbContext db, int roomId)
         {
             var roomModel = await db.Rooms
