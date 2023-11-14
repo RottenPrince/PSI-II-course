@@ -71,6 +71,7 @@ namespace API.Managers
                 .Include(srm => srm.Question)
                 .ThenInclude(m => m.AnswerOptions)
                 .Where(srm => srm.SolveRunModelID == runId)
+                .OrderBy(q => q.Id)
                 .ToListAsync();
             try
             {
@@ -79,6 +80,26 @@ namespace API.Managers
             {
                 return null;
             }
+        }
+
+        public static async Task<QuestionSolveRunJoinModel> GetNextQuestionInReview(AppDbContext db, int runId, int currentQuestionIndex)
+        {
+            
+            var questions = await db.QuestionSolveRunJoinModels
+                .Include(srm => srm.Question)
+                .ThenInclude(m => m.AnswerOptions)
+                .Where(srm => srm.SolveRunModelID == runId)
+                .OrderBy(q => q.Id)
+                .ToListAsync();
+
+            if (currentQuestionIndex >= 0 && currentQuestionIndex < questions.Count)
+            {
+                return questions[currentQuestionIndex];
+            }
+            else
+            {
+                return null;
+            } 
         }
 
         public static async Task<List<QuestionSolveRunJoinModel>> GetAllQuestionRunInfo(AppDbContext db, int runId)
@@ -97,7 +118,7 @@ namespace API.Managers
             }
         }
 
-        public static async Task<int> CreateNewSolveRun(AppDbContext db, Random rng, int roomId)
+        public static async Task<int> CreateNewSolveRun(AppDbContext db, Random rng, int roomId, int questionAmount)
         {
             var roomModel = await db.Rooms
                             .Include(room => room.Questions)
@@ -106,7 +127,7 @@ namespace API.Managers
             var questions = roomModel.Questions;
             lock (rng)
             {
-                questions = questions.OrderBy(x => rng.Next()).ToList();
+                questions = questions.OrderBy(x => rng.Next()).Take(questionAmount).ToList();
             }
             db.Rooms.Attach(roomModel);
             db.Questions.AttachRange(questions);

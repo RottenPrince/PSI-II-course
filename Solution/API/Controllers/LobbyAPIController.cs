@@ -66,12 +66,12 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{roomId}")]
-        public async Task<IActionResult> CreateSolveRun(int roomId)
+        [HttpGet("{roomId}/{questionAmount}")]
+        public async Task<IActionResult> CreateSolveRun(int roomId, int questionAmount)
         {
             try
             {
-                return Ok(await QuestionManager.CreateNewSolveRun(_context, _random, roomId));
+                return Ok(await QuestionManager.CreateNewSolveRun(_context, _random, roomId, questionAmount));
             } catch (InvalidOperationException)
             {
                 return NotFound();
@@ -102,6 +102,28 @@ namespace API.Controllers
             var questions = await QuestionManager.GetAllQuestionRunInfo(_context, runId);
             if (questions.Any(x => x.SelectedAnswerOption == null)) return Unauthorized();
             return Ok(_mapper.Map<List<QuestionRunTransferModel>>(questions));
+        }
+
+        [HttpGet("{runId}/{currentQuestionIndex}")]
+        public async Task<IActionResult> GetNextQuestionInReview(int runId, int currentQuestionIndex)
+        {
+            var model = await QuestionManager.GetNextQuestionInReview(_context, runId, currentQuestionIndex);
+            if(model == null)
+                return NoContent();
+            return Ok(_mapper.Map<QuestionRunTransferModel>(model));
+        }
+
+        [HttpGet("{runId}")]
+        public async Task<IActionResult> GetRoomId(int runId)
+        {
+            var questions = await QuestionManager.GetAllQuestionRunInfo(_context, runId);
+            if (questions != null && questions.Any())
+            {
+                int roomId = questions.First().Question.RoomId; 
+                return Ok(roomId);
+            }
+
+            return NotFound();
         }
     }
 }

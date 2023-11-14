@@ -19,10 +19,10 @@ namespace MVC.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{roomId}")]
-        public IActionResult StartRun(int roomId)
+        [HttpGet("{roomId}/{questionAmount}")]
+        public IActionResult StartRun(int roomId, int questionAmount)
         {
-            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateSolveRun/{roomId}", out var error);
+            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateSolveRun/{roomId}/{questionAmount}", out var error);
             if(error != null)
             {
                 throw new Exception(); // TODO something normal
@@ -41,7 +41,7 @@ namespace MVC.Controllers
             }
             ViewBag.runId = runId;
             return View("Solve", questionModel);
-        }
+        } 
 
         [HttpPost]
         public IActionResult Solve(int runId, int selectedOption)
@@ -50,11 +50,24 @@ namespace MVC.Controllers
             return RedirectToAction("Solve", new { runId = runId });
         }
 
-        [HttpPost]
-        public IActionResult Review(int runId, int selectedQuestion)
+        [HttpGet]
+        public IActionResult Review(int runId, int currentQuestionIndex)
         {
-            var questions = APIHelper.Get<List<QuestionRunTransferModel>>($"api/Lobby/GetAllQuestionInfo/{runId}", out var error);
-            return Ok();
+            var questionModel = APIHelper.Get<QuestionRunTransferModel>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", out var error);
+            if(questionModel == null)
+            {
+                var roomId = APIHelper.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
+                return RedirectToAction("Room", "Lobby", new { roomId = roomId });
+            }
+            ViewBag.runId = runId;
+            ViewBag.currentQuestionIndex = currentQuestionIndex;
+            return View("Review", questionModel);
+        }
+
+        [HttpPost]
+        public IActionResult ReviewNext(int runId, int currentQuestionIndex)
+        {
+            return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = currentQuestionIndex+1 });
         }
 
         [HttpGet("{roomId}")]

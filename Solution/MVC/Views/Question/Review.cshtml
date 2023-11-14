@@ -1,5 +1,5 @@
 ﻿@using System.Text.Json;
-@model MVC.Models.ReviewRunModel
+@model SharedModels.Question.QuestionRunTransferModel
 @{
     ViewData["Title"] = "Question Page";
 }
@@ -9,13 +9,13 @@
 }
 
 <div id="questionTitle">
-    <h1>@Model.currentQuestion.Title</h1>
+    <h1>@Model.Question.Title</h1>
 </div>
 
-@if (Model.currentQuestion.ImageName != null)
+@if (Model.Question.ImageName != null)
 {
     <div id="questionImage" class="text-center mt-5">
-        <img src="~/img/@Model.currentQuestion.ImageName" alt="Question Image" />
+        <img src="~/img/@Model.Question.ImageName" alt="Question Image" />
     </div>
 }
 
@@ -24,20 +24,17 @@
 
 
 <div>
-        @foreach (var (idx, option) in Model.currentQuestion.AnswerOptions.WithIndex())
+        @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
         {
-            <div class="answer-option @((idx == Model.currentQuestion.CorrectAnswerIndex) ? "correct" : (idx == Model.answers[Model.currentQuestionIndex]) ? "selected" : "")">
-                @option
+            <div class="answer-option @((idx == Model.Question.CorrectAnswerIndex) ? "correct" : (idx == Model.SelectedAnswerOption) ? "selected" : "")">
+                @option.OptionText
             </div>
         }
 </div>
 
-<form asp-controller="Question" asp-action="Review" method="post">
-    <input type="hidden" name="roomId" value="@ViewBag.RoomId" />
-    <input type="hidden" name="currentQuestionIndex" value="@Model.currentQuestionIndex" />
-    <input type="hidden" name="correctAnswersCount" value="@Model.correctAnswersCount" />
-    <input type="hidden" name="questionsIdJson" value='@JsonSerializer.Serialize(Model.questionsId)' />
-    <input type="hidden" name="answersJson" value='@JsonSerializer.Serialize(Model.answers)' />
+<form asp-controller="Question" asp-action="ReviewNext" method="post">
+    <input type="hidden" name="runId" value="@ViewBag.runId" />
+    <input type="hidden" name="currentQuestionIndex" value="@ViewBag.currentQuestionIndex" />
 
     <button type="submit" class="btn btn-primary">Next</button>
 </form>
