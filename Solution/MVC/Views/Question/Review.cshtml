@@ -32,7 +32,7 @@
         }
 </div>
 
-<form asp-controller="Question" asp-action="ReviewNext" method="post">
+<form asp-controller="Question" asp-action="Review" method="get">
     <input type="hidden" name="runId" value="@ViewBag.runId" />
     <input type="hidden" name="currentQuestionIndex" value="@ViewBag.currentQuestionIndex" />
 

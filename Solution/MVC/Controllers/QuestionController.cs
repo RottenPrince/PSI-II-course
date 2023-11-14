@@ -40,6 +40,9 @@ namespace MVC.Controllers
                 return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = 0 });
             }
             ViewBag.runId = runId;
+            var roomId = APIHelper.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
+            ViewBag.roomId = roomId;
+
             return View("Solve", questionModel);
         } 
 
@@ -60,14 +63,8 @@ namespace MVC.Controllers
                 return RedirectToAction("Room", "Lobby", new { roomId = roomId });
             }
             ViewBag.runId = runId;
-            ViewBag.currentQuestionIndex = currentQuestionIndex;
+            ViewBag.currentQuestionIndex = currentQuestionIndex + 1;
             return View("Review", questionModel);
-        }
-
-        [HttpPost]
-        public IActionResult ReviewNext(int runId, int currentQuestionIndex)
-        {
-            return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = currentQuestionIndex+1 });
         }
 
         [HttpGet("{roomId}")]
