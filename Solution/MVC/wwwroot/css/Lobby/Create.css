@@ -44,3 +44,26 @@ input {
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
+
+.btn-secondary {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+    .btn-secondary:hover {
+        background-color: #0056b3;
+    }
+
+.nav-link {
+    color: #333;
+    text-decoration: none;
+}
+
+    .nav-link:hover {
+        text-decoration: underline;
+    }
