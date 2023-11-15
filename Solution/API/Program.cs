@@ -43,7 +43,8 @@ builder.Services.AddAutoMapper(m =>
 });
 
 builder.Services.AddScoped<IRepository<QuestionModel>, QuestionRepository>();
-// builder.Services.AddSingleton<IRepository<RoomModel>, RoomRepository>();
+builder.Services.AddScoped<IRepository<RoomModel>, RoomRepository>();
+builder.Services.AddScoped<IQuestionSolveRunJoinRepository, QuestionSolveRunJoinRepository>();
 
 var app = builder.Build();
 

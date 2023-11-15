@@ -16,29 +16,28 @@ namespace API.Controllers
     {
         private Random _random;
         private readonly IMapper _mapper;
-        private readonly AppDbContext _context;
-        private readonly RoomRepository _rooms;
+        private readonly IRepository<RoomModel> _rooms;
+        private readonly IQuestionSolveRunJoinRepository _runs;
 
-        public LobbyAPIController(IMapper mapper, AppDbContext context, RoomRepository rooms)
+        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> rooms, IQuestionSolveRunJoinRepository runs)
         {
             _random = new Random();
             _mapper = mapper;
-            _context = context;
             _rooms = rooms;
+            _runs = runs;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllRooms()
         {
             var rooms = await _rooms.GetAll();
-            // TODO turbut jeigu yra mapping T->U, tai bus ir List<T>->List<U>
-            return Ok(rooms.Select(r => _mapper.Map<RoomTransferModel>(r)));
+            return Ok(_mapper.Map<List<RoomTransferModel>>(rooms));
         }
 
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
-            RoomModel? room = await QuestionRepository.GetRoomContent(_context, roomId);
+            RoomModel? room = await _rooms.GetById(roomId);
             if (room == null) return NotFound();
             return Ok(new RoomContentStruct
             {
@@ -50,40 +49,39 @@ namespace API.Controllers
         [HttpPost]
         public IActionResult CreateRoom([FromBody] string roomName)
         {
-            using (var db = new AppDbContext())
+            _rooms.Add(new RoomModel { Name = roomName });
+            try
             {
-                db.Rooms.Add(new RoomModel { Name = roomName });
-                try
-                {
-                    db.SaveChanges();
-                } catch (DbUpdateException ex) {
-                    var message = ex.InnerException.Message;
-                    var errorCode = Regex.Match(message, "^.*Error (\\d+):.*$");
-                    if (!errorCode.Success || errorCode.Groups.Count < 2) { throw ex; }
-                    var errorCodeInt = int.Parse(errorCode.Groups[1].Value);
-                    if (errorCodeInt == 19) { return BadRequest("Name already in use"); }
-                    else { throw ex; }
-                }
-                return Ok("Room successfully added");
+                _rooms.Save();
+            } catch (DbUpdateException ex) {
+                var message = ex.InnerException.Message;
+                var errorCode = Regex.Match(message, "^.*Error (\\d+):.*$");
+                if (!errorCode.Success || errorCode.Groups.Count < 2) { throw ex; }
+                var errorCodeInt = int.Parse(errorCode.Groups[1].Value);
+                if (errorCodeInt == 19) { return BadRequest("Name already in use"); }
+                else { throw ex; }
             }
+            return Ok("Room successfully added");
         }
 
         [HttpGet("{roomId}")]
         public async Task<IActionResult> CreateSolveRun(int roomId)
         {
-            try
-            {
-                return Ok(await QuestionRepository.CreateNewSolveRun(_context, _random, roomId));
-            } catch (InvalidOperationException)
+            int id = await _runs.CreateNewSolveRun(roomId);
+            if(id == -1)
             {
                 return NotFound();
+            }
+            else
+            {
+                return Ok(id);
             }
         }
 
         [HttpGet("{runId}")]
         public async Task<IActionResult> GetNextQuestionInRun(int runId)
         {
-            var model = await QuestionRepository.GetNextQuestionInRun(_context, runId);
+            var model = await _runs.GetNextQuestionInRun(runId);
             if (model == null) return NoContent();
             return Ok(_mapper.Map<QuestionTransferModel>(model.Question));
         }
@@ -91,17 +89,17 @@ namespace API.Controllers
         [HttpPost("{runId}/{answerId}")]
         public async Task<IActionResult> SubmitAnswer(int runId, int answerId)
         {
-            var model = await QuestionRepository.GetNextQuestionInRun(_context, runId);
+            var model = await _runs.GetNextQuestionInRun(runId);
             if (model == null) return BadRequest();
             model.SelectedAnswerOption = model.Question.AnswerOptions[answerId];
-            _context.SaveChanges();
+            _runs.Save();
             return Ok();
         }
 
         [HttpGet("{runId}")]
         public async Task<IActionResult> GetAllQuestionRunInfo(int runId)
         {
-            var questions = await QuestionRepository.GetAllQuestionRunInfo(_context, runId);
+            var questions = await _runs.GetAllQuestionRunInfo(runId);
             if (questions.Any(x => x.SelectedAnswerOption == null)) return Unauthorized();
             return Ok(_mapper.Map<List<QuestionRunTransferModel>>(questions));
         }
