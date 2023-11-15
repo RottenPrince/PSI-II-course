@@ -26,18 +26,15 @@
 <div>
         @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
         {
-            <div class="answer-option @((idx == Model.Question.CorrectAnswerIndex) ? "correct" : (idx == Model.answers[Model.currentQuestionIndex]) ? "selected" : "")">
-                @option
+            <div class="answer-option @((idx == Model.Question.CorrectAnswerIndex) ? "correct" : (idx == Model.SelectedAnswerOption) ? "selected" : "")">
+                @option.OptionText
             </div>
         }
 </div>
 
-<form asp-controller="Question" asp-action="Review" method="post">
-    <input type="hidden" name="roomId" value="@ViewBag.RoomId" />
-    <input type="hidden" name="currentQuestionIndex" value="@Model.currentQuestionIndex" />
-    <input type="hidden" name="correctAnswersCount" value="@Model.correctAnswersCount" />
-    <input type="hidden" name="questionsIdJson" value='@JsonSerializer.Serialize(Model.questionsId)' />
-    <input type="hidden" name="answersJson" value='@JsonSerializer.Serialize(Model.answers)' />
+<form asp-controller="Question" asp-action="Review" method="get">
+    <input type="hidden" name="runId" value="@ViewBag.runId" />
+    <input type="hidden" name="currentQuestionIndex" value="@ViewBag.currentQuestionIndex" />
 
     <button type="submit" class="btn btn-primary">Next</button>
 </form>

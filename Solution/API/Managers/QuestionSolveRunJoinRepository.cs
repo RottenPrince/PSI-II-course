@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace API.Managers
 {
@@ -50,7 +51,7 @@ namespace API.Managers
             }
         }
 
-        public async Task<int> CreateNewSolveRun(int roomId)
+        public async Task<int> CreateNewSolveRun(int roomId, int questionAmount)
         {
             var roomModel = await _room.GetById(roomId);
             if(roomModel == null)
@@ -60,7 +61,7 @@ namespace API.Managers
             var questions = roomModel.Questions;
             lock (_rng)
             {
-                questions = questions.OrderBy(x => _rng.Next()).ToList();
+                questions = questions.OrderBy(x => _rng.Next()).Take(questionAmount).ToList();
             }
             var newModel = new SolveRunModel
             {
@@ -78,6 +79,23 @@ namespace API.Managers
             _context.SolveRunModels.Add(newModel);
             Save();
             return newModel.Id;
+        }
+
+        public async Task<QuestionSolveRunJoinModel?> GetNextQuestionInReview(int runId, int currentQuestionIndex)
+        {
+            var questions = await Query
+                        .Where(srm => srm.SolveRunModelID == runId)
+                        .OrderBy(q => q.Id)
+                        .ToListAsync();
+
+            if (currentQuestionIndex >= 0 && currentQuestionIndex < questions.Count)
+            {
+                return questions[currentQuestionIndex];
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

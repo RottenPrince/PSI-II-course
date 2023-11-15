@@ -50,22 +50,23 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateRoom([FromBody] string roomName)
         {
-            _rooms.Add(new RoomModel { Name = roomName });
+            var newRoom = new RoomModel { Name = roomName };
+            _rooms.Add(newRoom);
             try
             {
                 _rooms.Save();
             }
             catch (DbConstraintFailedException)
             {
-                return BadRequest("Room name already taken");
+                return BadRequest("Name already in use");
             }
-            return Ok("Room successfully added");
+            return Ok(newRoom.Id);
         }
 
-        [HttpGet("{roomId}")]
-        public async Task<IActionResult> CreateSolveRun(int roomId)
+        [HttpGet("{roomId}/{questionAmount}")]
+        public async Task<IActionResult> CreateSolveRun(int roomId, int questionAmount)
         {
-            int id = await _runs.CreateNewSolveRun(roomId);
+            int id = await _runs.CreateNewSolveRun(roomId, questionAmount);
             if(id == -1)
             {
                 return NotFound();
@@ -100,6 +101,28 @@ namespace API.Controllers
             var questions = await _runs.GetAllQuestionRunInfo(runId);
             if (questions.Any(x => x.SelectedAnswerOption == null)) return Unauthorized();
             return Ok(_mapper.Map<List<QuestionRunTransferModel>>(questions));
+        }
+
+        [HttpGet("{runId}/{currentQuestionIndex}")]
+        public async Task<IActionResult> GetNextQuestionInReview(int runId, int currentQuestionIndex)
+        {
+            var model = await _runs.GetNextQuestionInReview(runId, currentQuestionIndex);
+            if(model == null)
+                return NoContent();
+            return Ok(_mapper.Map<QuestionRunTransferModel>(model));
+        }
+
+        [HttpGet("{runId}")]
+        public async Task<IActionResult> GetRoomId(int runId)
+        {
+            var questions = await _runs.GetAllQuestionRunInfo(runId);
+            if (questions != null && questions.Any())
+            {
+                int roomId = questions.First().Question.RoomId; 
+                return Ok(roomId);
+            }
+
+            return NotFound();
         }
     }
 }

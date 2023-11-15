@@ -19,10 +19,10 @@ namespace MVC.Controllers
             _logger = logger;
         }
 
-        [HttpGet("{roomId}")]
-        public IActionResult StartRun(int roomId)
+        [HttpGet("{roomId}/{questionAmount}")]
+        public IActionResult StartRun(int roomId, int questionAmount)
         {
-            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateSolveRun/{roomId}", out var error);
+            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateSolveRun/{roomId}/{questionAmount}", out var error);
             if(error != null)
             {
                 throw new Exception(); // TODO something normal
@@ -40,8 +40,11 @@ namespace MVC.Controllers
                 return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = 0 });
             }
             ViewBag.runId = runId;
+            var roomId = APIHelper.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
+            ViewBag.roomId = roomId;
+
             return View("Solve", questionModel);
-        }
+        } 
 
         [HttpPost]
         public IActionResult Solve(int runId, int selectedOption)
@@ -50,11 +53,18 @@ namespace MVC.Controllers
             return RedirectToAction("Solve", new { runId = runId });
         }
 
-        [HttpPost]
-        public IActionResult Review(int runId, int selectedQuestion)
+        [HttpGet]
+        public IActionResult Review(int runId, int currentQuestionIndex)
         {
-            var questions = APIHelper.Get<List<QuestionRunTransferModel>>($"api/Lobby/GetAllQuestionInfo/{runId}", out var error);
-            return Ok();
+            var questionModel = APIHelper.Get<QuestionRunTransferModel>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", out var error);
+            if(questionModel == null)
+            {
+                var roomId = APIHelper.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
+                return RedirectToAction("Room", "Lobby", new { roomId = roomId });
+            }
+            ViewBag.runId = runId;
+            ViewBag.currentQuestionIndex = currentQuestionIndex + 1;
+            return View("Review", questionModel);
         }
 
         [HttpGet("{roomId}")]
@@ -70,6 +80,8 @@ namespace MVC.Controllers
         [HttpPost("{roomId}")]
         public IActionResult Create(string roomId, IFormFile? image, QuestionWithAnswerTransferModel questionModel)
         {
+            Console.WriteLine(questionModel.AnswerOptions.Count);
+
             if(!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).ToList();
