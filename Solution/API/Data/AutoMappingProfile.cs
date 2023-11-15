@@ -9,11 +9,18 @@ namespace API.Data
         public AutoMappingProfile()
         {
             CreateMap<AnswerOptionModel, AnswerOptionTransferModel>();
+            CreateMap<AnswerOptionTransferModel, AnswerOptionModel>();
             CreateMap<QuestionModel, QuestionTransferModel>();
             CreateMap<QuestionModel, QuestionWithAnswerTransferModel>()
                 .AfterMap((a, b) =>
                 {
                     b.CorrectAnswerIndex = a.AnswerOptions.FindIndex(x => x.IsCorrect);
+                });
+            CreateMap<QuestionWithAnswerTransferModel, QuestionModel>()
+                .AfterMap((a, b) =>
+                {
+                    b.AnswerOptions[a.CorrectAnswerIndex].IsCorrect = true;
+                    b.AnswerOptions.ForEach(o => o.Question = b);
                 });
             CreateMap<QuestionSolveRunJoinModel, QuestionRunTransferModel>()
                 .ForMember(x => x.SelectedAnswerOption, opt => opt.Ignore())

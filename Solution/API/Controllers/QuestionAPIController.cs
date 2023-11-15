@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using API.Managers;
 using AutoMapper;
 using API.Data;
+using API.Models;
 
 namespace API.Controllers
 {
@@ -13,19 +14,20 @@ namespace API.Controllers
         private readonly ILogger<QuestionAPIController> _logger;
         private Random _random;
         private readonly IMapper _mapper;
-        private readonly AppDbContext _context;
+        private readonly IRepository<QuestionModel> _questions;
 
-        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper, AppDbContext context)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper, IRepository<QuestionModel> questions)
         {
             _logger = logger;
             _mapper = mapper;
-            _context = context;
+            _questions = questions;
+            _random = new Random();
         }
 
         [HttpGet("{questionId}")]
         public async Task<IActionResult> GetQuestion(int questionId)
         {
-            var questionModel = await QuestionManager.GetQuestionWithAnswer(_context, questionId);
+            var questionModel = await _questions.GetById(questionId);
             if (questionModel == null) return NotFound();
             return Ok(_mapper.Map<QuestionTransferModel>(questionModel));
         }
@@ -33,20 +35,23 @@ namespace API.Controllers
         [HttpGet("{questionId}")]
         public async Task<IActionResult> GetFullQuestion(int questionId)
         {
-            var questionModel = await QuestionManager.GetQuestionWithAnswer(_context, questionId);
+            var questionModel = await _questions.GetById(questionId);
             if (questionModel == null) return NotFound();
             return Ok(_mapper.Map<QuestionWithAnswerTransferModel>(questionModel));
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
+        public async Task<IActionResult> SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
         {
             if (questionModel == null)
             {
                 return BadRequest("Question data is invalid");
             }
 
-            QuestionManager.CreateNewQuestion(_context, roomId, questionModel);
+            var dbModel = _mapper.Map<QuestionModel>(questionModel);
+            dbModel.RoomId = roomId;
+            _questions.Add(dbModel);
+            _questions.Save();
             return Ok("Question created successfully.");
         }
     }

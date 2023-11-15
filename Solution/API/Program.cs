@@ -1,4 +1,6 @@
 using API.Data;
+using API.Managers;
+using API.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +41,10 @@ builder.Services.AddAutoMapper(m =>
 {
     m.AddProfile(new AutoMappingProfile());
 });
+
+builder.Services.AddScoped<IRepository<QuestionModel>, QuestionRepository>();
+builder.Services.AddScoped<IRepository<RoomModel>, RoomRepository>();
+builder.Services.AddScoped<IQuestionSolveRunJoinRepository, QuestionSolveRunJoinRepository>();
 
 var app = builder.Build();
 
