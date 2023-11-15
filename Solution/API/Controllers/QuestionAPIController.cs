@@ -51,7 +51,7 @@ namespace API.Controllers
             var dbModel = _mapper.Map<QuestionModel>(questionModel);
             dbModel.RoomId = roomId;
             _questions.Add(dbModel);
-            await _questions.Save();
+            _questions.Save();
             return Ok("Question created successfully.");
         }
     }

@@ -1,5 +1,7 @@
 ﻿using API.Data;
+using API.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace API.Managers
 {
@@ -40,9 +42,20 @@ namespace API.Managers
             _context.Remove(entities);
         }
 
-        public Task<int> Save()
+        public int Save()
         {
-            return _context.SaveChangesAsync();
+            try
+            {
+                return _context.SaveChanges();
+            } catch (DbUpdateException ex)
+            {
+                var message = ex.InnerException.Message;
+                var errorCode = Regex.Match(message, "^.*Error (\\d+):.*$");
+                if (!errorCode.Success || errorCode.Groups.Count < 2) { throw ex; }
+                var errorCodeInt = int.Parse(errorCode.Groups[1].Value);
+                if (errorCodeInt == 19) { throw new DbConstraintFailedException(ex); }
+                else { throw ex; }
+            }
         }
     }
 }

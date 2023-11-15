@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using System;
 using AutoMapper;
+using API.Exceptions;
 
 namespace API.Controllers
 {
@@ -47,19 +48,16 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateRoom([FromBody] string roomName)
+        public async Task<IActionResult> CreateRoom([FromBody] string roomName)
         {
             _rooms.Add(new RoomModel { Name = roomName });
             try
             {
                 _rooms.Save();
-            } catch (DbUpdateException ex) {
-                var message = ex.InnerException.Message;
-                var errorCode = Regex.Match(message, "^.*Error (\\d+):.*$");
-                if (!errorCode.Success || errorCode.Groups.Count < 2) { throw ex; }
-                var errorCodeInt = int.Parse(errorCode.Groups[1].Value);
-                if (errorCodeInt == 19) { return BadRequest("Name already in use"); }
-                else { throw ex; }
+            }
+            catch (DbConstraintFailedException)
+            {
+                return BadRequest("Room name already taken");
             }
             return Ok("Room successfully added");
         }

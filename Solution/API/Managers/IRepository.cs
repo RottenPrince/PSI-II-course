@@ -9,6 +9,6 @@
         void Add(IEnumerable<T> entities);
         void Remove(T entity);
         void Remove(IEnumerable<T> entities);
-        Task<int> Save();
+        int Save();
     }
 }

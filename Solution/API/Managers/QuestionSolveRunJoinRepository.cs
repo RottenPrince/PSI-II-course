@@ -62,8 +62,6 @@ namespace API.Managers
             {
                 questions = questions.OrderBy(x => _rng.Next()).ToList();
             }
-            //db.Rooms.Attach(roomModel);
-            //db.Questions.AttachRange(questions);
             var newModel = new SolveRunModel
             {
                 StartTime = DateTime.UtcNow,
@@ -78,7 +76,7 @@ namespace API.Managers
                 });
             }
             _context.SolveRunModels.Add(newModel);
-            await Save();
+            Save();
             return newModel.Id;
         }
     }
