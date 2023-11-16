@@ -1,10 +1,10 @@
 ﻿namespace BrainBoxAPI.Models
 {
-    public class QuestionSolveRunJoinModel
+    public class QuizQuestionRelationModel
     {
         public int Id { get; set; }
-        public int SolveRunModelID { get; set; }
-        public SolveRunModel SolveRun;
+        public int QuizModelID { get; set; }
+        public QuizModel Quiz;
         public int QuestionModelID { get; set; }
         public QuestionModel Question;
         public int? AnswerOptionModelID { get; set; }

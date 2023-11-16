@@ -4,12 +4,12 @@ namespace BrainBoxUI.Models
 {
     public class SolveViewModel
     {
-        public SolveViewModel(QuestionTransferModel questionModel, int questionId)
+        public SolveViewModel(QuestionDTO questionModel, int questionId)
         {
             Question = questionModel;
             QuestionId = questionId;
         }
-        public QuestionTransferModel? Question { get; set; }
+        public QuestionDTO? Question { get; set; }
         public int? QuestionId { get; set; }
     }
 }

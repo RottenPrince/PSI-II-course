@@ -22,7 +22,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet("{roomId}/{questionAmount}")]
         public IActionResult StartRun(int roomId, int questionAmount)
         {
-            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateSolveRun/{roomId}/{questionAmount}", out var error);
+            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateQuiz/{roomId}/{questionAmount}", out var error);
             if(error != null)
             {
                 throw new Exception(); // TODO something normal
@@ -34,7 +34,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet]
         public IActionResult Solve(int runId)
         {
-            var questionModel = APIHelper.Get<QuestionTransferModel>($"api/Lobby/GetNextQuestionInRun/{runId}", out var error);
+            var questionModel = APIHelper.Get<QuestionDTO>($"api/Lobby/GetNextQuestionInQuiz/{runId}", out var error);
             if(questionModel == null)
             {
                 return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = 0 });
@@ -56,7 +56,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet]
         public IActionResult Review(int runId, int currentQuestionIndex)
         {
-            var questionModel = APIHelper.Get<QuestionRunTransferModel>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", out var error);
+            var questionModel = APIHelper.Get<QuizQuestionDTO>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", out var error);
             if(questionModel == null)
             {
                 var roomId = APIHelper.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
@@ -70,7 +70,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Create(string roomId)
         {
-            var questionModel = new QuestionWithAnswerTransferModel();
+            var questionModel = new QuestionWithAnswerDTO();
 
             ViewBag.RoomId = roomId;
 
@@ -78,10 +78,8 @@ namespace BrainBoxUI.Controllers
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult Create(string roomId, IFormFile? image, QuestionWithAnswerTransferModel questionModel)
+        public IActionResult Create(string roomId, IFormFile? image, QuestionWithAnswerDTO questionModel)
         {
-            Console.WriteLine(questionModel.AnswerOptions.Count);
-
             if(!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).ToList();
@@ -96,8 +94,10 @@ namespace BrainBoxUI.Controllers
                 string filename = $"{guid}.{extension}";
                 string savedImagePath = Path.Combine(_host.WebRootPath, "img", filename);
                 questionModel.ImageName = filename;
+                //Console.Write(filename);
+                //Console.Write(questionModel.ImageName);
 
-                using(FileStream fs = System.IO.File.Create(savedImagePath))
+                using (FileStream fs = System.IO.File.Create(savedImagePath))
                 {
                     image.CopyTo(fs);
                 }
@@ -105,7 +105,7 @@ namespace BrainBoxUI.Controllers
 
             ViewBag.Title = questionModel.Title;
 
-            var response = APIHelper.Post<QuestionWithAnswerTransferModel, string>($"api/Question/SaveQuestion/{roomId}", questionModel, out APIError? error);
+            var response = APIHelper.Post<QuestionWithAnswerDTO, string>($"api/Question/SaveQuestion/{roomId}", questionModel, out APIError? error);
 
             if (error == null)
             {

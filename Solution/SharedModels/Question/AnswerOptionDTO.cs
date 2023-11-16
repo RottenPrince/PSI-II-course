@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace SharedModels.Question
 {
-    public class QuestionRunTransferModel
+    public class AnswerOptionDTO
     {
-        public QuestionWithAnswerTransferModel Question { get; set; }
-        public int SelectedAnswerOption { get; set; }
+        public int Id { get; set; }
+        public string OptionText { get; set; }
     }
 }

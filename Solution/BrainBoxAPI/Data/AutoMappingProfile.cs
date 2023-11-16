@@ -8,27 +8,27 @@ namespace BrainBoxAPI.Data
     {
         public AutoMappingProfile()
         {
-            CreateMap<AnswerOptionModel, AnswerOptionTransferModel>();
-            CreateMap<AnswerOptionTransferModel, AnswerOptionModel>();
-            CreateMap<QuestionModel, QuestionTransferModel>();
-            CreateMap<QuestionModel, QuestionWithAnswerTransferModel>()
+            CreateMap<AnswerOptionModel, AnswerOptionDTO>();
+            CreateMap<AnswerOptionDTO, AnswerOptionModel>();
+            CreateMap<QuestionModel, QuestionDTO>();
+            CreateMap<QuestionModel, QuestionWithAnswerDTO>()
                 .AfterMap((a, b) =>
                 {
                     b.CorrectAnswerIndex = a.AnswerOptions.FindIndex(x => x.IsCorrect);
                 });
-            CreateMap<QuestionWithAnswerTransferModel, QuestionModel>()
+            CreateMap<QuestionWithAnswerDTO, QuestionModel>()
                 .AfterMap((a, b) =>
                 {
                     b.AnswerOptions[a.CorrectAnswerIndex].IsCorrect = true;
                     b.AnswerOptions.ForEach(o => o.Question = b);
                 });
-            CreateMap<QuestionSolveRunJoinModel, QuestionRunTransferModel>()
+            CreateMap<QuizQuestionRelationModel, QuizQuestionDTO>()
                 .ForMember(x => x.SelectedAnswerOption, opt => opt.Ignore())
                 .AfterMap((a, b) =>
                 {
                     b.SelectedAnswerOption = a.Question.AnswerOptions.FindIndex(x => x == a.SelectedAnswerOption);
                 });
-            CreateMap<RoomModel, RoomTransferModel>();
+            CreateMap<RoomModel, RoomDTO>();
         }
     }
 }

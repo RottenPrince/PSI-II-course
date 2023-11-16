@@ -8,7 +8,7 @@ namespace BrainBoxAPI.Managers
     {
         public override IQueryable<RoomModel> Query => _context.Rooms
                         .Include(q => q.Questions)
-                        .Include(q => q.SolveRuns);
+                        .Include(q => q.Quizs);
         public RoomRepository(AppDbContext context) : base(context) { }
         public override Task<RoomModel?> GetById(int id)
         {

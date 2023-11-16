@@ -17,30 +17,30 @@ namespace BrainBoxAPI.Controllers
     {
         private Random _random;
         private readonly IMapper _mapper;
-        private readonly IRepository<RoomModel> _rooms;
-        private readonly IQuestionSolveRunJoinRepository _runs;
+        private readonly IRepository<RoomModel> _roomRepo;
+        private readonly IQuizQuestionRelationRepository _relationRepo;
 
-        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> rooms, IQuestionSolveRunJoinRepository runs)
+        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> roomRepo, IQuizQuestionRelationRepository relationRepo)
         {
             _random = new Random();
             _mapper = mapper;
-            _rooms = rooms;
-            _runs = runs;
+            _roomRepo = roomRepo;
+            _relationRepo = relationRepo;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllRooms()
         {
-            var rooms = await _rooms.GetAll();
-            return Ok(_mapper.Map<List<RoomTransferModel>>(rooms));
+            var rooms = await _roomRepo.GetAll();
+            return Ok(_mapper.Map<List<RoomDTO>>(rooms));
         }
 
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
-            RoomModel? room = await _rooms.GetById(roomId);
+            RoomModel? room = await _roomRepo.GetById(roomId);
             if (room == null) return NotFound();
-            return Ok(new RoomContentStruct
+            return Ok(new RoomContentDTO
             {
                 RoomName = room.Name,
                 QuestionAmount = room.Questions.Count,
@@ -51,10 +51,10 @@ namespace BrainBoxAPI.Controllers
         public async Task<IActionResult> CreateRoom([FromBody] string roomName)
         {
             var newRoom = new RoomModel { Name = roomName };
-            _rooms.Add(newRoom);
+            _roomRepo.Add(newRoom);
             try
             {
-                _rooms.Save();
+                _roomRepo.Save();
             }
             catch (DbConstraintFailedException)
             {
@@ -64,9 +64,9 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet("{roomId}/{questionAmount}")]
-        public async Task<IActionResult> CreateSolveRun(int roomId, int questionAmount)
+        public async Task<IActionResult> CreateQuiz(int roomId, int questionAmount)
         {
-            int id = await _runs.CreateNewSolveRun(roomId, questionAmount);
+            int id = await _relationRepo.CreateNewQuiz(roomId, questionAmount);
             if(id == -1)
             {
                 return NotFound();
@@ -78,44 +78,44 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet("{runId}")]
-        public async Task<IActionResult> GetNextQuestionInRun(int runId)
+        public async Task<IActionResult> GetNextQuestionInQuiz(int runId)
         {
-            var model = await _runs.GetNextQuestionInRun(runId);
+            var model = await _relationRepo.GetNextQuestionInQuiz(runId);
             if (model == null) return NoContent();
-            return Ok(_mapper.Map<QuestionTransferModel>(model.Question));
+            return Ok(_mapper.Map<QuestionDTO>(model.Question));
         }
 
         [HttpPost("{runId}/{answerId}")]
         public async Task<IActionResult> SubmitAnswer(int runId, int answerId)
         {
-            var model = await _runs.GetNextQuestionInRun(runId);
+            var model = await _relationRepo.GetNextQuestionInQuiz(runId);
             if (model == null) return BadRequest();
             model.SelectedAnswerOption = model.Question.AnswerOptions[answerId];
-            _runs.Save();
+            _relationRepo.Save();
             return Ok();
         }
 
         [HttpGet("{runId}")]
-        public async Task<IActionResult> GetAllQuestionRunInfo(int runId)
+        public async Task<IActionResult> GetAllQuizQuestionsInfo(int runId)
         {
-            var questions = await _runs.GetAllQuestionRunInfo(runId);
+            var questions = await _relationRepo.GetAllQuizQuestionsInfo(runId);
             if (questions.Any(x => x.SelectedAnswerOption == null)) return Unauthorized();
-            return Ok(_mapper.Map<List<QuestionRunTransferModel>>(questions));
+            return Ok(_mapper.Map<List<QuizQuestionDTO>>(questions));
         }
 
         [HttpGet("{runId}/{currentQuestionIndex}")]
         public async Task<IActionResult> GetNextQuestionInReview(int runId, int currentQuestionIndex)
         {
-            var model = await _runs.GetNextQuestionInReview(runId, currentQuestionIndex);
+            var model = await _relationRepo.GetNextQuestionInReview(runId, currentQuestionIndex);
             if(model == null)
                 return NoContent();
-            return Ok(_mapper.Map<QuestionRunTransferModel>(model));
+            return Ok(_mapper.Map<QuizQuestionDTO>(model));
         }
 
         [HttpGet("{runId}")]
         public async Task<IActionResult> GetRoomId(int runId)
         {
-            var questions = await _runs.GetAllQuestionRunInfo(runId);
+            var questions = await _relationRepo.GetAllQuizQuestionsInfo(runId);
             if (questions != null && questions.Any())
             {
                 int roomId = questions.First().Question.RoomId; 

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace SharedModels.Question
 {
-    public class QuestionWithAnswerTransferModel : QuestionTransferModel
+    public class QuestionWithAnswerDTO : QuestionDTO
     {
-        public QuestionWithAnswerTransferModel() : base() { }
+        public QuestionWithAnswerDTO() : base() { }
 
         [Required]
         public int CorrectAnswerIndex { get; set; }

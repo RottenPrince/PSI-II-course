@@ -11,7 +11,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Room(string roomId)
         {
-            var roomContent = APIHelper.Get<RoomContentStruct>($"api/Lobby/GetRoomContent/{roomId}", out APIError? error);
+            var roomContent = APIHelper.Get<RoomContentDTO>($"api/Lobby/GetRoomContent/{roomId}", out APIError? error);
 
             if (error == null)
             {
@@ -31,7 +31,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet]
         public IActionResult AllRooms()
         {
-            var rooms = APIHelper.Get<List<RoomTransferModel>>("api/Lobby/GetAllRooms", out _);
+            var rooms = APIHelper.Get<List<RoomDTO>>("api/Lobby/GetAllRooms", out _);
             return View(rooms);
         }
 

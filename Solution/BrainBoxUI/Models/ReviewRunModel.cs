@@ -8,7 +8,7 @@ namespace BrainBoxUI.Models
         {
         }
 
-        public QuestionWithAnswerTransferModel? currentQuestion { get; set; }
+        public QuestionWithAnswerDTO? currentQuestion { get; set; }
         public int correctAnswersCount { get; set; }
     }
 }

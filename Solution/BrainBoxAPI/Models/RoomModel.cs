@@ -11,6 +11,6 @@ namespace BrainBoxAPI.Models
         public string Name { get; set; }
 
         public List<QuestionModel> Questions { get; set; }
-        public List<SolveRunModel> SolveRuns { get; set; }
+        public List<QuizModel> Quizs { get; set; }
     }
 }

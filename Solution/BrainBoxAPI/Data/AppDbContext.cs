@@ -16,8 +16,8 @@ namespace BrainBoxAPI.Data
         public DbSet<RoomModel> Rooms { get; set; }
         public DbSet<QuestionModel> Questions { get; set; }
         public DbSet<AnswerOptionModel> AnswerOptions { get; set; }
-        public DbSet<SolveRunModel> SolveRunModels { get; set; }
-        public DbSet<QuestionSolveRunJoinModel> QuestionSolveRunJoinModels { get; set; }
+        public DbSet<QuizModel> QuizModels { get; set; }
+        public DbSet<QuizQuestionRelationModel> QuizQuestionRelationModels { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,26 +35,26 @@ namespace BrainBoxAPI.Data
                 .WithOne(option => option.Question)
                 .HasForeignKey(option => option.QuestionId);
 
-            modelBuilder.Entity<SolveRunModel>()
+            modelBuilder.Entity<QuizModel>()
                 .HasOne(model => model.Room)
-                .WithMany(model => model.SolveRuns)
+                .WithMany(model => model.Quizs)
                 .HasForeignKey(model => model.RoomId)
                 .IsRequired();
 
-            modelBuilder.Entity<QuestionSolveRunJoinModel>()
+            modelBuilder.Entity<QuizQuestionRelationModel>()
                 .HasOne(model => model.SelectedAnswerOption)
                 .WithMany()
                 .HasForeignKey(model => model.AnswerOptionModelID);
 
-            modelBuilder.Entity<QuestionSolveRunJoinModel>()
+            modelBuilder.Entity<QuizQuestionRelationModel>()
                 .HasOne(model => model.Question)
-                .WithMany(model => model.Joins)
+                .WithMany(model => model.QuizRelations)
                 .HasForeignKey(model => model.QuestionModelID);
 
-            modelBuilder.Entity<QuestionSolveRunJoinModel>()
-                .HasOne(model => model.SolveRun)
-                .WithMany(model => model.SolveRunJoin)
-                .HasForeignKey(model => model.SolveRunModelID);
+            modelBuilder.Entity<QuizQuestionRelationModel>()
+                .HasOne(model => model.Quiz)
+                .WithMany(model => model.QuestionRelations)
+                .HasForeignKey(model => model.QuizModelID);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

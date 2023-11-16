@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SharedModels.Question
 {
-    public class QuestionTransferModel
+    public class QuestionDTO
     {
-        public QuestionTransferModel()
+        public QuestionDTO()
         {
-            AnswerOptions = new List<AnswerOptionTransferModel>();
+            AnswerOptions = new List<AnswerOptionDTO>();
         }
 
         [Required]
@@ -14,7 +14,7 @@ namespace SharedModels.Question
         [Required]
         public string? Title { get; set; }
         [Required]
-        public List<AnswerOptionTransferModel>? AnswerOptions { get; set; }
+        public List<AnswerOptionDTO>? AnswerOptions { get; set; }
         public string? ImageName { get; set; }
     }
 }

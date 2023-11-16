@@ -16,6 +16,6 @@ namespace BrainBoxAPI.Models
         public RoomModel Room { get; set; }
 
         public List<AnswerOptionModel> AnswerOptions { get; set; }
-        public List<QuestionSolveRunJoinModel> Joins { get; set; }
+        public List<QuizQuestionRelationModel> QuizRelations { get; set; }
     }
 }

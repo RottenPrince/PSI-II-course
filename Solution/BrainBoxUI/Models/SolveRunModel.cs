@@ -8,6 +8,6 @@ namespace BrainBoxUI.Models
         {
         }
 
-        public QuestionTransferModel? currentQuestion { get; set; }
+        public QuestionDTO? currentQuestion { get; set; }
     }
 }
