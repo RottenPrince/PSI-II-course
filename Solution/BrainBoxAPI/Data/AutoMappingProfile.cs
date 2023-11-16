@@ -1,0 +1,34 @@
+﻿using BrainBoxAPI.Models;
+using SharedModels.Question;
+using AutoMapper;
+
+namespace BrainBoxAPI.Data
+{
+    public class AutoMappingProfile : Profile
+    {
+        public AutoMappingProfile()
+        {
+            CreateMap<AnswerOptionModel, AnswerOptionTransferModel>();
+            CreateMap<AnswerOptionTransferModel, AnswerOptionModel>();
+            CreateMap<QuestionModel, QuestionTransferModel>();
+            CreateMap<QuestionModel, QuestionWithAnswerTransferModel>()
+                .AfterMap((a, b) =>
+                {
+                    b.CorrectAnswerIndex = a.AnswerOptions.FindIndex(x => x.IsCorrect);
+                });
+            CreateMap<QuestionWithAnswerTransferModel, QuestionModel>()
+                .AfterMap((a, b) =>
+                {
+                    b.AnswerOptions[a.CorrectAnswerIndex].IsCorrect = true;
+                    b.AnswerOptions.ForEach(o => o.Question = b);
+                });
+            CreateMap<QuestionSolveRunJoinModel, QuestionRunTransferModel>()
+                .ForMember(x => x.SelectedAnswerOption, opt => opt.Ignore())
+                .AfterMap((a, b) =>
+                {
+                    b.SelectedAnswerOption = a.Question.AnswerOptions.FindIndex(x => x == a.SelectedAnswerOption);
+                });
+            CreateMap<RoomModel, RoomTransferModel>();
+        }
+    }
+}
