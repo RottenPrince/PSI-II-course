@@ -1,4 +1,4 @@
-﻿namespace SharedModels.Lobby
+namespace SharedModels.Lobby
 {
     public record struct RoomContentStruct
     {

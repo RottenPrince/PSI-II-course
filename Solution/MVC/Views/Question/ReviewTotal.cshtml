@@ -1,0 +1,13 @@
+﻿@model MVC.Models.ReviewRunModel
+
+@{
+    ViewData["Title"] = "Review Total";
+}
+
+<h1>Total Questions Answered Correctly</h1>
+
+<p>You answered @Model.correctAnswersCount out of @Model.questionsId.Count questions correctly.</p>
+
+<div>
+    <a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class="btn btn-secondary">Return to Lobby</a>
+</div>

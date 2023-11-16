@@ -1,15 +1,15 @@
-﻿using SharedModels.Question;
+using SharedModels.Question;
 
 namespace MVC.Models
 {
     public class SolveViewModel
     {
-        public SolveViewModel(QuestionModel questionModel, string questionName)
+        public SolveViewModel(QuestionTransferModel questionModel, int questionId)
         {
             Question = questionModel;
-            QuestionName = questionName;
+            QuestionId = questionId;
         }
-        public QuestionModel? Question { get; set; }
-        public string? QuestionName { get; set; }
+        public QuestionTransferModel? Question { get; set; }
+        public int? QuestionId { get; set; }
     }
 }

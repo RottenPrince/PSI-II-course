@@ -1,137 +1,160 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using SharedModels.Question;
 using SharedModels.Lobby;
-using API.Enums.QuestionManager;
+using SharedModels.Question;
+using API.Models;
+using API.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using System;
 
 namespace API.Managers
 {
     public static class QuestionManager
     {
-        private static readonly string _questionsFolder = "../../questions";
-        private static readonly string _questionDBExtension = ".json";
-
-        public static QuestionModel? GetQuestionWithoutAnswer(string room, string questionName, out QuestionParsingError? error)
+        public static async Task<QuestionModel?> GetQuestionWithAnswer(AppDbContext db, int questionId)
         {
-            return ParseQuestionFromDatabase<QuestionModel>(room, questionName, out error);
+            return await GetQuestionFromDatabase(db, questionId);
         }
 
-        public static QuestionModelWithAnswer? GetQuestionWithAnswer(string roomId, string questionName, out QuestionParsingError? error)
+        public static bool CreateNewQuestion(AppDbContext db, int roomId, QuestionWithAnswerTransferModel model)
         {
-            return ParseQuestionFromDatabase<QuestionModelWithAnswer>(roomId, questionName, out error);
-        }
+            var roomModel = db.Rooms.Find(roomId);
 
-        public static string[] GetAllQuestionNames(string room)
-        {
-            DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder + "/" + room);
-            return (from file in dirinfo.GetFiles()
-                    where file.Name.EndsWith(_questionDBExtension)
-                    select file.Name.Substring(0, file.Name.Length - _questionDBExtension.Length))
-                .ToArray();
-        }
-
-        public static List<QuestionModelWithAnswer?> GetAllQuestions(string room)
-        {
-            var questions = GetAllQuestionNames(room)
-                .Select(x => GetQuestionWithAnswer(room, x, out _))
-                .ToList();
-
-            questions.Sort();
-            return questions;
-        }
-
-        public static int GetQuestionCountInRoom(string room)
-        {
-            return GetAllQuestionNames(room).Length;
-        }
-
-        public static void CreateNewQuestion(string room, string questionName, QuestionModelWithAnswer questionModel)
-        {
-            int newQuestionIndex = GetQuestionCountInRoom(room);
-            questionModel.QuestionIndex = newQuestionIndex;
-
-            string jsonQuestion = JsonConvert.SerializeObject(questionModel);
-            string fileName = $"{questionName}{_questionDBExtension}";
-
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(_questionsFolder, room, fileName)))
+            if(roomModel == null)
             {
-                outputFile.Write(jsonQuestion);
+                return false;
             }
+
+            var newQuestionModel = new QuestionModel
+            {
+                Title = model.Title,
+                ImageSource = model.ImageName,
+                Room = roomModel,
+                AnswerOptions = model.AnswerOptions.Select(o => new AnswerOptionModel
+                {
+                    OptionText = o.OptionText,
+                    IsCorrect = false,
+                }).ToList(),
+            };
+
+            newQuestionModel.AnswerOptions[model.CorrectAnswerIndex].IsCorrect = true;
+
+            db.Add(newQuestionModel);
+            db.SaveChanges();
+            return true;
         }
 
-        public static string? GetRoomName(string room, out ActionResult? error)
+        public static async Task<List<RoomModel>> GetAllRooms(AppDbContext db)
         {
-            string roomNameFile = Path.Combine(_questionsFolder, room, "room.txt");
-            if (!System.IO.File.Exists(roomNameFile))
+            return await db.Rooms.ToListAsync();
+        }
+
+        public static async Task<RoomModel?> GetRoomContent(AppDbContext db, int roomId)
+        {
+            var roomModel = await db.Rooms
+                            .Include(q => q.Questions)
+                            .Include(q => q.SolveRuns)
+                            .Where(q => q.Id == roomId)
+                            .FirstOrDefaultAsync();
+            if(roomModel == null)
             {
-                error = new NotFoundObjectResult("Room name file not found");
                 return null;
             }
 
-            using (StreamReader reader = new StreamReader(roomNameFile))
+            return roomModel;
+        }
+
+        public static async Task<QuestionSolveRunJoinModel> GetNextQuestionInRun(AppDbContext db, int runId)
+        {
+            var questions = await db.QuestionSolveRunJoinModels
+                .Include(srm => srm.Question)
+                .ThenInclude(m => m.AnswerOptions)
+                .Where(srm => srm.SolveRunModelID == runId)
+                .OrderBy(q => q.Id)
+                .ToListAsync();
+            try
             {
-                error = null;
-                return reader.ReadToEnd();
+                return questions.First(m => m.SelectedAnswerOption == null);
+            } catch (InvalidOperationException)
+            {
+                return null;
             }
         }
 
-        public static IEnumerable<RoomModel> GetAllRooms()
+        public static async Task<QuestionSolveRunJoinModel> GetNextQuestionInReview(AppDbContext db, int runId, int currentQuestionIndex)
         {
-            DirectoryInfo dirinfo = new DirectoryInfo(_questionsFolder);
-            return dirinfo.GetDirectories()
-                .Select(d => new RoomModel
-                        {
-                        Id = d.Name,
-                        Name = File.ReadAllText(Path.Combine(d.FullName, "room.txt")).Trim()
-                        });
+            
+            var questions = await db.QuestionSolveRunJoinModels
+                .Include(srm => srm.Question)
+                .ThenInclude(m => m.AnswerOptions)
+                .Where(srm => srm.SolveRunModelID == runId)
+                .OrderBy(q => q.Id)
+                .ToListAsync();
+
+            if (currentQuestionIndex >= 0 && currentQuestionIndex < questions.Count)
+            {
+                return questions[currentQuestionIndex];
+            }
+            else
+            {
+                return null;
+            } 
         }
 
-        public static RoomContentStruct? GetRoomContent(string room, out ActionResult? error)
+        public static async Task<List<QuestionSolveRunJoinModel>> GetAllQuestionRunInfo(AppDbContext db, int runId)
         {
-            string roomNameFile = Path.Combine(_questionsFolder, room, "room.txt");
-
-            if (!System.IO.File.Exists(roomNameFile))
+            var questions = await db.QuestionSolveRunJoinModels
+                .Include(srm => srm.Question)
+                .ThenInclude(m => m.AnswerOptions)
+                .Where(srm => srm.SolveRunModelID == runId)
+                .ToListAsync();
+            try
             {
-                error = new NotFoundObjectResult("Room name file not found");
+                return questions;
+            } catch (InvalidOperationException)
+            {
                 return null;
             }
-
-            error = null;
-
-            string roomName = System.IO.File.ReadAllText(roomNameFile);
-
-            int questionAmount = GetQuestionCountInRoom(room);
-
-            return new RoomContentStruct(questionAmount, roomName);
         }
 
-        private static T? ParseQuestionFromDatabase<T>(string room, string question, out QuestionParsingError? error) where T: QuestionModel
+        public static async Task<int> CreateNewSolveRun(AppDbContext db, Random rng, int roomId, int questionAmount)
         {
-            if(!question.All(c => char.IsAsciiLetterOrDigit(c) || c == '_' || c == '-'))
+            var roomModel = await db.Rooms
+                            .Include(room => room.Questions)
+                            .Where(room => room.Id == roomId)
+                            .FirstAsync();
+            var questions = roomModel.Questions;
+            lock (rng)
             {
-                error = QuestionParsingError.DisallowedCharacterInName;
-                return null;
+                questions = questions.OrderBy(x => rng.Next()).Take(questionAmount).ToList();
             }
-
-            string questionModelFile = Path.Combine(_questionsFolder, room, question + ".json");
-
-            if (!System.IO.File.Exists(questionModelFile))
+            db.Rooms.Attach(roomModel);
+            db.Questions.AttachRange(questions);
+            var newModel = new SolveRunModel
             {
-                error = QuestionParsingError.QuestionNotFound;
-                return null;
-            }
-
-            string questionModelText = System.IO.File.ReadAllText(questionModelFile);
-
-            var questionModel = JsonConvert.DeserializeObject<T>(questionModelText);
-            if(questionModel == null)
+                StartTime = DateTime.UtcNow,
+                Room = roomModel,
+            };
+            foreach (var q in questions)
             {
-                error = QuestionParsingError.FailedDeserialization;
-                return null;
+                db.QuestionSolveRunJoinModels.Add(new QuestionSolveRunJoinModel
+                {
+                    SolveRun = newModel,
+                    Question = q,
+                });
             }
+            db.SolveRunModels.Add(newModel);
+            db.SaveChanges();
+            return newModel.Id;
+        }
 
-            error = null;
-            return questionModel;
+        private static async Task<QuestionModel?> GetQuestionFromDatabase(AppDbContext db, int questionId)
+        {
+            return await db.Questions
+                                .Include(q => q.AnswerOptions)
+                                .Where(q => q.Id == questionId)
+                                .FirstOrDefaultAsync();
         }
     }
 }

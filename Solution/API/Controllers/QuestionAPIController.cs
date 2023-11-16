@@ -1,95 +1,58 @@
-﻿using SharedModels.Question;
+using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using API.Managers;
-using API.Enums.QuestionManager;
+using AutoMapper;
+using API.Data;
+using API.Models;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/Question/[action]")]
     [ApiController]
     public class QuestionAPIController : ControllerBase
     {
         private readonly ILogger<QuestionAPIController> _logger;
-        private static Random random = new Random();
+        private Random _random;
+        private readonly IMapper _mapper;
+        private readonly IRepository<QuestionModel> _questions;
 
-        public QuestionAPIController(ILogger<QuestionAPIController> logger)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper, IRepository<QuestionModel> questions)
         {
             _logger = logger;
+            _mapper = mapper;
+            _questions = questions;
+            _random = new Random();
         }
 
-        [HttpGet("GetQuestion/{room}/{question}")]
-        public IActionResult GetQuestion(string room, string question)
+        [HttpGet("{questionId}")]
+        public async Task<IActionResult> GetQuestion(int questionId)
         {
-            var questionModel = QuestionManager.GetQuestionWithoutAnswer(room, question, out QuestionParsingError? error);
-            if (error != null) {
-                return ConvertErrorToResponse(error.Value);
-            }
-
-            return Ok(questionModel);
+            var questionModel = await _questions.GetById(questionId);
+            if (questionModel == null) return NotFound();
+            return Ok(_mapper.Map<QuestionTransferModel>(questionModel));
         }
 
-        [HttpGet("GetRandomQuestionName/{room}")]
-        public IActionResult GetRandomQuestionName(string room)
+        [HttpGet("{questionId}")]
+        public async Task<IActionResult> GetFullQuestion(int questionId)
         {
-            string[] questionFiles = QuestionManager.GetAllQuestionNames(room);
-
-            if(questionFiles.Length == 0)
-                return NotFound("No questions found");
-
-            int randomIndex;
-            lock(random)
-            {
-                randomIndex = random.Next(0, questionFiles.Length);
-            }
-
-            string selectionQuestion = questionFiles[randomIndex];
-            return Ok(selectionQuestion);
+            var questionModel = await _questions.GetById(questionId);
+            if (questionModel == null) return NotFound();
+            return Ok(_mapper.Map<QuestionWithAnswerTransferModel>(questionModel));
         }
 
         [HttpPost("{roomId}")]
-        public IActionResult GetFullQuestion([FromBody] QuestionLocationModel model)
-        {
-            var questionModel = QuestionManager.GetQuestionWithAnswer(model.RoomId, model.Name, out var error);
-            if (error != null) {
-                return ConvertErrorToResponse(error.Value);
-            }
-
-            return Ok(questionModel);
-        }
-
-        [HttpPost("SaveQuestion/{room}")]
-        public IActionResult SaveQuestion(string room, [FromBody] QuestionModelWithAnswer questionModel)
+        public async Task<IActionResult> SaveQuestion(int roomId, [FromBody] QuestionWithAnswerTransferModel questionModel)
         {
             if (questionModel == null)
             {
-                return BadRequest("Question data is null.");
+                return BadRequest("Question data is invalid");
             }
 
-            string uniqueIdentifier = Guid.NewGuid().ToString();
-            string questionName = $"question_{uniqueIdentifier}";
-            QuestionManager.CreateNewQuestion(room, questionName, questionModel);
-
+            var dbModel = _mapper.Map<QuestionModel>(questionModel);
+            dbModel.RoomId = roomId;
+            _questions.Add(dbModel);
+            _questions.Save();
             return Ok("Question created successfully.");
-        }
-
-        private IActionResult ConvertErrorToResponse(QuestionParsingError error)
-        {
-            switch(error) {
-                case QuestionParsingError.DisallowedCharacterInName:
-                    {
-                        return BadRequest("Question name should only contain alphanumeric characters, dashes and underscores");
-                    }
-                case QuestionParsingError.QuestionNotFound:
-                    {
-                        return NotFound("Question not found.");
-                    }
-                case QuestionParsingError.FailedDeserialization:
-                    {
-                        return UnprocessableEntity("Question name should only contain alphanumeric characters, dashes and underscores");
-                    }
-                default:
-                    throw new Exception("Not all enum cases are handled");
-            }
         }
     }
 }

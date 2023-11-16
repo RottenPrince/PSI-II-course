@@ -1,0 +1,19 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Create New Room";
+}
+
+<h3><strong>Create New Room</strong></h3>
+
+@using (Html.BeginForm("CreateRoom", "Lobby", FormMethod.Post))
+{
+    <table>
+        <tr>
+            <td>
+                <label>Room name: </label>
+                <input name="roomName">
+            </td>
+        </tr>
+    </table>
+    <input type="submit" value="Create" />
+}

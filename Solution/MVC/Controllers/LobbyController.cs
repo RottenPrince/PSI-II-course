@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using MVC.Helpers.API;
 using SharedModels.Question;
 using SharedModels.Lobby;
@@ -11,7 +11,7 @@ namespace MVC.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Room(string roomId)
         {
-            var roomContent = APIHelper.Get<RoomContentStruct>($"LobbyAPI/GetRoomContent/{roomId}", out APIError? error);
+            var roomContent = APIHelper.Get<RoomContentStruct>($"api/Lobby/GetRoomContent/{roomId}", out APIError? error);
 
             if (error == null)
             {
@@ -31,8 +31,28 @@ namespace MVC.Controllers
         [HttpGet]
         public IActionResult AllRooms()
         {
-            var rooms = APIHelper.Get<List<RoomModel>>("LobbyAPI/GetAllRooms", out _);
+            var rooms = APIHelper.Get<List<RoomTransferModel>>("api/Lobby/GetAllRooms", out _);
             return View(rooms);
+        }
+
+        [HttpGet]
+        public IActionResult CreateRoom()
+        {
+            return View("Create");
+        }
+
+        [HttpPost]
+        public IActionResult CreateRoom(string roomName)
+        {
+            ViewBag.RoomId = APIHelper.Post<string, int>("api/Lobby/CreateRoom", roomName, out var error);
+            if (error != null)
+            {
+                ViewBag.ErrorMessage = error.Message;
+                return View("CreateError");
+            }
+            ViewBag.RoomName = roomName;
+
+            return View("CreateSuccess");
         }
     }
 }

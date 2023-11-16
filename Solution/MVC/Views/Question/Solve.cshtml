@@ -1,4 +1,5 @@
-﻿@model MVC.Models.SolveViewModel
+﻿@using System.Text.Json
+@model SharedModels.Question.QuestionTransferModel
 @{
     ViewData["Title"] = "Question Page";
 }
@@ -10,28 +11,27 @@
 @section Scripts {
     <script src="~/js/Question/Solve.js"></script>
 }
-<a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class=" btn btn-secondary">Return</a>
+<a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.roomId" class=" btn btn-secondary">Return</a>
 <div id="questionTitle">
-    <h1>@Model.Question.Title</h1>
+    <h1>@Model.Title</h1>
 </div>
 
-    @if (Model.Question.ImageName != null)
+    @if (Model.ImageName != null)
     {
         <div id="questionImage" class="text-center mt-5">
-            <img src="~/img/@Model.Question.ImageName" alt="Question Image" class="img-fluid" />
+            <img src="~/img/@Model.ImageName" alt="Question Image" class="img-fluid" />
         </div>
     }
 
 <div id="form">
     @using (Html.BeginForm("Solve", "Question", FormMethod.Post))
     {
-        <input type="hidden" name="questionName" value="@Model.QuestionName" />
-        
-        @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
+        <input type="hidden" name="runId" value="@ViewBag.runId"/>
+        @foreach (var (idx, option) in Model.AnswerOptions.WithIndex())
         {
             <label class="option">
                 <input type="radio" name="selectedOption" value="@idx" />
-                <span class="option-text">@option</span>
+                <span class="option-text">@option.OptionText</span>
             </label>
         }
 
