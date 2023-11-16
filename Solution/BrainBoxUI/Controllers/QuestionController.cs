@@ -93,7 +93,7 @@ namespace BrainBoxUI.Controllers
                 string guid = Guid.NewGuid().ToString();
                 string filename = $"{guid}.{extension}";
                 string savedImagePath = Path.Combine(_host.WebRootPath, "img", filename);
-                questionModel.ImageName = filename;
+                questionModel.ImageSource = filename;
                 //Console.Write(filename);
                 //Console.Write(questionModel.ImageName);
 

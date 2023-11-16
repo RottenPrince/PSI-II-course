@@ -15,6 +15,6 @@ namespace SharedModels.Question
         public string? Title { get; set; }
         [Required]
         public List<AnswerOptionDTO>? AnswerOptions { get; set; }
-        public string? ImageName { get; set; }
+        public string? ImageSource { get; set; }
     }
 }

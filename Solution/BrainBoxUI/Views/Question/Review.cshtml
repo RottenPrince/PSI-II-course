@@ -12,10 +12,10 @@
     <h1>@Model.Question.Title</h1>
 </div>
 
-@if (Model.Question.ImageName != null)
+@if (Model.Question.ImageSource != null)
 {
     <div id="questionImage" class="text-center mt-5">
-        <img src="~/img/@Model.Question.ImageName" alt="Question Image" />
+        <img src="~/img/@Model.Question.ImageSource" alt="Question Image" />
     </div>
 }
 
