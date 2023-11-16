@@ -1,0 +1,40 @@
+﻿@using System.Text.Json;
+@model SharedModels.Question.QuizQuestionDTO
+@{
+    ViewData["Title"] = "Question Page";
+}
+
+@section Stylesheets {
+    <link rel="stylesheet" href="~/css/Question/Solve.css">
+}
+
+<div id="questionTitle">
+    <h1>@Model.Question.Title</h1>
+</div>
+
+@if (Model.Question.ImageSource != null)
+{
+    <div id="questionImage" class="text-center mt-5">
+        <img src="~/img/@Model.Question.ImageSource" alt="Question Image" />
+    </div>
+}
+
+
+
+
+
+<div>
+        @foreach (var (idx, option) in Model.Question.AnswerOptions.WithIndex())
+        {
+            <div class="answer-option @((idx == Model.Question.CorrectAnswerIndex) ? "correct" : (idx == Model.SelectedAnswerOption) ? "selected" : "")">
+                @option.OptionText
+            </div>
+        }
+</div>
+
+<form asp-controller="Question" asp-action="Review" method="get">
+    <input type="hidden" name="runId" value="@ViewBag.runId" />
+    <input type="hidden" name="currentQuestionIndex" value="@ViewBag.currentQuestionIndex" />
+
+    <button type="submit" class="btn btn-primary">Next</button>
+</form>

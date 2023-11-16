@@ -1,0 +1,25 @@
+﻿@using SharedModels.Question
+@model List<RoomDTO>
+@{
+    ViewData["Title"] = "Available rooms";
+}
+
+@section Stylesheets {
+
+}
+
+@section Scripts {
+
+}
+
+<div>
+    <a asp-area="" asp-controller="Lobby" asp-action="CreateRoom" class="btn btn-secondary">Create new room</a>
+    <ul>
+        @foreach (RoomDTO room in Model)
+        {
+            <li>
+                <a class="nav-link text-dark" asp-area="" asp-controller="Lobby" asp-action="Room" asp-route-roomId="@room.Id">@room.Name</a>
+            </li>
+        }
+    </ul>
+</div>
