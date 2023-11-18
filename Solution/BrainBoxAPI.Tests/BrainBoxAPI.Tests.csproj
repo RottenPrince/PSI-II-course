@@ -23,4 +23,12 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="LobbyAPIControllerTests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BrainBoxAPI\BrainBoxAPI.csproj" />
+  </ItemGroup>
+
 </Project>
