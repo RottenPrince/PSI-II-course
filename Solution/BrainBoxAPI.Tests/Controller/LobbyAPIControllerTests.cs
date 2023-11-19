@@ -4,6 +4,7 @@ using BrainBoxAPI.Managers;
 using BrainBoxAPI.Models;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using SharedModels.Lobby;
 using SharedModels.Question;
 using System;
@@ -120,6 +121,113 @@ namespace BrainBoxAPI.Tests.Controller
         //        roomId.Should().BeGreaterThan(0);
         //        roomId.Should().Be(newRoom.Id);
         //    }
+
+
+
+
+        /*
+        [Fact]
+        public async Task GetNextQuestionInQuiz_ReturnsOkResultWithQuestionDTO()
+        {
+            // Arrange
+            var mapperMock = new Mock<IMapper>();
+            var roomRepoMack = new Mock<IRepository<RoomModel>>();
+            var relationRepoMack = new Mock<IQuizQuestionRelationRepository>();
+            var controller = new LobbyAPIController(_mapper, _roomRepo, _relationRepo);
+
+            var questionModel = new QuestionModel { Id = 1, Title = "test 1" };
+            var quizRelationModel = new QuizQuestionRelationModel { Question = questionModel };
+            relationRepoMack.Setup(repo => repo.GetNextQuestionInQuiz(123)).ReturnsAsync(quizRelationModel);
+            mapperMock.Setup(mapper => mapper.Map<QuestionDTO>(questionModel))
+                .Returns(new QuestionDTO { Id = 1, Title = "test 1" });
+
+            // Act
+            var result = await controller.GetNextQuestionInQuiz(123);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var questionDTO = Assert.IsType<QuestionDTO>(okResult.Value);
+            Assert.Equal(1, questionDTO.Id);
+            Assert.Equal("test 1", questionDTO.Title);
+        */
+
+        [Fact]
+        public async Task GetAllQuizQuestionsInfo_ReturnsOkResultWithQuizQuestionsDTO()
+        {
+            // Arrange
+            var mapperMock = new Mock<IMapper>();
+            var roomRepoMock = new Mock<IRepository<RoomModel>>();
+            var relationRepoMock = new Mock<IQuizQuestionRelationRepository>();
+
+            var controller = new LobbyAPIController(mapperMock.Object, roomRepoMock.Object, relationRepoMock.Object);
+
+            var quizRelationModels = new List<QuizQuestionRelationModel>
+            {
+                new QuizQuestionRelationModel { SelectedAnswerOption = new AnswerOptionModel(), Question = new QuestionModel() }
+            };
+
+            relationRepoMock.Setup(repo => repo.GetAllQuizQuestionsInfo(123)).ReturnsAsync(quizRelationModels);
+            mapperMock.Setup(mapper => mapper.Map<List<QuizQuestionDTO>>(quizRelationModels))
+                .Returns(new List<QuizQuestionDTO> { new QuizQuestionDTO() });
+
+            // Act
+            var result = await controller.GetAllQuizQuestionsInfo(123);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var quizQuestionsDTO = Assert.IsType<List<QuizQuestionDTO>>(okResult.Value);
+            Assert.Single(quizQuestionsDTO);
+        }
+
+        [Fact]
+        public async Task GetNextQuestionInReview_ReturnsOkResultWithQuizQuestionDTO()
+        {
+            // Arrange
+            var mapperMock = new Mock<IMapper>();
+            var roomRepoMock = new Mock<IRepository<RoomModel>>();
+            var relationRepoMock = new Mock<IQuizQuestionRelationRepository>();
+
+            var controller = new LobbyAPIController(mapperMock.Object, roomRepoMock.Object, relationRepoMock.Object);
+
+            var quizRelationModel = new QuizQuestionRelationModel { Question = new QuestionModel(), SelectedAnswerOption = new AnswerOptionModel() };
+            relationRepoMock.Setup(repo => repo.GetNextQuestionInReview(123, 1)).ReturnsAsync(quizRelationModel);
+            mapperMock.Setup(mapper => mapper.Map<QuizQuestionDTO>(quizRelationModel))
+                .Returns(new QuizQuestionDTO());
+
+            // Act
+            var result = await controller.GetNextQuestionInReview(123, 1);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var quizQuestionDTO = Assert.IsType<QuizQuestionDTO>(okResult.Value);
+            Assert.NotNull(quizQuestionDTO);
+        }
+
+        [Fact]
+        public async Task GetRoomId_ReturnsOkResultWithRoomId()
+        {
+            // Arrange
+            var mapperMock = new Mock<IMapper>();
+            var roomRepoMock = new Mock<IRepository<RoomModel>>();
+            var relationRepoMock = new Mock<IQuizQuestionRelationRepository>();
+
+            var controller = new LobbyAPIController(mapperMock.Object, roomRepoMock.Object, relationRepoMock.Object);
+
+            var quizRelationModels = new List<QuizQuestionRelationModel>
+            {
+                new QuizQuestionRelationModel { SelectedAnswerOption = new AnswerOptionModel(), Question = new QuestionModel { RoomId = 456 } }
+            };
+
+            relationRepoMock.Setup(repo => repo.GetAllQuizQuestionsInfo(123)).ReturnsAsync(quizRelationModels);
+
+            // Act
+            var result = await controller.GetRoomId(123);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var roomId = Assert.IsType<int>(okResult.Value);
+            Assert.Equal(456, roomId);
+        }
 
     }
 }
