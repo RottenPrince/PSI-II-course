@@ -5,6 +5,7 @@ using BrainBoxAPI.Models;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using SharedModels.Lobby;
+using SharedModels.Question;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,26 @@ namespace BrainBoxAPI.Tests.Controller
 
             roomContentDto.RoomName.Should().Be(roomModel.Name);
             roomContentDto.QuestionAmount.Should().Be(roomModel.Questions.Count);
+        }
+
+        [Fact]
+        public async Task GetAllRooms_ReturnsOkResult_WithValidInput()
+        {
+            // Arrange
+            var fakeRoomList = A.Fake<List<RoomModel>>();
+            var fakeTask = Task.FromResult(fakeRoomList);
+
+            A.CallTo(() => _roomRepo.GetAll()).Returns(fakeTask);
+
+            var roomList = A.Fake<List<RoomDTO>>();
+            A.CallTo(() => _mapper.Map<List<RoomDTO>>(fakeRoomList)).Returns(roomList);
+
+            // Act
+            var result = await _controller.GetAllRooms();
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().BeOfType<OkObjectResult>();
         }
 
 
