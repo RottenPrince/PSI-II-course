@@ -229,5 +229,103 @@ namespace BrainBoxAPI.Tests.Controller
             Assert.Equal(456, roomId);
         }
 
+        [Fact]
+        public async Task CreateQuiz_ReturnsOkResult()
+        {
+            // Arrange
+            A.CallTo(() => _relationRepo.CreateNewQuiz(A<int>._, A<int>._)).Returns(1);
+
+            // Act
+            var result = await _controller.CreateQuiz(1, 5) as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            Assert.Equal(1, result.Value);
+            // Add more assertions as needed
+        }
+
+        [Fact]
+        public async Task CreateQuiz_ReturnsNotFoundResult()
+        {
+            // Arrange
+            A.CallTo(() => _relationRepo.CreateNewQuiz(A<int>._, A<int>._)).Returns(-1);
+
+            // Act
+            var result = await _controller.CreateQuiz(1, 5) as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(404, result.StatusCode);
+            // Add more assertions as needed
+        }
+
+
+        [Fact]
+        public async Task GetAllQuizQuestionsInfo_ReturnsOkResult()
+        {
+            // Arrange
+            A.CallTo(() => _relationRepo.GetAllQuizQuestionsInfo(A<int>._)).Returns(Task.FromResult(new List<QuizQuestionRelationModel>
+            {
+                new QuizQuestionRelationModel { SelectedAnswerOption = new AnswerOptionModel() }
+            }));
+
+            // Act
+            var result = await _controller.GetAllQuizQuestionsInfo(1) as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            // Add more assertions as needed
+        }
+
+        [Fact]
+        public async Task GetNextQuestionInReview_ReturnsOkResult()
+        {
+            // Arrange
+            A.CallTo(() => _relationRepo.GetNextQuestionInReview(A<int>._, A<int>._)).Returns(Task.FromResult(new QuizQuestionRelationModel()));
+
+            // Act
+            var result = await _controller.GetNextQuestionInReview(1, 0) as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(200, result.StatusCode);
+            // Add more assertions as needed
+        }
+
+        [Fact]
+        public async Task GetAllQuizQuestionsInfo_ReturnsUnauthorizedResult()
+        {
+            // Arrange
+            A.CallTo(() => _relationRepo.GetAllQuizQuestionsInfo(A<int>._)).Returns(Task.FromResult(new List<QuizQuestionRelationModel>
+            {
+                new QuizQuestionRelationModel { SelectedAnswerOption = null }
+            }));
+
+            // Act
+            var result = await _controller.GetAllQuizQuestionsInfo(1) as UnauthorizedResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(401, result.StatusCode);
+            // Add more assertions as needed
+        }
+
+        [Fact]
+        public async Task GetNextQuestionInReview_ReturnsNoContentResult()
+        {
+            // Arrange
+            A.CallTo(() => _relationRepo.GetNextQuestionInReview(A<int>._, A<int>._)).Returns(Task.FromResult<QuizQuestionRelationModel>(null));
+
+            // Act
+            var result = await _controller.GetNextQuestionInReview(1, 0) as NoContentResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(204, result.StatusCode);
+            // Add more assertions as needed
+        }
+
     }
 }
