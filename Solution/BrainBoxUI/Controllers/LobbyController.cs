@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using BrainBoxUI.Helpers.BrainBoxAPI;
+using BrainBoxUI.Helpers.API;
 using SharedModels.Question;
 using SharedModels.Lobby;
 
@@ -8,10 +8,17 @@ namespace BrainBoxUI.Controllers
     [Route("[controller]/[action]")]
     public class LobbyController : Controller
     {
+        private readonly IApiRepository _apiRepository;
+
+        public LobbyController(IApiRepository apiRepository)
+        {
+            _apiRepository = apiRepository;
+        }
+
         [HttpGet("{roomId}")]
         public IActionResult Room(string roomId)
         {
-            var roomContent = APIHelper.Get<RoomContentDTO>($"api/Lobby/GetRoomContent/{roomId}", out APIError? error);
+            var roomContent = _apiRepository.Get<RoomContentDTO>($"api/Lobby/GetRoomContent/{roomId}", out APIError? error);
 
             if (error == null)
             {
@@ -31,7 +38,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet]
         public IActionResult AllRooms()
         {
-            var rooms = APIHelper.Get<List<RoomDTO>>("api/Lobby/GetAllRooms", out _);
+            var rooms = _apiRepository.Get<List<RoomDTO>>("api/Lobby/GetAllRooms", out _);
             return View(rooms);
         }
 
@@ -44,7 +51,7 @@ namespace BrainBoxUI.Controllers
         [HttpPost]
         public IActionResult CreateRoom(string roomName)
         {
-            ViewBag.RoomId = APIHelper.Post<string, int>("api/Lobby/CreateRoom", roomName, out var error);
+            ViewBag.RoomId = _apiRepository.Post<string, int>("api/Lobby/CreateRoom", roomName, out var error);
             if (error != null)
             {
                 ViewBag.ErrorMessage = error.Message;

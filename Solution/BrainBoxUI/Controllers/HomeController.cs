@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using BrainBoxUI.Helpers.BrainBoxAPI;
+using BrainBoxUI.Helpers.API;
 using BrainBoxUI.Models;
 using System.Diagnostics;
 
