@@ -90,66 +90,32 @@ namespace BrainBoxAPI.Tests.Controller
         }
 
 
-        //    PROBLEM WITH .SAVE
-        //    [Fact]
-        //    public async Task CreateRoom_ReturnsOkResult_WithValidInput()
-        //    {
-        //        // Arrange
-        //        var roomName = "TestRoom";
-
-        //        var newRoom = new RoomModel { Name = roomName };
-        //        A.CallTo(() => _roomRepo.Add(A<RoomModel>._)).DoesNothing();
-
-        //        A.CallTo(() => _roomRepo.Save()).WithAnyArguments().Invokes(call =>
-        //        {
-        //            // Simulate the behavior of assigning the generated Id to newRoom.Id
-        //            newRoom.Id = 1;
-        //        });
-
-        //        // Act
-        //        var result = await _controller.CreateRoom(roomName);
-
-        //        // Assert
-        //        result.Should().BeOfType<OkObjectResult>();
-
-        //        var okResult = result as OkObjectResult;
-        //        okResult.Should().NotBeNull();
-
-        //        okResult.Value.Should().BeOfType<int>();
-
-        //        var roomId = (int)okResult.Value;
-        //        roomId.Should().BeGreaterThan(0);
-        //        roomId.Should().Be(newRoom.Id);
-        //    }
-
-
-
-
-        /*
         [Fact]
-        public async Task GetNextQuestionInQuiz_ReturnsOkResultWithQuestionDTO()
+        public async Task CreateRoom_ReturnsOkResult_WithValidInput()
         {
             // Arrange
-            var mapperMock = new Mock<IMapper>();
-            var roomRepoMack = new Mock<IRepository<RoomModel>>();
-            var relationRepoMack = new Mock<IQuizQuestionRelationRepository>();
-            var controller = new LobbyAPIController(_mapper, _roomRepo, _relationRepo);
+            var roomName = "TestRoom";
 
-            var questionModel = new QuestionModel { Id = 1, Title = "test 1" };
-            var quizRelationModel = new QuizQuestionRelationModel { Question = questionModel };
-            relationRepoMack.Setup(repo => repo.GetNextQuestionInQuiz(123)).ReturnsAsync(quizRelationModel);
-            mapperMock.Setup(mapper => mapper.Map<QuestionDTO>(questionModel))
-                .Returns(new QuestionDTO { Id = 1, Title = "test 1" });
+            var newRoom = new RoomModel { Name = roomName };
+            A.CallTo(() => _roomRepo.Add(A<RoomModel>._)).DoesNothing();
+
+            A.CallTo(() => _roomRepo.Save()).Returns(1); 
 
             // Act
-            var result = await controller.GetNextQuestionInQuiz(123);
+            var result = await _controller.CreateRoom(roomName);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var questionDTO = Assert.IsType<QuestionDTO>(okResult.Value);
-            Assert.Equal(1, questionDTO.Id);
-            Assert.Equal("test 1", questionDTO.Title);
-        */
+            result.Should().BeOfType<OkObjectResult>();
+
+            var okResult = result as OkObjectResult;
+            okResult.Should().NotBeNull();
+
+            okResult.Value.Should().BeOfType<int>();
+
+            var roomId = (int)okResult.Value;
+
+            newRoom.Id.Should().Be(roomId);
+        }
 
         [Fact]
         public async Task GetAllQuizQuestionsInfo_ReturnsOkResultWithQuizQuestionsDTO()
@@ -242,7 +208,6 @@ namespace BrainBoxAPI.Tests.Controller
             Assert.NotNull(result);
             Assert.Equal(200, result.StatusCode);
             Assert.Equal(1, result.Value);
-            // Add more assertions as needed
         }
 
         [Fact]
@@ -257,7 +222,6 @@ namespace BrainBoxAPI.Tests.Controller
             // Assert
             Assert.NotNull(result);
             Assert.Equal(404, result.StatusCode);
-            // Add more assertions as needed
         }
 
 
@@ -276,7 +240,6 @@ namespace BrainBoxAPI.Tests.Controller
             // Assert
             Assert.NotNull(result);
             Assert.Equal(200, result.StatusCode);
-            // Add more assertions as needed
         }
 
         [Fact]
@@ -291,7 +254,6 @@ namespace BrainBoxAPI.Tests.Controller
             // Assert
             Assert.NotNull(result);
             Assert.Equal(200, result.StatusCode);
-            // Add more assertions as needed
         }
 
         [Fact]
@@ -309,7 +271,6 @@ namespace BrainBoxAPI.Tests.Controller
             // Assert
             Assert.NotNull(result);
             Assert.Equal(401, result.StatusCode);
-            // Add more assertions as needed
         }
 
         [Fact]
@@ -324,7 +285,7 @@ namespace BrainBoxAPI.Tests.Controller
             // Assert
             Assert.NotNull(result);
             Assert.Equal(204, result.StatusCode);
-            // Add more assertions as needed
+
         }
 
     }

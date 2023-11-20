@@ -80,7 +80,7 @@ namespace BrainBoxAPI.Tests.Controller
             {
                 Id = 1,
                 Title = "Just Question",
-                ImageSource = null,
+                ImageSource = null
             };
 
             A.CallTo(() => _questionRepo.GetById(A<int>._))
@@ -110,6 +110,7 @@ namespace BrainBoxAPI.Tests.Controller
             var returnedDto = okResult.Value.Should().BeOfType<QuestionWithAnswerDTO>().Subject;
             returnedDto.Should().BeEquivalentTo(expectedDto); 
         }
+
 
 
 
