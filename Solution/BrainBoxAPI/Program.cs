@@ -1,7 +1,9 @@
+using BrainBoxAPI.Caching;
 using BrainBoxAPI.Data;
 using BrainBoxAPI.Managers;
 using BrainBoxAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using SharedModels.Lobby;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +47,7 @@ builder.Services.AddAutoMapper(m =>
 builder.Services.AddScoped<IRepository<QuestionModel>, QuestionRepository>();
 builder.Services.AddScoped<IRepository<RoomModel>, RoomRepository>();
 builder.Services.AddScoped<IQuizQuestionRelationRepository, QuizQuestionRelationRepository>();
+builder.Services.AddSingleton<IDictionaryCache<int, RoomContentDTO>, RoomContentCache>();
 
 var app = builder.Build();
 

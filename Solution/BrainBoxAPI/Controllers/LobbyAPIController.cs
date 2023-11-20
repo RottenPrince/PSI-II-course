@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System;
 using AutoMapper;
 using BrainBoxAPI.Exceptions;
+using BrainBoxAPI.Caching;
 
 namespace BrainBoxAPI.Controllers
 {
@@ -19,13 +20,15 @@ namespace BrainBoxAPI.Controllers
         private readonly IMapper _mapper;
         private readonly IRepository<RoomModel> _roomRepo;
         private readonly IQuizQuestionRelationRepository _relationRepo;
+        private readonly IDictionaryCache<int, RoomContentDTO> _roomCache;
 
-        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> roomRepo, IQuizQuestionRelationRepository relationRepo)
+        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> roomRepo, IQuizQuestionRelationRepository relationRepo, IDictionaryCache<int, RoomContentDTO> roomCache)
         {
             _random = new Random();
             _mapper = mapper;
             _roomRepo = roomRepo;
             _relationRepo = relationRepo;
+            _roomCache = roomCache;
         }
 
         [HttpGet]
@@ -38,13 +41,17 @@ namespace BrainBoxAPI.Controllers
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
-            RoomModel? room = await _roomRepo.GetById(roomId);
-            if (room == null) return NotFound();
-            return Ok(new RoomContentDTO
+            var model = _roomCache.GetOrCompute(roomId, id =>
             {
-                RoomName = room.Name,
-                QuestionAmount = room.Questions.Count,
+                RoomModel? room = _roomRepo.GetById(id).Result;
+                if (room == null) return null;
+                return new RoomContentDTO
+                {
+                    RoomName = room.Name,
+                    QuestionAmount = room.Questions.Count,
+                };
             });
+            return Ok(model);
         }
 
         [HttpPost]
@@ -60,6 +67,7 @@ namespace BrainBoxAPI.Controllers
             {
                 return BadRequest("Name already in use");
             }
+            _roomCache.Invalidate(newRoom.Id);
             return Ok(newRoom.Id);
         }
 
@@ -67,6 +75,7 @@ namespace BrainBoxAPI.Controllers
         public async Task<IActionResult> CreateQuiz(int roomId, int questionAmount)
         {
             int id = await _relationRepo.CreateNewQuiz(roomId, questionAmount);
+            _roomCache.Invalidate(roomId);
             if(id == -1)
             {
                 return NotFound();
