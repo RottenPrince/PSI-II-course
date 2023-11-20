@@ -94,8 +94,6 @@ namespace BrainBoxUI.Controllers
                 string filename = $"{guid}.{extension}";
                 string savedImagePath = Path.Combine(_host.WebRootPath, "img", filename);
                 questionModel.ImageSource = filename;
-                //Console.Write(filename);
-                //Console.Write(questionModel.ImageName);
 
                 using (FileStream fs = System.IO.File.Create(savedImagePath))
                 {
