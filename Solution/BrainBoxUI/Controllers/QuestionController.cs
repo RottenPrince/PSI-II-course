@@ -1,6 +1,6 @@
 using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
-using BrainBoxUI.Helpers.BrainBoxAPI;
+using BrainBoxUI.Helpers.API;
 using BrainBoxUI.Models;
 using System.Text.Json;
 using Microsoft.Identity.Client;
@@ -12,17 +12,19 @@ namespace BrainBoxUI.Controllers
     {
         private readonly IWebHostEnvironment _host;
         private readonly ILogger<QuestionController> _logger;
+        private readonly IApiRepository _apiRepository;
 
-        public QuestionController(IWebHostEnvironment host, ILogger<QuestionController> logger)
+        public QuestionController(IWebHostEnvironment host, ILogger<QuestionController> logger, IApiRepository apiRepository)
         {
             _host = host;
             _logger = logger;
+            _apiRepository = apiRepository;
         }
 
         [HttpGet("{roomId}/{questionAmount}")]
         public IActionResult StartRun(int roomId, int questionAmount)
         {
-            int newRunId = APIHelper.Get<int>($"api/Lobby/CreateQuiz/{roomId}/{questionAmount}", out var error);
+            int newRunId = _apiRepository.Get<int>($"api/Lobby/CreateQuiz/{roomId}/{questionAmount}", out var error);
             if(error != null)
             {
                 throw new Exception(); // TODO something normal
@@ -34,13 +36,13 @@ namespace BrainBoxUI.Controllers
         [HttpGet]
         public IActionResult Solve(int runId)
         {
-            var questionModel = APIHelper.Get<QuestionDTO>($"api/Lobby/GetNextQuestionInQuiz/{runId}", out var error);
+            var questionModel = _apiRepository.Get<QuestionDTO>($"api/Lobby/GetNextQuestionInQuiz/{runId}", out var error);
             if(questionModel == null)
             {
                 return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = 0 });
             }
             ViewBag.runId = runId;
-            var roomId = APIHelper.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
+            var roomId = _apiRepository.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
             ViewBag.roomId = roomId;
 
             return View("Solve", questionModel);
@@ -49,17 +51,17 @@ namespace BrainBoxUI.Controllers
         [HttpPost]
         public IActionResult Solve(int runId, int selectedOption)
         {
-            APIHelper.Post<object, string>($"api/Lobby/SubmitAnswer/{runId}/{selectedOption}", new { }, out var error);
+            _apiRepository.Post<object, string>($"api/Lobby/SubmitAnswer/{runId}/{selectedOption}", new { }, out var error);
             return RedirectToAction("Solve", new { runId = runId });
         }
 
         [HttpGet]
         public IActionResult Review(int runId, int currentQuestionIndex)
         {
-            var questionModel = APIHelper.Get<QuizQuestionDTO>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", out var error);
+            var questionModel = _apiRepository.Get<QuizQuestionDTO>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", out var error);
             if(questionModel == null)
             {
-                var roomId = APIHelper.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
+                var roomId = _apiRepository.Get<int>($"api/Lobby/GetRoomId/{runId}", out var error2);
                 return RedirectToAction("Room", "Lobby", new { roomId = roomId });
             }
             ViewBag.runId = runId;
@@ -103,7 +105,7 @@ namespace BrainBoxUI.Controllers
 
             ViewBag.Title = questionModel.Title;
 
-            var response = APIHelper.Post<QuestionWithAnswerDTO, string>($"api/Question/SaveQuestion/{roomId}", questionModel, out APIError? error);
+            var response = _apiRepository.Post<QuestionWithAnswerDTO, string>($"api/Question/SaveQuestion/{roomId}", questionModel, out APIError? error);
 
             if (error == null)
             {
