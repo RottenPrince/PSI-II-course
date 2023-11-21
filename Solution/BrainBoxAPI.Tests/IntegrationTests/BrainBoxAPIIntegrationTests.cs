@@ -57,7 +57,6 @@ namespace BrainBoxAPI.Tests.IntegrationTests
             var response = await _client.GetAsync($"/api/Lobby/GetRoomContent/1");
             response.EnsureSuccessStatusCode();
 
-            // Deserialize the response content
             var roomContent = await response.Content.ReadFromJsonAsync<RoomContentDTO>();
 
             // Assert
