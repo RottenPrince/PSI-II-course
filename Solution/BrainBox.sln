@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainBoxAPI", "BrainBoxAPI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainBoxUI", "BrainBoxUI\BrainBoxUI.csproj", "{49419342-998A-4962-994E-AF618A3EE245}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainBoxAPI.Tests", "BrainBoxAPI.Tests\BrainBoxAPI.Tests.csproj", "{C6FE582A-6C5B-47E8-AC34-397CC4EA3FD7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BrainBoxUI.Tests", "BrainBoxUI.Tests\BrainBoxUI.Tests.csproj", "{83736E27-7F27-4549-A74D-FA8C53AFB5BA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{49419342-998A-4962-994E-AF618A3EE245}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49419342-998A-4962-994E-AF618A3EE245}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49419342-998A-4962-994E-AF618A3EE245}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6FE582A-6C5B-47E8-AC34-397CC4EA3FD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6FE582A-6C5B-47E8-AC34-397CC4EA3FD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6FE582A-6C5B-47E8-AC34-397CC4EA3FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6FE582A-6C5B-47E8-AC34-397CC4EA3FD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83736E27-7F27-4549-A74D-FA8C53AFB5BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83736E27-7F27-4549-A74D-FA8C53AFB5BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83736E27-7F27-4549-A74D-FA8C53AFB5BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83736E27-7F27-4549-A74D-FA8C53AFB5BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -62,5 +62,33 @@ namespace BrainBoxAPI.Data
             var dbPath = System.IO.Path.Combine(AppContext.BaseDirectory, "mydatabase.db");
             options.UseSqlite($"Data Source={dbPath}");
         }
+
+        public void SeedTestData()
+        {
+            if (!Rooms.Any())
+            {
+                var rooms = new List<RoomModel>
+                {
+                    new RoomModel { Name = "Room 1" },
+                    new RoomModel { Name = "Room 2" },
+                };
+
+                Rooms.AddRange(rooms);
+                SaveChanges();
+
+                if (!Questions.Any())
+                {
+                    var room1 = Rooms.First();
+                    var questions = new List<QuestionModel>
+                    {
+                        new QuestionModel { Title = "Question 1", RoomId = room1.Id },
+                        new QuestionModel { Title = "Question 2", RoomId = room1.Id },
+                    };
+
+                    Questions.AddRange(questions);
+                    SaveChanges();
+                }
+            }
+        }
     }
 }

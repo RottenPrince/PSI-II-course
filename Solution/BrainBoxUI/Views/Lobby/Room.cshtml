@@ -3,6 +3,6 @@
 <div>Questions: @ViewBag.QuestionAmount</div>
 <div>
     <a asp-controller="Question" asp-action="StartRun" asp-route-roomId="@ViewBag.RoomId" asp-route-questionAmount="1" class="btn btn-primary">Solve random Question</a>
-    <a asp-controller="Question" asp-action="StartRun" asp-route-roomId="@ViewBag.RoomId" asp-route-questionAmount="3" class="btn btn-primary">Start a Run</a>
+    <a asp-controller="Question" asp-action="StartRun" asp-route-roomId="@ViewBag.RoomId" asp-route-questionAmount="3" class="btn btn-primary">Start a Quiz</a>
     <a asp-controller="Question" asp-action="Create" asp-route-id="@ViewBag.RoomId" class=" btn btn-primary">Create new Question</a>
 </div>

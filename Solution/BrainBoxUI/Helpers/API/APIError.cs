@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace BrainBoxUI.Helpers.BrainBoxAPI
+namespace BrainBoxUI.Helpers.API
 {
     public class APIError
     {
