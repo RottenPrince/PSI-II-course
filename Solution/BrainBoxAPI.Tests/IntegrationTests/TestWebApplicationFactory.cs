@@ -18,7 +18,7 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             );
 
             services.Remove(descriptor);
-            var dbName = Guid.NewGuid().ToString();
+            var dbName = "TestDatabase_" + Guid.NewGuid().ToString();
 
             services.AddDbContext<AppDbContext>(options =>
             {
@@ -34,6 +34,7 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             var scopedServices = scope.ServiceProvider;
             var db = scopedServices.GetRequiredService<AppDbContext>();
 
+            db.SeedTestData();
             db.Database.EnsureCreated();
         });
     }

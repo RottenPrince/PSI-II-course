@@ -9,53 +9,60 @@ using System.Threading.Tasks;
 using BrainBoxAPI;
 using BrainBoxAPI.Data;
 using Microsoft.Extensions.DependencyInjection;
+using SharedModels.Lobby;
 using SharedModels.Question;
+
 
 namespace BrainBoxAPI.Tests.IntegrationTests
 {
     public class BrainBoxAPIIntegrationTests : IClassFixture<TestWebApplicationFactory<Program>>
     {
         private readonly TestWebApplicationFactory<Program> _factory;
+        private readonly HttpClient _client;
 
         public BrainBoxAPIIntegrationTests(TestWebApplicationFactory<Program> factory)
         {
             _factory = factory;
-        }
-
-        private async Task<HttpResponseMessage> PostQuestionAsync(QuestionWithAnswerDTO question)
-        {
-            var client = _factory.CreateClient();
-
-            // Simulate the behavior of _apiRepository.Post
-            var questionJson = JsonSerializer.Serialize(question);
-            var content = new StringContent(questionJson, System.Text.Encoding.UTF8, "application/json");
-            var response = await client.PostAsync("/api/Question/SaveQuestion/1?image=null", content);
-
-            return response;
+            _client = _factory.CreateClient();
         }
 
         [Fact]
-        public async Task SaveQuestion_ReturnsSuccessStatusCode()
+        public async Task GetAllRooms_ReturnsSuccessAndRooms()
         {
-            // Arrange
-            var question = new QuestionWithAnswerDTO
-            {
-                Id = 0,
-                Title = "Sample Question",
-                AnswerOptions = new List<AnswerOptionDTO>
-                {
-                    new AnswerOptionDTO { Id = 1, OptionText = "Option 1" },
-                    new AnswerOptionDTO { Id = 2, OptionText = "Option 2" },
-                },
-                ImageSource = "sample-image.jpg",
-                CorrectAnswerIndex = 0
-            };
-
             // Act
-            var response = await PostQuestionAsync(question);
+            var response = await _client.GetAsync("/api/Lobby/GetAllRooms");
+            response.EnsureSuccessStatusCode();
+
+            var rooms = await JsonSerializer.DeserializeAsync<List<RoomDTO>>(await response.Content.ReadAsStreamAsync());
 
             // Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.NotNull(rooms);
+            Assert.NotEmpty(rooms);
         }
+
+        [Fact]
+        public async Task GetRoomContent_ReturnsRoomContent()
+        {
+            // Arrange
+
+            using (var scope = _factory.Services.CreateScope()) //idejau, nes Assert.Equal(2, roomContent.QuestionAmount); nepraina, nors paSeed'inau dbContext'e
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.SeedTestData();
+            }
+
+            // Act
+            var response = await _client.GetAsync($"/api/Lobby/GetRoomContent/1");
+            response.EnsureSuccessStatusCode();
+
+            // Deserialize the response content
+            var roomContent = await response.Content.ReadFromJsonAsync<RoomContentDTO>();
+
+            // Assert
+            Assert.NotNull(roomContent);
+            Assert.Equal("Room 1", roomContent.RoomName);
+            Assert.Equal(2, roomContent.QuestionAmount);
+        }
+
     }
 }
