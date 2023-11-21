@@ -8,7 +8,7 @@ using BrainBoxAPI.Managers;
 using Castle.Core.Logging;
 using System;
 
-namespace BrainBoxAPI.Tests.Controller
+namespace BrainBoxAPI.Tests.ControllerUnitTests
 {
     public class QuestionAPIControllerTests
     {

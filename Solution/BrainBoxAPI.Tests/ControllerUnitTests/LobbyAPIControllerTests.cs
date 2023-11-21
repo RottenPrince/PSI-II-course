@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BrainBoxAPI.Tests.Controller
+namespace BrainBoxAPI.Tests.ControllerUnitTests
 {
     public class LobbyAPIControllerTests
     {
