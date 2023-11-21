@@ -45,9 +45,11 @@ namespace BrainBoxAPI.Tests.IntegrationTests
         {
             // Arrange
 
-            using (var scope = _factory.Services.CreateScope()) //idejau, nes Assert.Equal(2, roomContent.QuestionAmount); nepraina, nors paSeed'inau dbContext'e
+            using (var scope = _factory.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                dbContext.Database.EnsureDeleted();
+                dbContext.Database.EnsureCreated();
                 dbContext.SeedTestData();
             }
 
