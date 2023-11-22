@@ -31,13 +31,17 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
         public async Task GetAllRooms_ReturnsOkResult_WithValidInput()
         {
             // Arrange
-            var fakeRoomList = A.Fake<List<RoomModel>>();
+            var fakeRoomList = new List<RoomModel>
+            {
+                new RoomModel { Id = 1, Name = "Room 1" },
+                new RoomModel { Id = 2, Name = "Room 2" },
+            };
             var fakeTask = Task.FromResult(fakeRoomList);
 
             A.CallTo(() => _roomRepo.GetAll()).Returns(fakeTask);
 
-            var roomList = A.Fake<List<RoomDTO>>();
-            A.CallTo(() => _mapper.Map<List<RoomDTO>>(fakeRoomList)).Returns(roomList);
+            var roomDTOs = fakeRoomList.Select(roomModel => new RoomDTO { Id = roomModel.Id, Name = roomModel.Name }).ToList();
+            A.CallTo(() => _mapper.Map<List<RoomDTO>>(fakeRoomList)).Returns(roomDTOs);
 
             // Act
             var result = await _controller.GetAllRooms();
@@ -45,6 +49,10 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
             // Assert
             result.Should().NotBeNull();
             result.Should().BeOfType<OkObjectResult>();
+
+            var okObjectResult = result.As<OkObjectResult>();
+            var returnedRoomList = okObjectResult.Value.As<List<RoomDTO>>();
+            returnedRoomList.Should().BeEquivalentTo(roomDTOs, options => options.ExcludingMissingMembers());
         }
 
 
@@ -79,25 +87,71 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
         public async Task GetAllQuizQuestionsInfo_ReturnsOkResultWithQuizQuestionsDTO()
         {
             // Arrange
-
             var quizRelationModels = new List<QuizQuestionRelationModel>
             {
-                new QuizQuestionRelationModel { SelectedAnswerOption = new AnswerOptionModel(), Question = new QuestionModel() }
+                new QuizQuestionRelationModel
+                {
+                    Id = 1,
+                    QuizModelID = 123,
+                    QuestionModelID = 456,
+                    SelectedAnswerOption = new AnswerOptionModel
+                    {
+                        Id = 789,
+                        OptionText = "Option 1",
+                        IsCorrect = true,
+                        QuestionId = 456
+                    },
+                    Question = new QuestionModel
+                    {
+                        Id = 456,
+                        Title = "Question 1",
+                        ImageSource = "image.jpg",
+                        RoomId = 789
+                    },
+                    Quiz = new QuizModel
+                    {
+                        Id = 123,
+                        RoomId = 789,
+                        StartTime = DateTime.Now
+                    }
+                }
             };
 
             A.CallTo(() => _relationRepo.GetAllQuizQuestionsInfo(123))
                 .Returns(Task.FromResult(quizRelationModels));
 
+            var expectedQuizQuestionDTOs = quizRelationModels.Select(q => new QuizQuestionDTO
+            {
+                Question = new QuestionWithAnswerDTO
+                {
+                    Id = q.Question.Id,
+                    Title = q.Question.Title,
+                    ImageSource = q.Question.ImageSource,
+                    CorrectAnswerIndex = 0,
+                },
+                SelectedAnswerOption = 0,
+            }).ToList();
+
             A.CallTo(() => _mapper.Map<List<QuizQuestionDTO>>(A<IEnumerable<QuizQuestionRelationModel>>._))
-                .Returns(new List<QuizQuestionDTO> { new QuizQuestionDTO() });
+                .Returns(expectedQuizQuestionDTOs);
 
             // Act
             var result = await _controller.GetAllQuizQuestionsInfo(123);
 
             // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var quizQuestionsDTO = Assert.IsType<List<QuizQuestionDTO>>(okResult.Value);
-            Assert.Single(quizQuestionsDTO);
+            var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+            var quizQuestionsDTO = okResult.Value.Should().BeAssignableTo<List<QuizQuestionDTO>>().Subject;
+
+            quizQuestionsDTO.Should().HaveCount(1);
+
+            var expectedQuizQuestionDTO = expectedQuizQuestionDTOs.First();
+            var actualQuizQuestionDTO = quizQuestionsDTO.First();
+
+            actualQuizQuestionDTO.Question.Id.Should().Be(expectedQuizQuestionDTO.Question.Id);
+            actualQuizQuestionDTO.Question.Title.Should().Be(expectedQuizQuestionDTO.Question.Title);
+            actualQuizQuestionDTO.Question.ImageSource.Should().Be(expectedQuizQuestionDTO.Question.ImageSource);
+            actualQuizQuestionDTO.Question.CorrectAnswerIndex.Should().Be(expectedQuizQuestionDTO.Question.CorrectAnswerIndex);
+            actualQuizQuestionDTO.SelectedAnswerOption.Should().Be(expectedQuizQuestionDTO.SelectedAnswerOption);
         }
 
         [Fact]
