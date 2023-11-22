@@ -34,8 +34,11 @@ public class TestWebApplicationFactory<TProgram> : WebApplicationFactory<TProgra
             var scopedServices = scope.ServiceProvider;
             var db = scopedServices.GetRequiredService<AppDbContext>();
 
-            db.SeedTestData();
+            
+            
+            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
+            db.SeedTestData();
         });
     }
 }

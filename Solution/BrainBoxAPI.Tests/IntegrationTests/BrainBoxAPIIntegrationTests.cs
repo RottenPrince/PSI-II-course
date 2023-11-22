@@ -45,13 +45,6 @@ namespace BrainBoxAPI.Tests.IntegrationTests
         {
             // Arrange
 
-            using (var scope = _factory.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
-                dbContext.SeedTestData();
-            }
 
             // Act
             var response = await _client.GetAsync($"/api/Lobby/GetRoomContent/1");
