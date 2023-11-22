@@ -2,7 +2,6 @@ using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using BrainBoxAPI.Managers;
 using AutoMapper;
-using BrainBoxAPI.Data;
 using BrainBoxAPI.Models;
 using BrainBoxAPI.Caching;
 using SharedModels.Lobby;

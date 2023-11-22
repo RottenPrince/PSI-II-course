@@ -1,12 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using SharedModels.Lobby;
-using SharedModels.Question;
 using BrainBoxAPI.Models;
 using BrainBoxAPI.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using System;
 
 namespace BrainBoxAPI.Managers
 {

@@ -6,9 +6,6 @@ using Microsoft.Extensions.Logging;
 using SharedModels.Question;
 using BrainBoxAPI.Managers;
 using BrainBoxAPI.Caching;
-using Castle.Core.Logging;
-using System;
-using BrainBoxAPI.Caching;
 using SharedModels.Lobby;
 
 namespace BrainBoxAPI.Tests.ControllerUnitTests

@@ -1,9 +1,6 @@
 using SharedModels.Question;
 using Microsoft.AspNetCore.Mvc;
 using BrainBoxUI.Helpers.API;
-using BrainBoxUI.Models;
-using System.Text.Json;
-using Microsoft.Identity.Client;
 
 namespace BrainBoxUI.Controllers
 {
