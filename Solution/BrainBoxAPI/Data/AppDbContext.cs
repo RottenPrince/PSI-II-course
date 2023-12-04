@@ -1,14 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using BrainBoxAPI.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BrainBoxAPI.Data
 {
-    public class AppDbContext : DbContext
-    {
-        public AppDbContext() : base()
-        {
-        }
 
+
+    public class AppDbContext : IdentityDbContext<IdentityUser>
+    { 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -21,6 +21,9 @@ namespace BrainBoxAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
+
             modelBuilder.Entity<RoomModel>()
                 .HasMany(room => room.Questions)
                 .WithOne(question => question.Room)
