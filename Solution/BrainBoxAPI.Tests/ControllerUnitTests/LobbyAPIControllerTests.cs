@@ -6,6 +6,7 @@ using BrainBoxAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using SharedModels.Lobby;
 using SharedModels.Question;
+using System.Net;
 
 namespace BrainBoxAPI.Tests.ControllerUnitTests
 {
@@ -50,9 +51,23 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
             result.Should().NotBeNull();
             result.Should().BeOfType<OkObjectResult>();
 
+           
             var okObjectResult = result.As<OkObjectResult>();
+            okObjectResult.Should().NotBeNull();
+            okObjectResult.StatusCode.Should().Be((int)HttpStatusCode.OK);
+
             var returnedRoomList = okObjectResult.Value.As<List<RoomDTO>>();
-            returnedRoomList.Should().BeEquivalentTo(roomDTOs, options => options.ExcludingMissingMembers());
+            returnedRoomList.Should().NotBeNull();
+
+            returnedRoomList.Should().HaveCount(fakeRoomList.Count);
+
+            for (int i = 0; i < returnedRoomList.Count; i++)
+            {
+                returnedRoomList[i].Id.Should().Be(fakeRoomList[i].Id);
+                returnedRoomList[i].Name.Should().Be(fakeRoomList[i].Name);
+            }
+            A.CallTo(() => _mapper.Map<List<RoomDTO>>(fakeRoomList)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _roomRepo.GetAll()).MustHaveHappenedOnceExactly();
         }
 
 
@@ -62,10 +77,10 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
             // Arrange
             var roomName = "TestRoom";
 
-            var newRoom = new RoomModel { Name = roomName };
+            var newRoom = new RoomModel { Name = roomName};
             A.CallTo(() => _roomRepo.Add(A<RoomModel>._)).DoesNothing();
 
-            A.CallTo(() => _roomRepo.Save()).Returns(1); 
+            A.CallTo(() => _roomRepo.Save()).Returns(1);
 
             // Act
             var result = await _controller.CreateRoom(roomName);
@@ -79,8 +94,10 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
             okResult.Value.Should().BeOfType<int>();
 
             var roomId = (int)okResult.Value;
-
             newRoom.Id.Should().Be(roomId);
+            A.CallTo(() => _roomRepo.Add(A<RoomModel>.That.Matches(r => r.Name == roomName))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _roomRepo.Save()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _cache.Invalidate(newRoom.Id)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -179,21 +196,30 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
         public async Task GetRoomId_ReturnsOkResultWithRoomId()
         {
             // Arrange
-            var quizRelationModels = new List<QuizQuestionRelationModel>
-            {
-                new QuizQuestionRelationModel { SelectedAnswerOption = new AnswerOptionModel(), Question = new QuestionModel { RoomId = 456 } }
-            };
+            int expectedRunId = 123;
+            int expectedRoomId = 456;
 
-            A.CallTo(() => _relationRepo.GetAllQuizQuestionsInfo(123)).Returns(Task.FromResult(quizRelationModels));
+            var quizRelationModels = new List<QuizQuestionRelationModel>
+    {
+        new QuizQuestionRelationModel { SelectedAnswerOption = new AnswerOptionModel(), Question = new QuestionModel { RoomId = expectedRoomId } }
+    };
+
+            A.CallTo(() => _relationRepo.GetAllQuizQuestionsInfo(expectedRunId)).Returns(Task.FromResult(quizRelationModels));
 
             // Act
-            var result = await _controller.GetRoomId(123);
+            var result = await _controller.GetRoomId(expectedRunId);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
+
+            Assert.IsType<int>(okResult.Value);
+
             var roomId = Assert.IsType<int>(okResult.Value);
-            Assert.Equal(456, roomId);
+            Assert.Equal(expectedRoomId, roomId);
+            Assert.Equal(200, okResult.StatusCode);
+            A.CallTo(() => _relationRepo.GetAllQuizQuestionsInfo(expectedRunId)).MustHaveHappenedOnceExactly();
         }
+
 
         [Fact]
         public async Task CreateQuiz_ReturnsOkResult()
