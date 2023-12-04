@@ -6,6 +6,7 @@ using BrainBoxAPI.Models;
 using AutoMapper;
 using BrainBoxAPI.Exceptions;
 using BrainBoxAPI.Caching;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BrainBoxAPI.Controllers
 {
@@ -28,6 +29,7 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetAllRooms()
         {
             var rooms = await _roomRepo.GetAll();

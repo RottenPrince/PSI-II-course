@@ -2,9 +2,12 @@ using BrainBoxAPI.Caching;
 using BrainBoxAPI.Data;
 using BrainBoxAPI.Managers;
 using BrainBoxAPI.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using SharedModels.Lobby;
+using System.Text;
 
 namespace BrainBoxAPI;
 
@@ -70,6 +73,24 @@ public class Program
         builder.Services.AddScoped<IQuizQuestionRelationRepository, QuizQuestionRelationRepository>();
         builder.Services.AddSingleton<IDictionaryCache<int, RoomContentDTO>, RoomContentCache>();
         builder.Services.AddScoped<Services.JwtService>(); //should be changed to interface + implementation
+
+        builder.Services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+                    )
+                };
+            });
 
         var app = builder.Build();
 
