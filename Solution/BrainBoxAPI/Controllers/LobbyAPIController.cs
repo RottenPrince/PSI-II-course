@@ -7,6 +7,10 @@ using AutoMapper;
 using BrainBoxAPI.Exceptions;
 using BrainBoxAPI.Caching;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using BrainBoxAPI.Data;
 
 namespace BrainBoxAPI.Controllers
 {
@@ -18,21 +22,35 @@ namespace BrainBoxAPI.Controllers
         private readonly IRepository<RoomModel> _roomRepo;
         private readonly IQuizQuestionRelationRepository _relationRepo;
         private readonly IDictionaryCache<int, RoomContentDTO> _roomCache;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> roomRepo, IQuizQuestionRelationRepository relationRepo, IDictionaryCache<int, RoomContentDTO> roomCache)
+        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> roomRepo, IQuizQuestionRelationRepository relationRepo,
+            IDictionaryCache<int, RoomContentDTO> roomCache, UserManager<ApplicationUser> userManager)
         {
             _random = new Random();
             _mapper = mapper;
             _roomRepo = roomRepo;
             _relationRepo = relationRepo;
             _roomCache = roomCache;
+            _userManager = userManager;
         }
 
         [HttpGet]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetAllRooms()
         {
-            var rooms = await _roomRepo.GetAll();
+            var userId = User.FindFirst("Id")?.Value;
+            Console.Write("USER ID2: " + userId);
+
+            var user = await _userManager.Users
+                .Include(u => u.Rooms)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            var rooms = user.Rooms; //all rooms user has
+
+            if (rooms == null)
+                return NotFound();
+
             return Ok(_mapper.Map<List<RoomDTO>>(rooms));
         }
 
@@ -120,7 +138,7 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet("{runId}")]
-        public async Task<IActionResult> GetRoomId(int runId)
+        public async Task<IActionResult> GetRoomId(int runId) //doesn't work with empty quiz, because searches by QuizRelations
         {
             var questions = await _relationRepo.GetAllQuizQuestionsInfo(runId);
             if (questions != null && questions.Any())
@@ -131,5 +149,45 @@ namespace BrainBoxAPI.Controllers
 
             return NotFound();
         }
+
+        [HttpPost("{roomId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> JoinRoom(int roomId)  //roomId + user Token, connects room and user
+        {
+            var userId = User.FindFirst("Id")?.Value;
+
+            Console.Write("USER ID: " + userId);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+
+            var room = _roomRepo.GetById(roomId).Result;
+            if (room == null)
+            {
+                return NotFound();
+            }
+
+            // Check if the user is already in the room
+            if (user.Rooms != null && user.Rooms.Any(r => r.Id == roomId))
+            {
+                return BadRequest("User is already in the room.");
+            }
+
+            // Add the user to the room
+            user.Rooms.Add(room);
+            await _userManager.UpdateAsync(user);
+
+            return Ok("User joined the room successfully.");
+        }
     }
+
+
 }

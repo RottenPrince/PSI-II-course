@@ -2,12 +2,23 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using BrainBoxAPI.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace BrainBoxAPI.Data
 {
 
+    public class ApplicationUser : IdentityUser
+    {
+        public ApplicationUser()
+        {
+            Rooms = new List<RoomModel>();
+        }
 
-    public class AppDbContext : IdentityUserContext<IdentityUser>
+        public ICollection<RoomModel> Rooms { get; set; }
+    }
+
+
+    public class AppDbContext : IdentityUserContext<ApplicationUser>
     { 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -58,6 +69,11 @@ namespace BrainBoxAPI.Data
                 .HasOne(model => model.Quiz)
                 .WithMany(model => model.QuestionRelations)
                 .HasForeignKey(model => model.QuizModelID);
+
+            modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.Rooms)
+            .WithMany(r => r.Users)
+            .UsingEntity(j => j.ToTable("UserRooms"));
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

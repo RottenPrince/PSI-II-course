@@ -29,7 +29,7 @@ public class Program
             options.EnableSensitiveDataLogging(true);
         });
 
-        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+        builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 

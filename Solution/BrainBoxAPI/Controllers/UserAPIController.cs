@@ -1,4 +1,5 @@
-﻿using BrainBoxAPI.Services;
+﻿using BrainBoxAPI.Data;
+using BrainBoxAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SharedModels.User;
@@ -9,10 +10,10 @@ namespace BrainBoxAPI.Controllers
     [ApiController]
     public class UserAPIController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly JwtService _jwtService;
 
-        public UserAPIController(UserManager<IdentityUser> userManager, JwtService jwtService)
+        public UserAPIController(UserManager<ApplicationUser> userManager, JwtService jwtService)
         {
             _userManager = userManager;
             _jwtService = jwtService;
@@ -27,7 +28,7 @@ namespace BrainBoxAPI.Controllers
             }
 
             var result = await _userManager.CreateAsync(
-                new IdentityUser() { UserName = user.UserName, Email = user.Email },
+                new ApplicationUser() { UserName = user.UserName, Email = user.Email },
                 user.Password
             );
 
