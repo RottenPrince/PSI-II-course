@@ -7,7 +7,7 @@ namespace BrainBoxAPI.Data
 {
 
 
-    public class AppDbContext : IdentityDbContext<IdentityUser>
+    public class AppDbContext : IdentityUserContext<IdentityUser>
     { 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
