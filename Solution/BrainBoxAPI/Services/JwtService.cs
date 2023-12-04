@@ -9,7 +9,7 @@ namespace BrainBoxAPI.Services
 {
     public class JwtService //should implement an interface
     {
-        private const int EXPIRATION_MINUTES = 1;
+        private const int EXPIRATION_MINUTES = 20;
 
         private readonly IConfiguration _configuration;
 
@@ -46,7 +46,7 @@ namespace BrainBoxAPI.Services
                 signingCredentials: credentials
             );
 
-        private Claim[] CreateClaims(IdentityUser user) =>
+        private Claim[] CreateClaims(IdentityUser user) => //we should choose needed claims
             new[] {
                 new Claim("Id", user.Id),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),

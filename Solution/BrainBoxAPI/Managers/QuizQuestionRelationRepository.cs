@@ -50,7 +50,7 @@ namespace BrainBoxAPI.Managers
             }
         }
 
-        public async Task<int> CreateNewQuiz(int roomId, int questionAmount)
+        public async Task<int> CreateNewQuiz(int roomId, int questionAmount, string userId, ApplicationUser user)
         {
             var roomModel = await _room.GetById(roomId);
             if(roomModel == null)
@@ -66,6 +66,8 @@ namespace BrainBoxAPI.Managers
             {
                 StartTime = DateTime.UtcNow,
                 Room = roomModel,
+                UserId = userId,
+                User = user,
             };
             foreach (var q in questions)
             {
@@ -76,6 +78,7 @@ namespace BrainBoxAPI.Managers
                 });
             }
             _context.QuizModels.Add(newModel);
+
             Save();
             return newModel.Id;
         }

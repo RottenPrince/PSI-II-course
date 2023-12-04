@@ -12,9 +12,11 @@ namespace BrainBoxAPI.Data
         public ApplicationUser()
         {
             Rooms = new List<RoomModel>();
+            Quizzes = new List<QuizModel>();
         }
 
         public ICollection<RoomModel> Rooms { get; set; }
+        public ICollection<QuizModel> Quizzes { get; set; }
     }
 
 
@@ -74,6 +76,11 @@ namespace BrainBoxAPI.Data
             .HasMany(u => u.Rooms)
             .WithMany(r => r.Users)
             .UsingEntity(j => j.ToTable("UserRooms"));
+
+            modelBuilder.Entity<ApplicationUser>()
+            .HasMany(u => u.Quizzes)
+            .WithOne(q => q.User)
+            .HasForeignKey(q => q.UserId);
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)

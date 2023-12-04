@@ -20,16 +20,18 @@ namespace BrainBoxAPI.Controllers
         private Random _random;
         private readonly IMapper _mapper;
         private readonly IRepository<RoomModel> _roomRepo;
+        private readonly IRepository<QuizModel> _quizRepo;
         private readonly IQuizQuestionRelationRepository _relationRepo;
         private readonly IDictionaryCache<int, RoomContentDTO> _roomCache;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> roomRepo, IQuizQuestionRelationRepository relationRepo,
+        public LobbyAPIController(IMapper mapper, IRepository<RoomModel> roomRepo, IRepository<QuizModel> quizRepo, IQuizQuestionRelationRepository relationRepo,
             IDictionaryCache<int, RoomContentDTO> roomCache, UserManager<ApplicationUser> userManager)
         {
             _random = new Random();
             _mapper = mapper;
             _roomRepo = roomRepo;
+            _quizRepo = quizRepo;
             _relationRepo = relationRepo;
             _roomCache = roomCache;
             _userManager = userManager;
@@ -40,7 +42,6 @@ namespace BrainBoxAPI.Controllers
         public async Task<IActionResult> GetAllRooms()
         {
             var userId = User.FindFirst("Id")?.Value;
-            Console.Write("USER ID2: " + userId);
 
             var user = await _userManager.Users
                 .Include(u => u.Rooms)
@@ -88,17 +89,26 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet("{roomId}/{questionAmount}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> CreateQuiz(int roomId, int questionAmount)
         {
-            int id = await _relationRepo.CreateNewQuiz(roomId, questionAmount);
+            var userId = User.FindFirst("Id")?.Value;
+            var user = await _userManager.Users
+                .Include(u => u.Quizzes)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            int quizId = await _relationRepo.CreateNewQuiz(roomId, questionAmount, userId, user); //added  userId, user to assign them on creation. not sure about that
             _roomCache.Invalidate(roomId);
-            if(id == -1)
+            if(quizId == -1)
             {
                 return NotFound();
             }
             else
             {
-                return Ok(id);
+                var quiz = _quizRepo.GetById(quizId).Result;
+                user.Quizzes.Add(quiz);
+
+                return Ok(quizId);
             }
         }
 
@@ -137,17 +147,13 @@ namespace BrainBoxAPI.Controllers
             return Ok(_mapper.Map<QuizQuestionDTO>(model));
         }
 
-        [HttpGet("{runId}")]
-        public async Task<IActionResult> GetRoomId(int runId) //doesn't work with empty quiz, because searches by QuizRelations
+        [HttpGet("{quizId}")]
+        public async Task<IActionResult> GetRoomId(int quizId)
         {
-            var questions = await _relationRepo.GetAllQuizQuestionsInfo(runId);
-            if (questions != null && questions.Any())
-            {
-                int roomId = questions.First().Question.RoomId; 
-                return Ok(roomId);
-            }
+            var quiz = await _quizRepo.GetById(quizId);
+            if (quiz == null) return NotFound();
 
-            return NotFound();
+            return Ok(quiz.RoomId);
         }
 
         [HttpPost("{roomId}")]
@@ -156,7 +162,6 @@ namespace BrainBoxAPI.Controllers
         {
             var userId = User.FindFirst("Id")?.Value;
 
-            Console.Write("USER ID: " + userId);
             if (userId == null)
             {
                 return Unauthorized();

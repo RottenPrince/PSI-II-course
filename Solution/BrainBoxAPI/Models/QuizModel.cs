@@ -1,4 +1,6 @@
-﻿namespace BrainBoxAPI.Models
+﻿using BrainBoxAPI.Data;
+
+namespace BrainBoxAPI.Models
 {
     public class QuizModel
     {
@@ -8,5 +10,8 @@
 
         public RoomModel Room { get; set; }
         public List<QuizQuestionRelationModel> QuestionRelations { get; set; }
+
+        public string? UserId { get; set; } = "";
+        public ApplicationUser User { get; set; } = new ApplicationUser();
     }
 }
