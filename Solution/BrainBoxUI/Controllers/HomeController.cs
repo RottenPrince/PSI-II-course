@@ -15,6 +15,8 @@ namespace BrainBoxUI.Controllers
 
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetString("UserToken") != null)
+                Console.WriteLine(HttpContext.Session.GetString("UserToken"));
             return View();
         }
 
