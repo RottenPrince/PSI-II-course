@@ -63,14 +63,18 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
 
-            
-            okResult.Value.Should().NotBeNull(); 
+
+            okResult.Value.Should().NotBeNull();
 
             var returnedDto = okResult.Value.Should().BeOfType<QuestionDTO>().Subject;
-            returnedDto.Should().BeEquivalentTo(expectedDto); 
+            returnedDto.Should().BeEquivalentTo(expectedDto);
+            returnedDto.Id.Should().Be(questionModel.Id);
+            returnedDto.Title.Should().Be(questionModel.Title);
+            returnedDto.ImageSource.Should().Be(questionModel.ImageSource);
+            A.CallTo(() => _questionRepo.GetById(questionId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _mapper.Map<QuestionDTO>(questionModel)).MustHaveHappenedOnceExactly();
+
         }
-
-
 
         [Fact]
         public async Task GetFullQuestion_ReturnsOkResult_WithValidId()
@@ -106,15 +110,32 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
             var okResult = result as OkObjectResult;
             okResult.Should().NotBeNull();
 
-            okResult.Value.Should().NotBeNull(); 
+            okResult.Value.Should().NotBeNull();
 
-          
             var returnedDto = okResult.Value.Should().BeOfType<QuestionWithAnswerDTO>().Subject;
-            returnedDto.Should().BeEquivalentTo(expectedDto); 
+            returnedDto.Should().BeEquivalentTo(expectedDto);
+            returnedDto.Id.Should().Be(questionModel.Id);
+            returnedDto.Title.Should().Be(questionModel.Title);
+            returnedDto.ImageSource.Should().Be(questionModel.ImageSource);
+            A.CallTo(() => _questionRepo.GetById(questionId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _mapper.Map<QuestionWithAnswerDTO>(questionModel)).MustHaveHappenedOnceExactly();
+
         }
 
+        [Fact]
+        public async Task GetFullQuestion_ReturnsOkResult_WithNotValidId()
+        {
+            var questionId = 1;
+            // Arrange
+            A.CallTo(() => _questionRepo.GetById(A<int>._))
+        .Returns(Task.FromResult<QuestionModel>(null));
 
+            // Act
+            var notFoundResult = await _controller.GetFullQuestion(questionId);
 
+            // Assert
+            notFoundResult.Should().BeOfType<NotFoundResult>();
+        }
 
     }
 }
