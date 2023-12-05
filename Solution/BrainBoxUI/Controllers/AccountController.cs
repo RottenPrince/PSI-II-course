@@ -32,7 +32,7 @@ namespace BrainBoxUI.Controllers
         {
             if (ModelState.IsValid)
             {
-                var tokenResponse = _apiRepository.Post<AuthenticationRequest, AuthenticationResponse>($"api/User/CreateBearerToken", authRequest, out APIError? error2);
+                var tokenResponse = _apiRepository.Post<AuthenticationRequest, AuthenticationResponse>($"api/User/CreateBearerToken", authRequest, includeBearerToken: false, out APIError? error2);
 
                 if(HttpContext.Session != null)
                     HttpContext.Session.SetString("UserToken", tokenResponse.Token);
@@ -54,13 +54,13 @@ namespace BrainBoxUI.Controllers
         {
             if (ModelState.IsValid)
             {
-                _apiRepository.Post<UserDTO, UserDTO>($"api/User/PostUser", userDto, out APIError? error1);
+                _apiRepository.Post<UserDTO, UserDTO>($"api/User/PostUser", userDto, includeBearerToken: false, out APIError? error1);
                 var authRequest = new AuthenticationRequest
                 {
                     UserName = userDto.UserName,
                     Password = userDto.Password,
                 };
-                var createResponse = _apiRepository.Post<AuthenticationRequest,AuthenticationResponse>($"api/User/PostUser", authRequest, out APIError? error2);
+                var createResponse = _apiRepository.Post<AuthenticationRequest,AuthenticationResponse>($"api/User/PostUser", authRequest, includeBearerToken: false, out APIError? error2);
 
                 return RedirectToAction("Login");
             }
@@ -69,7 +69,10 @@ namespace BrainBoxUI.Controllers
 
         public IActionResult Logout()
         {
-            return View();
+            if (HttpContext.Session != null && (HttpContext.Session.GetString("UserToken") != null))
+                HttpContext.Session.Remove("UserToken");
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
