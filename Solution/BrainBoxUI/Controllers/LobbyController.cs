@@ -38,8 +38,6 @@ namespace BrainBoxUI.Controllers
         [HttpGet]
         public IActionResult AllRooms()
         {
-            _apiRepository.SetBearerToken(HttpContext.Session.GetString("UserToken"));
-
             var rooms = _apiRepository.Get<List<RoomDTO>>("api/Lobby/GetAllRooms", includeBearerToken: true, out _);
 
             return View(rooms);

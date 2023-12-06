@@ -34,9 +34,13 @@ namespace BrainBoxUI.Controllers
             {
                 var tokenResponse = _apiRepository.Post<AuthenticationRequest, AuthenticationResponse>($"api/User/CreateBearerToken", authRequest, includeBearerToken: false, out APIError? error2);
 
-                if(HttpContext.Session != null)
-                    HttpContext.Session.SetString("UserToken", tokenResponse.Token);
-
+                if(tokenResponse != null)
+                {
+                    HttpContext.Response.Cookies.Append("BearerToken", tokenResponse.Token, new CookieOptions
+                    {
+                        Expires = DateTime.Now.AddDays(1)
+                    });
+                }
 
                 return RedirectToAction("Index", "Home");
             }

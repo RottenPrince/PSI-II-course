@@ -10,44 +10,38 @@ namespace BrainBoxUI.Helpers.API
         U? Post<T, U>(string endpoint, T data, bool includeBearerToken, out APIError? error);
         T? Delete<T>(string endpoint, bool includeBearerToken, out APIError? error);
         U? Put<T, U>(string endpoint, T data, bool includeBearerToken, out APIError? error);
-        void SetBearerToken(string bearerToken);
-        string GetBearerToken();
     }
 
     public class ApiRepository : IApiRepository
     {
         private readonly string _apiUrl = "http://localhost:5096/";
         private readonly HttpClient _client = new HttpClient();
+        private readonly IHttpContextAccessor _httpContext;
 
-        private string? _bearerToken;
-
-        public ApiRepository()
+        public ApiRepository(IHttpContextAccessor httpContext)
         {
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            _httpContext = httpContext;
         }
 
-        public void SetBearerToken(string bearerToken)
+        private String GetBearerToken()
         {
-            _bearerToken = bearerToken;
-            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
-        }
-
-        public string GetBearerToken()
-        {
-            return _bearerToken;
+            var pair = _httpContext.HttpContext.Request.Cookies.FirstOrDefault(
+                    pr => pr.Key == "BearerToken"
+                );
+            if (pair.Equals(default(KeyValuePair<String, String>))) return null;
+            return pair.Value;
         }
 
         private T? MakeRequest<T>(string endpoint, Func<HttpClient, string, HttpResponseMessage> requestFunc, bool includeBearerToken, out APIError? error)
         {
             var request = new HttpRequestMessage(HttpMethod.Post, _apiUrl + endpoint);
 
-            if (includeBearerToken && _bearerToken != null)
+            var bearerToken = GetBearerToken();
+            if (includeBearerToken && bearerToken != null)
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _bearerToken);
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
             }
-
-
-
 
             var apiResult = requestFunc(_client, _apiUrl + endpoint);
             var content = apiResult.Content.ReadAsStringAsync().Result;
