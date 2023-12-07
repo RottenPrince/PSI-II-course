@@ -73,8 +73,8 @@ namespace BrainBoxUI.Controllers
 
         public IActionResult Logout()
         {
-            if (HttpContext.Session != null && (HttpContext.Session.GetString("UserToken") != null))
-                HttpContext.Session.Remove("UserToken");
+            if (!HttpContext.Request.Cookies.FirstOrDefault(pr => pr.Key == "BearerToken").Equals(default(KeyValuePair<String, String>)))
+                HttpContext.Response.Cookies.Delete("BearerToken");
 
             return RedirectToAction("Index", "Home");
         }

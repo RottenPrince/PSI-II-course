@@ -24,7 +24,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (Context.Session.GetString("UserToken") != null)
+                        @if (Context.Request.Cookies["BearerToken"] != null)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="" asp-controller="Lobby" asp-action="AllRooms">Lobby</a>
@@ -32,7 +32,7 @@
                         }
                     </ul>
                     <ul class="navbar-nav">
-                        @if (Context.Session.GetString("UserToken") != null)
+                        @if (Context.Request.Cookies["BearerToken"] != null)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
