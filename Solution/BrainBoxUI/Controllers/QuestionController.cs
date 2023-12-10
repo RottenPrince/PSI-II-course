@@ -21,7 +21,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet("{roomId}/{questionAmount}")]
         public IActionResult StartRun(int roomId, int questionAmount)
         {
-            int newRunId = _apiRepository.Get<int>($"api/Lobby/CreateQuiz/{roomId}/{questionAmount}", includeBearerToken: false, out var error);
+            int newRunId = _apiRepository.Get<int>($"api/Lobby/CreateQuiz/{roomId}/{questionAmount}", includeBearerToken: true, out var error);
             if(error != null)
             {
                 throw new Exception(); // TODO something normal

@@ -52,12 +52,16 @@ namespace BrainBoxUI.Controllers
         [HttpPost]
         public IActionResult CreateRoom(string roomName)
         {
-            ViewBag.RoomId = _apiRepository.Post<string, int>("api/Lobby/CreateRoom", roomName, includeBearerToken: false, out var error);
-            if (error != null)
+            var roomId = _apiRepository.Post<string, int>("api/Lobby/CreateRoom", roomName, includeBearerToken: false, out var error1);
+            ViewBag.RoomId = roomId;
+            if (error1 != null)
             {
-                ViewBag.ErrorMessage = error.Message;
+                ViewBag.ErrorMessage = error1.Message;
                 return View("CreateError");
             }
+
+            _apiRepository.Get<string>($"api/Lobby/JoinRoom/{roomId}", includeBearerToken: true, out _); //no error handling
+
             ViewBag.RoomName = roomName;
 
             return View("CreateSuccess");

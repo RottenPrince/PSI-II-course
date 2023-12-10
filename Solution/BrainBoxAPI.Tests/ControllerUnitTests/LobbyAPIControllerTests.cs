@@ -205,7 +205,7 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
         public async Task CreateQuiz_ReturnsOkResult()
         {
             // Arrange
-            A.CallTo(() => _relationRepo.CreateNewQuiz(A<int>._, A<int>._)).Returns(1);
+            A.CallTo(() => _relationRepo.CreateNewQuiz(A<int>._, A<int>._, A<string>._, A<ApplicationUser>._)).Returns(1);
 
             // Act
             var result = await _controller.CreateQuiz(1, 5) as OkObjectResult;
@@ -220,7 +220,7 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
         public async Task CreateQuiz_ReturnsNotFoundResult()
         {
             // Arrange
-            A.CallTo(() => _relationRepo.CreateNewQuiz(A<int>._, A<int>._)).Returns(-1);
+            A.CallTo(() => _relationRepo.CreateNewQuiz(A<int>._, A<int>._, A<string>._, A<ApplicationUser>._)).Returns(-1);
 
             // Act
             var result = await _controller.CreateQuiz(1, 5) as NotFoundResult;

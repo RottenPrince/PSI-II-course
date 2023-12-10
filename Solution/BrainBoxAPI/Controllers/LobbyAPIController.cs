@@ -156,7 +156,7 @@ namespace BrainBoxAPI.Controllers
             return Ok(quiz.RoomId);
         }
 
-        [HttpPost("{roomId}")]
+        [HttpGet("{roomId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> JoinRoom(int roomId)  //roomId + user Token, connects room and user
         {

@@ -25,7 +25,7 @@ namespace BrainBoxUI.Tests.Controller
             var fakeRooms = A.Fake<List<RoomDTO>>();
 
             APIError? apiError;
-            A.CallTo(() => _apiRepository.Get<List<RoomDTO>>(A<string>._, out apiError)).Returns(fakeRooms);
+            A.CallTo(() => _apiRepository.Get<List<RoomDTO>>(A<string>._, A<bool>._, out apiError)).Returns(fakeRooms);
 
             // Act
             var result = _controller.AllRooms();
