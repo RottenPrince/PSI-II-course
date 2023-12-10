@@ -54,7 +54,10 @@ namespace BrainBoxUI.Helpers.API
 
             if (typeof(T) == typeof(string))
             {
-                content = $"\"{content}\"";
+                if (content.Length == 0 || content[0] != '"')
+                {
+                    content = $"\"{content}\"";
+                }
             }
 
             error = null;
