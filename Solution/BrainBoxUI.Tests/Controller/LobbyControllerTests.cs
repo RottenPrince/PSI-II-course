@@ -1,7 +1,10 @@
 ﻿using BrainBoxUI.Controllers;
 using BrainBoxUI.Helpers.API;
+using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
+using SharedModels.Lobby;
 using SharedModels.Question;
+using System.Net;
 
 namespace BrainBoxUI.Tests.Controller
 {
@@ -12,9 +15,22 @@ namespace BrainBoxUI.Tests.Controller
         private LobbyController _controller;
         public LobbyControllerTests()
         {
+            //Arrange
             _apiRepository = A.Fake<IApiRepository>();
 
             _controller = new LobbyController(_apiRepository);
+        }
+
+        [Fact]
+        public void CreateRoom_ReturnsCreateView()
+        {
+            // Act
+            var result = _controller.CreateRoom();
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            var viewResult = (ViewResult)result;
+            Assert.Equal("Create", viewResult.ViewName);
         }
 
 
@@ -35,6 +51,34 @@ namespace BrainBoxUI.Tests.Controller
             var viewResult = result as ViewResult;
             viewResult.Model.Should().BeEquivalentTo(fakeRooms);
         }
+
+        [Fact]
+        public void Room_ReturnsViewWithCorrectViewBagValues()
+        {
+            // Arrange
+            var fakeRoomId = "RoomId";
+            var fakeRoomContent = new RoomContentDTO
+            {
+                RoomName = "Room1",
+                QuestionAmount = 10
+            };
+
+            APIError? apiError;
+            A.CallTo(() => _apiRepository.Get<RoomContentDTO>(A<string>._, A<bool>._, out apiError)).Returns(fakeRoomContent);
+
+            // Act
+            var result = _controller.Room(fakeRoomId) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<ViewResult>(result);
+
+            Assert.Equal("Room1", _controller.ViewBag.RoomName);
+            Assert.Equal(10, _controller.ViewBag.QuestionAmount);
+            Assert.Equal("RoomId", _controller.ViewBag.RoomId);
+            Assert.Null(_controller.ViewBag.ErrorMessage); 
+        }
+     
 
     }
 

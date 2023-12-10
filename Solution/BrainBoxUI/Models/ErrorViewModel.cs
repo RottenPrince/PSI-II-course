@@ -7,4 +7,3 @@ namespace BrainBoxUI.Models
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }
 }
-//mano komentar
