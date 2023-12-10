@@ -73,7 +73,7 @@ namespace BrainBoxUI.Tests.Controller
 
             APIError? fakeError;
             A.CallTo(() => _apiRepository.Get<QuestionDTO>(A<string>._, A<bool>._, out fakeError))
-                .Returns(null); // Simulate no next question
+                .Returns(null); 
 
             // Act
             var result = _controller.Solve(fakeRunId) as RedirectToActionResult;
