@@ -2,6 +2,7 @@
 using BrainBoxUI.Helpers.API;
 using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using SharedModels.Lobby;
 using SharedModels.Question;
 using System.Net;
@@ -76,11 +77,52 @@ namespace BrainBoxUI.Tests.Controller
             Assert.Equal("Room1", _controller.ViewBag.RoomName);
             Assert.Equal(10, _controller.ViewBag.QuestionAmount);
             Assert.Equal("RoomId", _controller.ViewBag.RoomId);
-            Assert.Null(_controller.ViewBag.ErrorMessage); 
+            Assert.Null(_controller.ViewBag.ErrorMessage);
         }
-     
 
+        [Fact]
+        public void CreateRoom_ReturnsCreateSuccessView_WhenApiCallSucceeds()
+        {
+            // Arrange
+             string fakeRoomName = "TestRoom";
+             int fakeRoomId = 123;
+            APIError? fakeError;
+
+            A.CallTo(() => _apiRepository.Post<string, int>(A<string>._, fakeRoomName, true, out fakeError))
+                .Returns(fakeRoomId);
+
+            // Act
+            var result = _controller.CreateRoom(fakeRoomName) as ViewResult;
+
+            // Assert
+            result.Should().NotBeNull().And.BeOfType<ViewResult>();
+            result.ViewName.Should().Be("CreateSuccess");
+
+            Assert.NotNull(_controller.ViewBag); 
+
+            if (_controller.ViewBag != null)
+            {
+                Assert.Equal(fakeRoomName, _controller.ViewBag.RoomName);
+                Assert.Equal(fakeRoomId, _controller.ViewBag.RoomId);
+                Assert.Null(_controller.ViewBag.ErrorMessage); 
+            }
+        }
+
+        [Fact]
+        public void CreateMultiple_SetsViewBagRoomIdAndReturnsCreateMultipleView()
+        {
+            // Arrange
+
+             int fakeRoomId = 123;
+
+            // Act
+            var result = _controller.CreateMultiple(fakeRoomId) as ViewResult;
+
+            // Assert
+            result.Should().NotBeNull().And.BeOfType<ViewResult>();
+            result.ViewName.Should().Be("CreateMultiple");
+
+            Assert.Equal(fakeRoomId, _controller.ViewBag.RoomId);
+        }
     }
-
-
 }

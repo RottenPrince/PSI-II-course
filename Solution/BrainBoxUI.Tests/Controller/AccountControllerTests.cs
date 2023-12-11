@@ -68,7 +68,7 @@ namespace BrainBoxUI.Tests.Controller
                 public void Register_ValidModel_RedirectsToLogin()
         {
             // Arrange
-            var fakeApiRepository = A.Fake<IApiRepository>(); // Replace IApiRepository with your actual repository interface
+            var fakeApiRepository = A.Fake<IApiRepository>(); 
             var controller = new AccountController(fakeApiRepository);
 
             var validUserDto = new UserDTO

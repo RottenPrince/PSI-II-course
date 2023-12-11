@@ -46,9 +46,9 @@ namespace BrainBoxUI.Tests.Controller
         public void StartRun_ReturnsRedirectToSolve_WhenApiCallSucceeds()
         {
             // Arrange
-            const int fakeRoomId = 123;
-            const int fakeQuestionAmount = 5;
-            const int fakeRunId = 676;
+            int fakeRoomId = 123;
+            int fakeQuestionAmount = 5;
+            int fakeRunId = 676;
 
             APIError? fakeError;
 
@@ -70,8 +70,8 @@ namespace BrainBoxUI.Tests.Controller
         public void StartRun_ThrowsExceptionOnError()
         {
             // Arrange
-            const int fakeRoomId = 123;
-            const int fakeQuestionAmount = 5;
+            int fakeRoomId = 123;
+            int fakeQuestionAmount = 5;
 
             APIError? fakeError = new APIError(HttpStatusCode.InternalServerError, "Internal Server Error");
 
@@ -89,8 +89,8 @@ namespace BrainBoxUI.Tests.Controller
         public void Solve_ReturnsRedirectToReview_WhenNoNextQuestion()
         {
             // Arrange
-            const int fakeRunId = 123;
-            const int fakeCurrentQuestionIndex = 0;
+            int fakeRunId = 123;
+            int fakeCurrentQuestionIndex = 0;
 
             APIError? fakeError;
             A.CallTo(() => _apiRepository.Get<QuestionDTO>(A<string>._, A<bool>._, out fakeError))
@@ -112,7 +112,7 @@ namespace BrainBoxUI.Tests.Controller
         public void Solve_ReturnsSolveView_WhenNextQuestionExists()
         {
             // Arrange
-            const int fakeRunId = 123;
+            int fakeRunId = 123;
 
             var fakeQuestionModel = new QuestionDTO
             {
@@ -149,8 +149,8 @@ namespace BrainBoxUI.Tests.Controller
         public void Solve_PostsToSubmitAnswerAndRedirectsToSolve()
         {
             // Arrange
-            const int fakeRunId = 123;
-            const int fakeSelectedOption = 1;
+            int fakeRunId = 123;
+            int fakeSelectedOption = 1;
 
             APIError? fakeError;
 
@@ -173,8 +173,8 @@ namespace BrainBoxUI.Tests.Controller
         public void Review_ReturnsReviewView_WhenNextQuestionInReviewExists()
         {
             // Arrange
-            const int fakeRunId = 123;
-            const int fakeCurrentQuestionIndex = 1;
+            int fakeRunId = 123;
+            int fakeCurrentQuestionIndex = 1;
 
             var fakeAnswerOptions = new List<AnswerOptionDTO>
     {
@@ -226,7 +226,87 @@ namespace BrainBoxUI.Tests.Controller
             questionModel.CorrectAnswerIndex.Should().Be(fakeQuestionWithAnswerDTO.CorrectAnswerIndex);
 
         }
-        
+
+        [Fact]
+        public void Create_ReturnsCreateSuccessView_WhenApiCallSucceeds()
+        {
+            // Arrange
+            var fakeApiRepository = A.Fake<IApiRepository>();
+            var fakeHostingEnvironment = A.Fake<IHostingEnvironment>();
+
+            string fakeRoomId = "123";
+            string fakeTitle = "TestTitle";
+            IFormFile? fakeImage = null;  
+            var fakeQuestionModel = new QuestionWithAnswerDTO { Title = fakeTitle, CorrectAnswerIndex = 1 };
+            var fakeApiResponse = "fakeApiResponse";
+            APIError? fakeError = null;
+
+            A.CallTo(() => fakeApiRepository.Post<QuestionWithAnswerDTO, string>(
+                $"api/Question/SaveQuestion/{fakeRoomId}",
+                fakeQuestionModel,
+                true,
+                out fakeError))
+                .Returns(fakeApiResponse);
+
+            A.CallTo(() => fakeHostingEnvironment.WebRootPath).Returns("fakeWebRootPath");
+
+            var fakeWebRootPath = Path.Combine(Path.GetTempPath(), "fakeWebRootPath");
+            A.CallTo(() => fakeHostingEnvironment.WebRootPath).Returns(fakeWebRootPath);
+
+            var fakeImagePath = Path.Combine(fakeWebRootPath, "img");
+            if (!Directory.Exists(fakeImagePath))
+            {
+                Directory.CreateDirectory(fakeImagePath);
+            }
+
+            // Act
+            var result = _controller.Create(fakeRoomId, fakeImage, fakeQuestionModel) as ViewResult;
+
+            // Assert
+            result.Should().NotBeNull().And.BeOfType<ViewResult>();
+            result.ViewName.Should().Be("CreateSuccess");
+
+            _controller.ViewBag.RoomId = fakeRoomId;
+            _controller.ViewBag.Title = fakeTitle;
+            _controller.ViewBag.ErrorMessage = null;
+
+            Assert.Equal(fakeRoomId, _controller.ViewBag.RoomId);
+            Assert.Equal(fakeTitle, _controller.ViewBag.Title);
+            Assert.Null(_controller.ViewBag.ErrorMessage);
+        }
+
+        [Fact]
+        public void Review_ReturnsReviewView_WhenApiCallSucceedsAndImageIsNull()
+        {
+            // Arrange
+            int fakeRunId = 123;
+            int fakeCurrentQuestionIndex = 2;
+            QuizQuestionDTO fakeQuestionModel = null;
+            APIError? fakeError = null;
+            int fakeRoomId = 456;
+
+            A.CallTo(() => _apiRepository.Get<QuizQuestionDTO>(
+                    $"api/Lobby/GetNextQuestionInReview/{fakeRunId}/{fakeCurrentQuestionIndex}",
+                    true,
+                    out fakeError))
+                .Returns(fakeQuestionModel);
+
+            A.CallTo(() => _apiRepository.Get<int>(
+                    $"api/Lobby/GetRoomId/{fakeRunId}",
+                    true,
+                    out fakeError))
+                .Returns(fakeRoomId);
+
+            // Act
+            var result = _controller.Review(fakeRunId, fakeCurrentQuestionIndex) as RedirectToActionResult;
+
+            // Assert
+            result.Should().NotBeNull().And.BeOfType<RedirectToActionResult>();
+            result.ActionName.Should().Be("Room");
+            result.ControllerName.Should().Be("Lobby");
+            result.RouteValues.Should().ContainKey("roomId");
+            result.RouteValues["roomId"].Should().Be(fakeRoomId);
+        }
 
     }
 }
