@@ -31,7 +31,7 @@ namespace BrainBoxUI.Controllers
             }
             else
             {
-                ViewBag.ErrorMessage = error.Message;
+                return RedirectToAction("AllRooms", "Lobby");
             }
 
 
