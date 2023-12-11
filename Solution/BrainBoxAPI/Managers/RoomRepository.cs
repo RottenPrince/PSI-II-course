@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BrainBoxAPI.Managers
 {
-    public class RoomRepository : Repository<RoomModel>
+    public class RoomRepository : Repository<RoomModel>, IRoomRepository
     {
         public override IQueryable<RoomModel> Query => _context.Rooms
                         .Include(q => q.Questions)
@@ -14,6 +14,12 @@ namespace BrainBoxAPI.Managers
         {
             return Query
                     .FirstOrDefaultAsync(q => q.Id == id);
+        }
+
+        public Task<RoomModel?> GetByUniqueCode(string uniqueCode)
+        {
+            return Query
+                .FirstOrDefaultAsync(q => q.UniqueCode == uniqueCode);
         }
     }
 }

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SharedModels.Question;
 using BrainBoxAPI.Managers;
-using BrainBoxAPI.Caching;
 using SharedModels.Lobby;
 
 namespace BrainBoxAPI.Tests.ControllerUnitTests
@@ -15,7 +14,6 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
         private ILogger<QuestionAPIController> _logger;
         private IMapper _mapper;
         private IRepository<QuestionModel> _questionRepo;
-        private IDictionaryCache<int, RoomContentDTO> _cache;
 
         private QuestionAPIController _controller;
 
@@ -24,9 +22,8 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
             _logger = A.Fake<ILogger<QuestionAPIController>>();
             _mapper = A.Fake<IMapper>();
             _questionRepo = A.Fake<IRepository<QuestionModel>>();
-            _cache = A.Fake<IDictionaryCache<int, RoomContentDTO>>();
 
-            _controller = new QuestionAPIController(_logger, _mapper, _questionRepo, _cache);
+            _controller = new QuestionAPIController(_logger, _mapper, _questionRepo);
         }
 
         [Fact]

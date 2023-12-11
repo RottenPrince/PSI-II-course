@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using BrainBoxAPI.Caching;
 using BrainBoxAPI.Controllers;
 using BrainBoxAPI.Data;
 using BrainBoxAPI.Managers;
@@ -14,23 +13,21 @@ namespace BrainBoxAPI.Tests.ControllerUnitTests
     public class LobbyAPIControllerTests
     {
         private IMapper _mapper;
-        private IRepository<RoomModel> _roomRepo;
+        private IRoomRepository _roomRepo;
         private IRepository<QuizModel> _quizRepo;
         private IQuizQuestionRelationRepository _relationRepo;
-        private IDictionaryCache<int, RoomContentDTO> _cache;
         private readonly UserManager<ApplicationUser> _userManager;
 
         private LobbyAPIController _controller;
         public LobbyAPIControllerTests()
         {
             _mapper = A.Fake<IMapper>();
-            _roomRepo = A.Fake<IRepository<RoomModel>>();
+            _roomRepo = A.Fake<IRoomRepository>();
             _quizRepo = A.Fake<IRepository<QuizModel>>();
             _relationRepo = A.Fake<IQuizQuestionRelationRepository>();
-            _cache = A.Fake<IDictionaryCache<int, RoomContentDTO>>();
             _userManager = A.Fake<UserManager<ApplicationUser>>();
 
-            _controller = new LobbyAPIController(_mapper, _roomRepo, _quizRepo, _relationRepo, _cache, _userManager);
+            _controller = new LobbyAPIController(_mapper, _roomRepo, _quizRepo, _relationRepo, _userManager);
         }
 
         [Fact]

@@ -33,13 +33,13 @@ namespace BrainBoxUI.Controllers
         [HttpGet]
         public IActionResult Solve(int runId)
         {
-            var questionModel = _apiRepository.Get<QuestionDTO>($"api/Lobby/GetNextQuestionInQuiz/{runId}", includeBearerToken: false, out var error);
+            var questionModel = _apiRepository.Get<QuestionDTO>($"api/Lobby/GetNextQuestionInQuiz/{runId}", includeBearerToken: true, out var error);
             if(questionModel == null)
             {
                 return RedirectToAction("Review", new { runId = runId, currentQuestionIndex = 0 });
             }
             ViewBag.runId = runId;
-            var roomId = _apiRepository.Get<int>($"api/Lobby/GetRoomId/{runId}", includeBearerToken: false, out var error2);
+            var roomId = _apiRepository.Get<int>($"api/Lobby/GetRoomId/{runId}", includeBearerToken: true, out var error2);
             ViewBag.roomId = roomId;
 
             return View("Solve", questionModel);
@@ -48,17 +48,17 @@ namespace BrainBoxUI.Controllers
         [HttpPost]
         public IActionResult Solve(int runId, int selectedOption)
         {
-            _apiRepository.Post<object, string>($"api/Lobby/SubmitAnswer/{runId}/{selectedOption}", new { }, includeBearerToken: false, out var error);
+            _apiRepository.Post<object, string>($"api/Lobby/SubmitAnswer/{runId}/{selectedOption}", new { }, includeBearerToken: true, out var error);
             return RedirectToAction("Solve", new { runId = runId });
         }
 
         [HttpGet]
         public IActionResult Review(int runId, int currentQuestionIndex)
         {
-            var questionModel = _apiRepository.Get<QuizQuestionDTO>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", includeBearerToken: false, out var error);
+            var questionModel = _apiRepository.Get<QuizQuestionDTO>($"api/Lobby/GetNextQuestionInReview/{runId}/{currentQuestionIndex}", includeBearerToken: true, out var error);
             if(questionModel == null)
             {
-                var roomId = _apiRepository.Get<int>($"api/Lobby/GetRoomId/{runId}", includeBearerToken: false, out var error2);
+                var roomId = _apiRepository.Get<int>($"api/Lobby/GetRoomId/{runId}", includeBearerToken: true, out var error2);
                 return RedirectToAction("Room", "Lobby", new { roomId = roomId });
             }
             ViewBag.runId = runId;
@@ -102,7 +102,7 @@ namespace BrainBoxUI.Controllers
 
             ViewBag.Title = questionModel.Title;
 
-            var response = _apiRepository.Post<QuestionWithAnswerDTO, string>($"api/Question/SaveQuestion/{roomId}", questionModel, includeBearerToken: false, out APIError? error);
+            var response = _apiRepository.Post<QuestionWithAnswerDTO, string>($"api/Question/SaveQuestion/{roomId}", questionModel, includeBearerToken: true, out APIError? error);
 
             if (error == null)
             {

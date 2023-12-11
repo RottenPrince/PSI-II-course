@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using BrainBoxAPI.Managers;
 using AutoMapper;
 using BrainBoxAPI.Models;
-using BrainBoxAPI.Caching;
 using SharedModels.Lobby;
 
 namespace BrainBoxAPI.Controllers
@@ -16,15 +15,13 @@ namespace BrainBoxAPI.Controllers
         private Random _random;
         private readonly IMapper _mapper;
         private readonly IRepository<QuestionModel> _questionRepo;
-        private readonly IDictionaryCache<int, RoomContentDTO> _roomCache;
 
-        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper, IRepository<QuestionModel> questionRepo, IDictionaryCache<int, RoomContentDTO> roomCache)
+        public QuestionAPIController(ILogger<QuestionAPIController> logger, IMapper mapper, IRepository<QuestionModel> questionRepo)
         {
             _logger = logger;
             _mapper = mapper;
             _questionRepo = questionRepo;
             _random = new Random();
-            _roomCache = roomCache;
         }
 
         [HttpGet("{questionId}")]
@@ -56,7 +53,6 @@ namespace BrainBoxAPI.Controllers
             dbModel.RoomId = roomId;
             _questionRepo.Add(dbModel);
             _questionRepo.Save();
-            _roomCache.Invalidate(roomId);
             return Ok("Question created successfully.");
         }
 
@@ -75,7 +71,6 @@ namespace BrainBoxAPI.Controllers
                 _questionRepo.Add(model);
             }
             _questionRepo.Save();
-            _roomCache.Invalidate(roomId);
             return Ok("Questions created successfully.");
         }
     }
