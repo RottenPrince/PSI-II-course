@@ -8,6 +8,7 @@ namespace BrainBoxAPI.Migrations
     public partial class Initial : Migration
     {
         /// <inheritdoc />
+        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(

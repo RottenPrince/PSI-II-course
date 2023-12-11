@@ -5,6 +5,7 @@
 namespace BrainBoxAPI.Migrations
 {
     /// <inheritdoc />
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public partial class WorkingSolveRun : Migration
     {
         /// <inheritdoc />
