@@ -9,59 +9,19 @@
 }
 
 @section Scripts {
-    <script>
-        document.getElementById("joinButton").addEventListener("click", function () {
-            var joinCode = document.getElementById("joinCode").value;
-            var messageField = document.getElementById("messageField");
-            if (joinCode) {
-                // Retrieve the token from the cookie
-                var token = getCookie("BearerToken");
-
-                fetch(`https://localhost:7016/api/Lobby/JoinRoom/${joinCode}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! Status: ${response.status}`);
-                        }
-                        // Check Content-Type before trying to parse as JSON
-                        var contentType = response.headers.get('Content-Type');
-                        if (contentType && contentType.includes('application/json')) {
-                            return response.json();
-                        } else {
-                            return response.text(); // handle non-JSON response
-                        }
-                    })
-                    .then(data => {
-                        // Handle the success response
-                        if (typeof data === 'object') {
-                            messageField.innerText = `User joined the room successfully: ${JSON.stringify(data)}`;
-                        } else {
-                            messageField.innerText = `Non-JSON response: ${data}`;
-                        }
-                    })
-                    .catch(error => {
-                        // Handle the error
-                        messageField.innerText = `Error joining room: ${error.message}`;
-                    });
-            }
-        });
-
-        function getCookie(name) {
-            var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-            if (match) return match[2];
-        }
-    </script>
+    
 }
 
 <div>
     <a asp-area="" asp-controller="Lobby" asp-action="CreateRoom" class="btn btn-secondary">Create new room</a>
-    <input type="text" id="joinCode" placeholder="Enter code" />
-    <button id="joinButton" class="btn btn-primary">Join</button>
-    <div id="messageField"></div>
+    <form asp-area="" asp-controller="Lobby" asp-action="JoinRoom" method="post">
+        <input type="text" name="uniqueCode" placeholder="Enter code" />
+        <button type="submit" class="btn btn-primary">Join</button>
+    </form>
+    @if (TempData["message"] != null)
+    {
+        <p><b>@TempData["message"]</b></p>
+    }
 
     <ul>
         @foreach (RoomDTO room in Model)

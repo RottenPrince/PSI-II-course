@@ -46,6 +46,15 @@ namespace BrainBoxUI.Controllers
             return View(rooms);
         }
 
+        [HttpPost]
+        public IActionResult JoinRoom(string uniqueCode)
+        {
+            _apiRepository.Get<string>($"api/Lobby/JoinRoom/{uniqueCode}", includeBearerToken: true, out var error);
+            if (error != null)
+                TempData["message"] = "Joining failed";
+            return RedirectToAction("AllRooms");
+        }
+
         [HttpGet]
         public IActionResult CreateRoom()
         {
