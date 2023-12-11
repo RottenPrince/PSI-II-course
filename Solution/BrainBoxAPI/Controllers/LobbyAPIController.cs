@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BrainBoxAPI.Data;
+using BrainBoxAPI.Extensions;
 
 namespace BrainBoxAPI.Controllers
 {
@@ -21,7 +22,6 @@ namespace BrainBoxAPI.Controllers
         private readonly IRoomRepository _roomRepo;
         private readonly IRepository<QuizModel> _quizRepo;
         private readonly IQuizQuestionRelationRepository _relationRepo;
-        private readonly IDictionaryCache<int, RoomContentDTO> _roomCache;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public LobbyAPIController(IMapper mapper, IRoomRepository roomRepo, IRepository<QuizModel> quizRepo, IQuizQuestionRelationRepository relationRepo,
@@ -39,12 +39,7 @@ namespace BrainBoxAPI.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetAllRooms()
         {
-            var userId = User.FindFirst("Id")?.Value;
-
-            var user = await _userManager.Users
-                .Include(u => u.Rooms)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
+            var user = await _userManager.FromClaim(User);
             var rooms = user.Rooms; //all rooms user has
 
             if (rooms == null)
@@ -53,34 +48,23 @@ namespace BrainBoxAPI.Controllers
             return Ok(_mapper.Map<List<RoomDTO>>(rooms));
         }
 
-        //[HttpGet("{roomId}")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //public async Task<IActionResult> GetAllQuizzes()
-        //{
-        //    var userId = User.FindFirst("Id")?.Value;
-
-        //    var user = await _userManager.Users
-        //        .Include(u => u.Rooms)
-        //        .FirstOrDefaultAsync(u => u.Id == userId);
-
-        //    var rooms = user.Rooms; //all rooms user has
-
-        //    if (rooms == null)
-        //        return NotFound();
-
-        //    return Ok(_mapper.Map<List<RoomDTO>>(rooms));
-        //}
-
         [HttpGet("{roomId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
+            var user = await _userManager.FromClaim(User);
+            if(!user.Rooms.Any(r => r.Id == roomId))
+            {
+                return Unauthorized();
+            }
+
             RoomModel? room = _roomRepo.GetById(roomId).Result;
             if (room == null) return NotFound();
             var model = new RoomContentDTO
-                {
-                    RoomName = room.Name,
-                    QuestionAmount = room.Questions.Count,
-                };
+            {
+                RoomName = room.Name,
+                QuestionAmount = room.Questions.Count,
+            };
             return Ok(model);
         }
 
@@ -106,12 +90,13 @@ namespace BrainBoxAPI.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> CreateQuiz(int roomId, int questionAmount)
         {
-            var userId = User.FindFirst("Id")?.Value;
-            var user = await _userManager.Users
-                .Include(u => u.Quizzes)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userManager.FromClaim(User);
+            if(!user.Rooms.Any(r => r.Id == roomId))
+            {
+                return Unauthorized();
+            }
 
-            int quizId = await _relationRepo.CreateNewQuiz(roomId, questionAmount, userId, user); //added  userId, user to assign them on creation. not sure about that
+            int quizId = await _relationRepo.CreateNewQuiz(roomId, questionAmount, user.Id, user); //added  userId, user to assign them on creation. not sure about that
             if(quizId == -1)
             {
                 return NotFound();
@@ -126,16 +111,28 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet("{runId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetNextQuestionInQuiz(int runId)
         {
+            var user = await _userManager.FromClaim(User);
+            if(!user.Quizzes.Any(q => q.Id == runId))
+            {
+                return Unauthorized();
+            }
             var model = await _relationRepo.GetNextQuestionInQuiz(runId);
             if (model == null) return NoContent();
             return Ok(_mapper.Map<QuestionDTO>(model.Question));
         }
 
         [HttpPost("{runId}/{answerId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> SubmitAnswer(int runId, int answerId)
         {
+            var user = await _userManager.FromClaim(User);
+            if(!user.Quizzes.Any(q => q.Id == runId))
+            {
+                return Unauthorized();
+            }
             var model = await _relationRepo.GetNextQuestionInQuiz(runId);
             if (model == null) return BadRequest();
             model.SelectedAnswerOption = model.Question.AnswerOptions[answerId];
@@ -144,16 +141,28 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet("{runId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetAllQuizQuestionsInfo(int runId)
         {
+            var user = await _userManager.FromClaim(User);
+            if(!user.Quizzes.Any(q => q.Id == runId))
+            {
+                return Unauthorized();
+            }
             var questions = await _relationRepo.GetAllQuizQuestionsInfo(runId);
             if (questions.Any(x => x.SelectedAnswerOption == null)) return Unauthorized();
             return Ok(_mapper.Map<List<QuizQuestionDTO>>(questions));
         }
 
         [HttpGet("{runId}/{currentQuestionIndex}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetNextQuestionInReview(int runId, int currentQuestionIndex)
         {
+            var user = await _userManager.FromClaim(User);
+            if(!user.Quizzes.Any(q => q.Id == runId))
+            {
+                return Unauthorized();
+            }
             var model = await _relationRepo.GetNextQuestionInReview(runId, currentQuestionIndex);
             if(model == null)
                 return NoContent();
@@ -161,8 +170,14 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpGet("{quizId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetRoomId(int quizId)
         {
+            var user = await _userManager.FromClaim(User);
+            if(!user.Quizzes.Any(q => q.Id == quizId))
+            {
+                return Unauthorized();
+            }
             var quiz = await _quizRepo.GetById(quizId);
             if (quiz == null) return NotFound();
 
@@ -173,18 +188,7 @@ namespace BrainBoxAPI.Controllers
         [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> JoinRoom(string uniqueCode)
         {
-            var userId = User.FindFirst("Id")?.Value;
-
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            var user = await _userManager.FromClaim(User);
 
             // Find the room by unique code
             var room = _roomRepo.GetByUniqueCode(uniqueCode).Result;
