@@ -1,0 +1,31 @@
+﻿@model string
+@{
+    ViewData["Title"] = "Create New Room";
+}
+
+<h3><strong>Upload Multiple Questions</strong></h3>
+
+@if(TempData["message"] != null)
+{
+    <p>@TempData["message"]</p>
+}
+
+@using (Html.BeginForm("CreateMultiple", "Lobby", new { roomId = ViewBag.RoomId }, FormMethod.Post, true, new { enctype = "multipart/form-data" }))
+{
+    <table>
+        <tr>
+            <td>
+                <label>Question CSV file: </label>
+                <input type="file" name="questions">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" value="Submit Question" />
+            </td>
+            <td>
+                <a asp-controller="Lobby" asp-action="Room" asp-route-id="@ViewBag.RoomId" class="return-button btn btn-secondary">Return</a>
+            </td>
+        </tr>
+    </table>
+}

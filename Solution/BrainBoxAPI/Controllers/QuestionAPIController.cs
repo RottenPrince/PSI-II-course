@@ -59,5 +59,24 @@ namespace BrainBoxAPI.Controllers
             _roomCache.Invalidate(roomId);
             return Ok("Question created successfully.");
         }
+
+        [HttpPost("{roomId}")]
+        public async Task<IActionResult> SaveMultipleQuestions(int roomId, [FromBody] List<QuestionWithAnswerDTO> questionModels)
+        {
+            if (questionModels == null)
+            {
+                return BadRequest("Question data is invalid");
+            }
+
+            var dbModels = _mapper.Map<List<QuestionModel>>(questionModels);
+            foreach(var model in dbModels)
+            {
+                model.RoomId = roomId;
+                _questionRepo.Add(model);
+            }
+            _questionRepo.Save();
+            _roomCache.Invalidate(roomId);
+            return Ok("Questions created successfully.");
+        }
     }
 }
