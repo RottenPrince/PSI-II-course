@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http.Features;
 using Xunit;
 using FakeItEasy;
+
 namespace BrainBoxUI.Tests.Controller
 {
     public class AccountControllerTests
@@ -62,5 +63,35 @@ namespace BrainBoxUI.Tests.Controller
             Assert.Null(result.ViewName);
             Assert.True(result.ViewData.ModelState.IsValid); 
         }
+
+        [Fact]
+                public void Register_ValidModel_RedirectsToLogin()
+        {
+            // Arrange
+            var fakeApiRepository = A.Fake<IApiRepository>(); // Replace IApiRepository with your actual repository interface
+            var controller = new AccountController(fakeApiRepository);
+
+            var validUserDto = new UserDTO
+            {
+                UserName = "TestUser",
+                Password = "TestPassword",
+                Email = "test@example.com"
+            };
+
+            // Act
+            var result = controller.Register(validUserDto) as RedirectToActionResult;
+            APIError? fakeError;
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Login", result.ActionName);
+            Assert.True(controller.ModelState.IsValid);
+            A.CallTo(() => fakeApiRepository.Post<UserDTO, UserDTO>(A<string>.Ignored, validUserDto, false, out fakeError))
+    .MustHaveHappenedOnceExactly();
+
+            A.CallTo(() => fakeApiRepository.Post<AuthenticationRequest, AuthenticationResponse>(A<string>.Ignored, A<AuthenticationRequest>.That.Matches(req => req.UserName == validUserDto.UserName && req.Password == validUserDto.Password), false, out fakeError))
+                .MustHaveHappenedOnceExactly();
+
+        }
+ 
     }
 }

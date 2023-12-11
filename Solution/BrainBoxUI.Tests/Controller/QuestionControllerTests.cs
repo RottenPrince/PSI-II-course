@@ -1,9 +1,12 @@
 ﻿using BrainBoxUI.Controllers;
 using BrainBoxUI.Helpers.API;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SharedModels.Question;
+using System;
+using System.Net;
 
 namespace BrainBoxUI.Tests.Controller
 {
@@ -63,7 +66,25 @@ namespace BrainBoxUI.Tests.Controller
 
         }
 
-      
+        [Fact]
+        public void StartRun_ThrowsExceptionOnError()
+        {
+            // Arrange
+            const int fakeRoomId = 123;
+            const int fakeQuestionAmount = 5;
+
+            APIError? fakeError = new APIError(HttpStatusCode.InternalServerError, "Internal Server Error");
+
+            A.CallTo(() => _apiRepository.Get<int>(A<string>._, A<bool>._, out fakeError))
+                .Throws(new Exception("Simulated exception"));
+
+            // Act & Assert
+            Assert.Throws<Exception>(() => _controller.StartRun(fakeRoomId, fakeQuestionAmount));
+            A.CallTo(() => _apiRepository.Get<int>(A<string>._, A<bool>._, out fakeError)).MustHaveHappenedOnceExactly();
+        }
+
+
+
         [Fact]
         public void Solve_ReturnsRedirectToReview_WhenNoNextQuestion()
         {
@@ -205,5 +226,7 @@ namespace BrainBoxUI.Tests.Controller
             questionModel.CorrectAnswerIndex.Should().Be(fakeQuestionWithAnswerDTO.CorrectAnswerIndex);
 
         }
+        
+
     }
 }
