@@ -17,7 +17,7 @@ namespace BrainBoxUI.Controllers
         }
 
         [HttpGet("{roomId}")]
-        public IActionResult Room(string roomId)
+        public IActionResult Room([FromRoute]string roomId)
         {
             var roomContent = _apiRepository.Get<RoomContentDTO>($"api/Lobby/GetRoomContent/{roomId}", includeBearerToken: false, out APIError? error);
 
@@ -26,6 +26,8 @@ namespace BrainBoxUI.Controllers
                 ViewBag.RoomName = roomContent.RoomName;
                 ViewBag.QuestionAmount = roomContent.QuestionAmount;
                 ViewBag.RoomId = roomId;
+
+                //var quizzes = _apiRepository.Get<List<QuizDTO>>($"api/Lobby/GetAllQuizzes/{roomId}", includeBearerToken: true, out _);
             }
             else
             {

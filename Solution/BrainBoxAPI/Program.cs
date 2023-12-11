@@ -70,6 +70,7 @@ public class Program
 
         builder.Services.AddScoped<IRepository<QuestionModel>, QuestionRepository>();
         builder.Services.AddScoped<IRepository<RoomModel>, RoomRepository>();
+        builder.Services.AddScoped<IRoomRepository, RoomRepository>();
         builder.Services.AddScoped<IQuizQuestionRelationRepository, QuizQuestionRelationRepository>();
         builder.Services.AddScoped<IRepository<QuizModel>, QuizRepository>();
         builder.Services.AddSingleton<IDictionaryCache<int, RoomContentDTO>, RoomContentCache>();

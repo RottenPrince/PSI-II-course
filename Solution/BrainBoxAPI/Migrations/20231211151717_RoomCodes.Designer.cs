@@ -3,6 +3,7 @@ using System;
 using BrainBoxAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,10 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BrainBoxAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231211151717_RoomCodes")]
+    partial class RoomCodes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
