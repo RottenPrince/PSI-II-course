@@ -26,16 +26,14 @@ namespace BrainBoxUI.Controllers
                 ViewBag.RoomName = roomContent.RoomName;
                 ViewBag.QuestionAmount = roomContent.QuestionAmount;
                 ViewBag.RoomId = roomId;
-
-                //var quizzes = _apiRepository.Get<List<QuizDTO>>($"api/Lobby/GetAllQuizzes/{roomId}", includeBearerToken: true, out _);
             }
             else
             {
                 return RedirectToAction("AllRooms", "Lobby");
             }
 
-
-            return View();
+            var quizzes = _apiRepository.Get<List<QuizDTO>>($"api/Lobby/GetAllQuizzes/{roomId}", includeBearerToken: true, out _);
+            return View(quizzes);
         }
 
         [HttpGet]

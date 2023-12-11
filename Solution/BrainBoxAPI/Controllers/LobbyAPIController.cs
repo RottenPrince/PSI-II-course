@@ -50,6 +50,36 @@ namespace BrainBoxAPI.Controllers
 
         [HttpGet("{roomId}")]
         [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> GetAllQuizzes(int roomId)
+        {
+            var userId = User.FindFirst("Id")?.Value;
+
+            var user = await _userManager.Users
+                .Include(u => u.Rooms)
+                .ThenInclude(r => r.Quizs)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return NotFound("User not found");
+
+            var room = user.Rooms.FirstOrDefault(r => r.Id == roomId);
+
+            if (room == null)
+                return NotFound("Room not found");
+
+            var quizzes = room.Quizs
+                .Select(q => new QuizDTO
+                {
+                    Id = q.Id,
+                    StartTime = q.StartTime,
+                })
+                .ToList();
+
+            return Ok(quizzes);
+        }
+
+        [HttpGet("{roomId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
             var user = await _userManager.FromClaim(User);
