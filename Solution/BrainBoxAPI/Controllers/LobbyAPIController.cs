@@ -5,7 +5,6 @@ using SharedModels.Lobby;
 using BrainBoxAPI.Models;
 using AutoMapper;
 using BrainBoxAPI.Exceptions;
-using BrainBoxAPI.Caching;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
@@ -26,14 +25,13 @@ namespace BrainBoxAPI.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
 
         public LobbyAPIController(IMapper mapper, IRoomRepository roomRepo, IRepository<QuizModel> quizRepo, IQuizQuestionRelationRepository relationRepo,
-            IDictionaryCache<int, RoomContentDTO> roomCache, UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager)
         {
             _random = new Random();
             _mapper = mapper;
             _roomRepo = roomRepo;
             _quizRepo = quizRepo;
             _relationRepo = relationRepo;
-            _roomCache = roomCache;
             _userManager = userManager;
         }
 
@@ -76,16 +74,13 @@ namespace BrainBoxAPI.Controllers
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetRoomContent(int roomId)
         {
-            var model = _roomCache.GetOrCompute(roomId, id =>
-            {
-                RoomModel? room = _roomRepo.GetById(id).Result;
-                if (room == null) return null;
-                return new RoomContentDTO
+            RoomModel? room = _roomRepo.GetById(roomId).Result;
+            if (room == null) return NotFound();
+            var model = new RoomContentDTO
                 {
                     RoomName = room.Name,
                     QuestionAmount = room.Questions.Count,
                 };
-            });
             return Ok(model);
         }
 
@@ -104,7 +99,6 @@ namespace BrainBoxAPI.Controllers
             {
                 return BadRequest("Name already in use");
             }
-            _roomCache.Invalidate(newRoom.Id);
             return Ok(newRoom.Id);
         }
 
@@ -118,7 +112,6 @@ namespace BrainBoxAPI.Controllers
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             int quizId = await _relationRepo.CreateNewQuiz(roomId, questionAmount, userId, user); //added  userId, user to assign them on creation. not sure about that
-            _roomCache.Invalidate(roomId);
             if(quizId == -1)
             {
                 return NotFound();
