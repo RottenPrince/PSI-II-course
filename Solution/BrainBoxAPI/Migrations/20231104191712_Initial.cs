@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BrainBoxAPI.Migrations
 {
     /// <inheritdoc />
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public partial class Initial : Migration
     {
         /// <inheritdoc />
-        [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
