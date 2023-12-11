@@ -68,6 +68,7 @@ namespace BrainBoxAPI.Controllers
                 return NotFound("Room not found");
 
             var quizzes = room.Quizs
+                .Where(q => q.UserId == userId)
                 .Select(q => new QuizDTO
                 {
                     Id = q.Id,
