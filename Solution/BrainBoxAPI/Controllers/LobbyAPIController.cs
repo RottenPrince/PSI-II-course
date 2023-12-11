@@ -69,12 +69,15 @@ namespace BrainBoxAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> CreateRoom([FromBody] string roomName)
         {
+            var user = await _userManager.FromClaim(User);
             string newCode = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
 
             var newRoom = new RoomModel { Name = roomName, UniqueCode = newCode };
             _roomRepo.Add(newRoom);
+            user.Rooms.Add(newRoom);
             try
             {
                 _roomRepo.Save();

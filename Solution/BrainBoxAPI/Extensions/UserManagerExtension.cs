@@ -12,6 +12,7 @@ namespace BrainBoxAPI.Extensions
             var userId = User.FindFirst("Id")?.Value;
             return self.Users
                 .Include(u => u.Rooms)
+                .Include(u => u.Quizzes)
                 .FirstOrDefaultAsync(u => u.Id == userId);
         }
     }

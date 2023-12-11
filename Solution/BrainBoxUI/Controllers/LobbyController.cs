@@ -19,7 +19,7 @@ namespace BrainBoxUI.Controllers
         [HttpGet("{roomId}")]
         public IActionResult Room([FromRoute]string roomId)
         {
-            var roomContent = _apiRepository.Get<RoomContentDTO>($"api/Lobby/GetRoomContent/{roomId}", includeBearerToken: false, out APIError? error);
+            var roomContent = _apiRepository.Get<RoomContentDTO>($"api/Lobby/GetRoomContent/{roomId}", includeBearerToken: true, out APIError? error);
 
             if (error == null)
             {
@@ -55,18 +55,15 @@ namespace BrainBoxUI.Controllers
         [HttpPost]
         public IActionResult CreateRoom(string roomName)
         {
-            var roomId = _apiRepository.Post<string, int>("api/Lobby/CreateRoom", roomName, includeBearerToken: false, out var error1);
+            var roomId = _apiRepository.Post<string, int>("api/Lobby/CreateRoom", roomName, includeBearerToken: true, out var error);
             ViewBag.RoomId = roomId;
-            if (error1 != null)
+            if (error != null)
             {
-                ViewBag.ErrorMessage = error1.Message;
+                ViewBag.ErrorMessage = error.Message;
                 return View("CreateError");
             }
 
-            _apiRepository.Get<string>($"api/Lobby/JoinRoom/{roomId}", includeBearerToken: true, out _); //no error handling
-
             ViewBag.RoomName = roomName;
-
             return View("CreateSuccess");
         }
 
