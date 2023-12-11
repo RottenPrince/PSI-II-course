@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using BrainBoxUI.Helpers.API;
 using SharedModels.Question;
 using SharedModels.Lobby;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BrainBoxUI.Controllers
 {
@@ -16,7 +17,8 @@ namespace BrainBoxUI.Controllers
         }
 
         [HttpGet("{roomId}")]
-        public IActionResult Room(string roomId)
+        //[Authorize(Policy = "RoomAccess")]
+        public IActionResult Room([FromRoute] string roomId)
         {
             var roomContent = _apiRepository.Get<RoomContentDTO>($"api/Lobby/GetRoomContent/{roomId}", includeBearerToken: false, out APIError? error);
 

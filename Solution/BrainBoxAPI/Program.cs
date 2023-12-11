@@ -93,7 +93,19 @@ public class Program
                 };
             });
 
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("RoomAccess", policy => policy.RequireClaim("RoomAccessClaim"));
+        });
+
         var app = builder.Build();
+
+        //var authorizationService = app.Services.GetRequiredService<IAuthorizationService>();
+        //var authorizationPolicyProvider = app.Services.GetRequiredService<IAuthorizationPolicyProvider>();
+
+        //var allPolicies = authorizationPolicyProvider.GetPolicyAsync("RoomAccess")
+        //                                             .Result
+        //                                             .Requirements;
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

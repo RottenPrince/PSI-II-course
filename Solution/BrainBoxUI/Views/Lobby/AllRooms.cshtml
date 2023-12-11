@@ -18,8 +18,40 @@
         @foreach (RoomDTO room in Model)
         {
             <li>
-                <a class="nav-link text-dark" asp-area="" asp-controller="Lobby" asp-action="Room" asp-route-roomId="@room.Id">@room.Name</a>
+               <a class="nav-link text-dark" asp-area="" asp-controller="Lobby" asp-action="Room" asp-route-roomId="@room.Id">@room.Name</a>
+                @* <a class="nav-link text-dark" onclick="navigateToRoom('@room.Id')"> @room.Name </a> *@
             </li>
         }
     </ul>
 </div>
+
+@* <script>
+    function navigateToRoom(roomId) {
+        var token = document.cookie.replace(/(?:(?:^|.*;\s*)BearerToken\s*=\s*([^;]*).*$)|^.*$/, "$1");
+
+        // Check if the token is available
+        if (token) {
+            // Add the token to the request header
+            var headers = new Headers();
+            headers.append('Authorization', 'Bearer ' + token);
+
+            // Make the request to the Room action
+            fetch(`/Lobby/Room/${roomId}`, {
+                method: 'GET',
+                headers: headers
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Process the response data as needed
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle errors
+                console.error('Error:', error);
+            });
+        } else {
+            // Handle the case where the token is not available
+            console.error('BearerToken cookie not found.');
+        }
+    }
+</script> *@

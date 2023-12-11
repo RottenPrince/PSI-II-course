@@ -1,7 +1,5 @@
 ﻿using BrainBoxUI.Helpers.API;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SharedModels.Lobby;
 using SharedModels.User;
 
 namespace BrainBoxUI.Controllers

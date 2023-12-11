@@ -18,12 +18,12 @@ namespace BrainBoxAPI.Services
             _configuration = configuration;
         }
 
-        public AuthenticationResponse CreateToken(IdentityUser user)
+        public AuthenticationResponse CreateToken(IdentityUser user, IEnumerable<string> accessibleRoomIds)
         {
             var expiration = DateTime.UtcNow.AddMinutes(EXPIRATION_MINUTES);
 
             var token = CreateJwtToken(
-                CreateClaims(user),
+                CreateClaims(user, accessibleRoomIds),
                 CreateSigningCredentials(),
                 expiration
             );
@@ -46,8 +46,9 @@ namespace BrainBoxAPI.Services
                 signingCredentials: credentials
             );
 
-        private Claim[] CreateClaims(IdentityUser user) => //we should choose needed claims
+        private Claim[] CreateClaims(IdentityUser user, IEnumerable<string> accessibleRoomIds) => //we should probably discuss claims
             new[] {
+                new Claim("RoomAccessClaim", string.Join(",", accessibleRoomIds)),
                 new Claim("Id", user.Id),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Jti,

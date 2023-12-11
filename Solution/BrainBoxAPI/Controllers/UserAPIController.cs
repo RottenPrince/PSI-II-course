@@ -2,6 +2,7 @@
 using BrainBoxAPI.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SharedModels.User;
 
 namespace BrainBoxAPI.Controllers
@@ -80,7 +81,12 @@ namespace BrainBoxAPI.Controllers
                 return BadRequest("Bad credentials");
             }
 
-            var token = _jwtService.CreateToken(user);
+            var accessibleRoomIds = await _userManager.Users
+                .Where(u => u.Id == user.Id)
+                .SelectMany(u => u.Rooms.Select(r => r.Id.ToString()))
+                .ToListAsync();
+
+            var token = _jwtService.CreateToken(user, accessibleRoomIds);
 
 
             return Ok(token);
