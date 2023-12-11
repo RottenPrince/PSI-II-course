@@ -55,23 +55,35 @@ namespace BrainBoxAPI.Controllers
             return Ok(_mapper.Map<List<RoomDTO>>(rooms));
         }
 
-        //[HttpGet("{roomId}")]
-        //[Authorize(AuthenticationSchemes = "Bearer")]
-        //public async Task<IActionResult> GetAllQuizzes()
-        //{
-        //    var userId = User.FindFirst("Id")?.Value;
+        [HttpGet("{roomId}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> GetAllQuizzes(int roomId)
+        {
+            var userId = User.FindFirst("Id")?.Value;
 
-        //    var user = await _userManager.Users
-        //        .Include(u => u.Rooms)
-        //        .FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userManager.Users
+                .Include(u => u.Rooms)
+                .ThenInclude(r => r.Quizs)
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
-        //    var rooms = user.Rooms; //all rooms user has
+            if (user == null)
+                return NotFound("User not found");
 
-        //    if (rooms == null)
-        //        return NotFound();
+            var room = user.Rooms.FirstOrDefault(r => r.Id == roomId);
 
-        //    return Ok(_mapper.Map<List<RoomDTO>>(rooms));
-        //}
+            if (room == null)
+                return NotFound("Room not found");
+
+            var quizzes = room.Quizs
+                .Select(q => new QuizDTO
+                {
+                    Id = q.Id,
+                    StartTime = q.StartTime,
+                })
+                .ToList();
+
+            return Ok(quizzes);
+        }
 
         [HttpGet("{roomId}")]
         public async Task<IActionResult> GetRoomContent(int roomId)
