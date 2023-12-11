@@ -1,6 +1,7 @@
 ﻿using BrainBoxUI.Helpers.API;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using SharedModels.Lobby;
 using SharedModels.User;
 
@@ -30,22 +31,27 @@ namespace BrainBoxUI.Controllers
         [HttpPost]
         public IActionResult Login(AuthenticationRequest authRequest)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var tokenResponse = _apiRepository.Post<AuthenticationRequest, AuthenticationResponse>($"api/User/CreateBearerToken", authRequest, includeBearerToken: false, out APIError? error2);
-
-                if(tokenResponse != null)
-                {
-                    HttpContext.Response.Cookies.Append("BearerToken", tokenResponse.Token, new CookieOptions
-                    {
-                        Expires = DateTime.Now.AddDays(1)
-                    });
-                }
-
-                return RedirectToAction("Index", "Home");
+                TempData["message"] = "Not all fields were filled";
+                return RedirectToAction("Login", "Account");
             }
 
-            return View(authRequest);
+            var tokenResponse = _apiRepository.Post<AuthenticationRequest, AuthenticationResponse>($"api/User/CreateBearerToken", authRequest, includeBearerToken: false, out APIError? error2);
+
+            if(tokenResponse != null)
+            {
+                HttpContext.Response.Cookies.Append("BearerToken", tokenResponse.Token, new CookieOptions
+                {
+                    Expires = DateTime.Now.AddDays(1)
+                });
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                TempData["message"] = error2.Message;
+                return RedirectToAction("Login", "Account");
+            }
         }
 
         public IActionResult Register()
@@ -56,19 +62,21 @@ namespace BrainBoxUI.Controllers
         [HttpPost]
         public IActionResult Register(UserDTO userDto)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _apiRepository.Post<UserDTO, UserDTO>($"api/User/PostUser", userDto, includeBearerToken: false, out APIError? error1);
-                var authRequest = new AuthenticationRequest
-                {
-                    UserName = userDto.UserName,
-                    Password = userDto.Password,
-                };
-                var createResponse = _apiRepository.Post<AuthenticationRequest,AuthenticationResponse>($"api/User/PostUser", authRequest, includeBearerToken: false, out APIError? error2);
-
-                return RedirectToAction("Login");
+                TempData["message"] = "Not all fields were filled";
+                return View(userDto);
             }
-            return View(userDto);
+
+            _apiRepository.Post<UserDTO, UserDTO>($"api/User/PostUser", userDto, includeBearerToken: false, out APIError? error1);
+            if(error1 != null)
+            {
+                TempData["message"] = error1.Message;
+                return View(userDto);
+            }
+
+            TempData["message"] = "Account created successfully";
+            return RedirectToAction("Login");
         }
 
         public IActionResult Logout()

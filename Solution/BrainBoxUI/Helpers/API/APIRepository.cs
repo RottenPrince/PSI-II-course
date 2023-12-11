@@ -48,6 +48,10 @@ namespace BrainBoxUI.Helpers.API
 
             if (!apiResult.IsSuccessStatusCode)
             {
+                if(content.Length > 2 && content[0] == '"' && content[content.Length - 1] == '"')
+                {
+                    content = content.Substring(1, content.Length - 2);
+                }
                 error = new APIError(apiResult.StatusCode, content);
                 return default(T);
             }
