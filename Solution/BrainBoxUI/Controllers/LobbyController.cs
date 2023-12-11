@@ -62,7 +62,7 @@ namespace BrainBoxUI.Controllers
                 return View("CreateError");
             }
 
-            _apiRepository.Get<string>($"api/Lobby/JoinRoom/{roomId}", includeBearerToken: true, out _); //no error handling
+            //_apiRepository.Get<string>($"api/Lobby/JoinRoom/{roomId}", includeBearerToken: true, out _); //no error handling
 
             ViewBag.RoomName = roomName;
 
