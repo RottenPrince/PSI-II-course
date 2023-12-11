@@ -27,6 +27,7 @@ namespace BrainBoxUI.Controllers
                 ViewBag.RoomName = roomContent.RoomName;
                 ViewBag.QuestionAmount = roomContent.QuestionAmount;
                 ViewBag.RoomId = roomId;
+                ViewBag.UniqueCode = roomContent.UniqueCode;
             }
             else
             {
