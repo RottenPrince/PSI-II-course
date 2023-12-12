@@ -1,4 +1,5 @@
 using BrainBoxUI.Helpers.API;
+using Westwind.AspNetCore.LiveReload;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,11 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddLiveReload();
+
 var app = builder.Build();
+
+app.UseLiveReload();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
