@@ -1,0 +1,40 @@
+﻿body {
+}
+
+h2 {
+    text-align: center;
+}
+
+.create{
+    margin: 15px 0;
+    width: 200px;
+}
+
+.create-button{
+    width: 100%;
+}
+
+.join{
+    
+}
+
+.join-form {
+    margin: 15px 0;
+    width: 200px;
+    padding: 0;
+}
+
+.code{
+    width: 60%;
+    margin: 0 7% 0 0;
+    height: 40px;
+    padding: 5px;
+}
+
+.join-button {
+    width: 30%;
+    margin: 0;
+    height: 40px;
+    padding: 0;
+    border-width: 0;
+}
