@@ -34,7 +34,7 @@ namespace BrainBoxAPI.Controllers
 
             if (!result.Succeeded)
             {
-                return BadRequest(result.Errors);
+                return BadRequest(result.Errors.First().Description);
             }
 
             user.Password = null;
