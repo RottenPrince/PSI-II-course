@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using SharedModels.Lobby;
 using System.Text;
 
 namespace BrainBoxAPI;
@@ -26,6 +25,7 @@ public class Program
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
             options.EnableSensitiveDataLogging(true);
+            options.AddInterceptors(new EfDbCommandInterceptor());
         });
 
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)

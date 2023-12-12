@@ -27,6 +27,7 @@ namespace BrainBoxUI.Controllers
                 ViewBag.RoomName = roomContent.RoomName;
                 ViewBag.QuestionAmount = roomContent.QuestionAmount;
                 ViewBag.RoomId = roomId;
+                ViewBag.UniqueCode = roomContent.UniqueCode;
             }
             else
             {
@@ -43,6 +44,15 @@ namespace BrainBoxUI.Controllers
             var rooms = _apiRepository.Get<List<RoomDTO>>("api/Lobby/GetAllRooms", includeBearerToken: true, out _);
 
             return View(rooms);
+        }
+
+        [HttpPost]
+        public IActionResult JoinRoom(string uniqueCode)
+        {
+            _apiRepository.Get<string>($"api/Lobby/JoinRoom/{uniqueCode}", includeBearerToken: true, out var error);
+            if (error != null)
+                TempData["message"] = "Joining failed";
+            return RedirectToAction("AllRooms");
         }
 
         [HttpGet]

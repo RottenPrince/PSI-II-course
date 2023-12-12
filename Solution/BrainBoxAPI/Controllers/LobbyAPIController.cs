@@ -95,6 +95,7 @@ namespace BrainBoxAPI.Controllers
             {
                 RoomName = room.Name,
                 QuestionAmount = room.Questions.Count,
+                UniqueCode = room.UniqueCode,
             };
             return Ok(model);
         }
