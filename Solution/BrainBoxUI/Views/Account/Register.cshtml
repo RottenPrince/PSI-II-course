@@ -1,32 +1,46 @@
 ﻿@model SharedModels.User.UserDTO
 
-<h2>Register</h2>
-
-@if(TempData["message"] != null)
-{
-    <p><b>@TempData["message"]</b></p>
+@section Stylesheets {
+    <link rel="stylesheet" href="~/css/Account/Login.css" asp-append-version="true" />
 }
 
-<form asp-action="Register" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<h2>Register</h2>
 
-    <div class="form-group">
-        <label asp-for="UserName"></label>
-        <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger"></span>
-    </div>
+<div class="form-div">
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
+        <div class="form-block">
+            <div class="field-block">
+                <div class="text-label">Username:</div>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
 
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
+            </div>
+        
+            <div class="field-block">
+                    <div class="text-label">Email:</div>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
 
-    <button type="submit" class="btn btn-primary">Register</button>
-</form>
+            </div>
+
+            <div class="field-block">
+                <div class="text-label">Password:</div>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="field-block submit-div">
+                <button type="submit" class="btn btn-primary submit-button">Login</button>
+            </div>
+
+            @if (TempData["message"] != null)
+            {
+                <div class="error"><b>@TempData["message"]</b></div>
+            }
+        </div>
+        
+    </form>
+</div>
+

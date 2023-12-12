@@ -3,17 +3,17 @@
     ViewData["Title"] = "Create New Room";
 }
 
-<h3><strong>Create New Room</strong></h3>
+<h3 style="text-align:center"><strong>Create New Room</strong></h3>
 
 @using (Html.BeginForm("CreateRoom", "Lobby", FormMethod.Post))
 {
-    <table>
+    <table style="margin: 15px 0;">
         <tr>
             <td>
-                <label>Room name: </label>
-                <input name="roomName">
+                <label style="font-weight: 600">Room name: </label>
+                <input name="roomName" >
             </td>
         </tr>
     </table>
-    <input type="submit" value="Create" />
+    <input type="submit" value="Create" class="btn btn-primary" style="margin: 15px 0;"/>
 }

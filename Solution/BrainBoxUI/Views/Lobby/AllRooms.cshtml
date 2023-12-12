@@ -5,19 +5,27 @@
 }
 
 @section Stylesheets {
-
+    <link rel="stylesheet" href="~/css/Lobby/AllRooms.css" asp-append-version="true" />
 }
 
 @section Scripts {
     
 }
 
+<h2>Available rooms</h2>
+
 <div>
-    <a asp-area="" asp-controller="Lobby" asp-action="CreateRoom" class="btn btn-secondary">Create new room</a>
-    <form asp-area="" asp-controller="Lobby" asp-action="JoinRoom" method="post">
-        <input type="text" name="uniqueCode" placeholder="Enter code" />
-        <button type="submit" class="btn btn-primary">Join</button>
-    </form>
+    <div class="create">
+        <a asp-area="" asp-controller="Lobby" asp-action="CreateRoom" class="btn btn-secondary create-button">Create new room</a>
+    </div>
+    
+    <div class="join">
+        <form asp-area="" asp-controller="Lobby" asp-action="JoinRoom" method="post" class="join-form">
+            <input type="text" name="uniqueCode" placeholder="Enter code" class="code"/>
+            <button type="submit" class="btn btn-primary join-button">Join</button>
+        </form>
+    </div>
+    
     @if (TempData["message"] != null)
     {
         <p><b>@TempData["message"]</b></p>

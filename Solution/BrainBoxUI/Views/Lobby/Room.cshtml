@@ -3,7 +3,7 @@
 
 <h2>Room <strong>"@ViewBag.RoomName"</strong></h2>
 <h3>@ViewBag.ErrorMessage</h3>
-<p>Code: @ViewBag.UniqueCode</p>
+<div>Code: <p style="color: darkorange; font-weight: 700; display: inline-block">@ViewBag.UniqueCode</p></div>
 <p>Questions: @ViewBag.QuestionAmount</p>
 <div>
     <a asp-controller="Question" asp-action="StartRun" asp-route-roomId="@ViewBag.RoomId" asp-route-questionAmount="1" class="btn btn-primary">Solve random Question</a>
@@ -12,11 +12,12 @@
     <a asp-controller="Lobby" asp-action="CreateMultiple" asp-route-roomId="@ViewBag.RoomId" class=" btn btn-primary">Create multiple questions</a>
 </div>
 
+<h4 style="margin: 60px 0 20px 0">Your previous Quizzes:</h4>
 <div id="quizzes">
     @foreach (var quiz in Model)
     {
-        <div>
-            <a asp-controller="Question" asp-action="Review" asp-route-runId="@quiz.Id" asp-route-currentQuestionIndex="0">@quiz.StartTime</a>
+        <div style="margin: 10px 0;">
+            <a asp-controller="Question" asp-action="Review" asp-route-runId="@quiz.Id" asp-route-currentQuestionIndex="0" style="font-weight: 500; color: darkorange">@quiz.StartTime</a>
         </div>
     }
 </div>

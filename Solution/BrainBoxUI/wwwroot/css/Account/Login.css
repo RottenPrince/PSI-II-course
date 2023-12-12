@@ -1,0 +1,43 @@
+﻿body {
+    
+}
+
+/**{
+    border: solid 1px black;
+    margin: 1px;
+}*/
+
+
+h2 {
+    text-align: center;
+}
+
+
+.form-block{
+    width: 50%;
+    margin: auto;
+}
+
+.field-block{
+    width: 100%;
+    margin: 15px 0;
+}
+
+.text-label{
+    display: block;
+    font-weight: 600;
+}
+
+.submit-div{
+    display:flex;
+    justify-content: center;
+}
+
+.submit-button{
+    width: 50%;
+}
+
+.error{
+    text-align: center;
+}
+
