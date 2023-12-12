@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SharedModels.Question;
+using System.Net;
+
 
 namespace BrainBoxUI.Tests.Controller
 {
@@ -43,9 +45,9 @@ namespace BrainBoxUI.Tests.Controller
         public void StartRun_ReturnsRedirectToSolve_WhenApiCallSucceeds()
         {
             // Arrange
-            const int fakeRoomId = 123;
-            const int fakeQuestionAmount = 5;
-            const int fakeRunId = 676;
+             int fakeRoomId = 123;
+             int fakeQuestionAmount = 5;
+             int fakeRunId = 676;
 
             APIError? fakeError;
 
@@ -63,13 +65,14 @@ namespace BrainBoxUI.Tests.Controller
 
         }
 
-      
+        
+
         [Fact]
         public void Solve_ReturnsRedirectToReview_WhenNoNextQuestion()
         {
             // Arrange
-            const int fakeRunId = 123;
-            const int fakeCurrentQuestionIndex = 0;
+            int fakeRunId = 123;
+            int fakeCurrentQuestionIndex = 0;
 
             APIError? fakeError;
             A.CallTo(() => _apiRepository.Get<QuestionDTO>(A<string>._, A<bool>._, out fakeError))
@@ -91,7 +94,7 @@ namespace BrainBoxUI.Tests.Controller
         public void Solve_ReturnsSolveView_WhenNextQuestionExists()
         {
             // Arrange
-            const int fakeRunId = 123;
+            int fakeRunId = 123;
 
             var fakeQuestionModel = new QuestionDTO
             {
@@ -128,8 +131,8 @@ namespace BrainBoxUI.Tests.Controller
         public void Solve_PostsToSubmitAnswerAndRedirectsToSolve()
         {
             // Arrange
-            const int fakeRunId = 123;
-            const int fakeSelectedOption = 1;
+            int fakeRunId = 123;
+            int fakeSelectedOption = 1;
 
             APIError? fakeError;
 
@@ -146,14 +149,41 @@ namespace BrainBoxUI.Tests.Controller
             result.RouteValues["runId"].Should().Be(fakeRunId);
         }
 
+        [Fact]
+        public void Review_RedirectsToRoom_WhenNextQuestionInReviewIsNull()
+        {
+            // Arrange
+            int fakeRunId = 123;
+            int fakeCurrentQuestionIndex = 1;
+            QuizQuestionDTO fakeQuestionModel = null;
+
+            APIError? fakeError;
+
+            A.CallTo(() => _apiRepository.Get<QuizQuestionDTO>(A<string>._, A<bool>._, out fakeError))
+                .Returns(fakeQuestionModel);
+
+            int fakeRoomId = 456;
+            A.CallTo(() => _apiRepository.Get<int>(A<string>._, A<bool>._, out fakeError))
+                .Returns(fakeRoomId);
+
+            // Act
+            var result = _controller.Review(fakeRunId, fakeCurrentQuestionIndex) as RedirectToActionResult;
+
+            // Assert
+            result.Should().NotBeNull().And.BeOfType<RedirectToActionResult>();
+            result.ActionName.Should().Be("Room");
+            result.ControllerName.Should().Be("Lobby");
+            result.RouteValues["roomId"].Should().Be(fakeRoomId);
+        }
+
 
 
         [Fact]
         public void Review_ReturnsReviewView_WhenNextQuestionInReviewExists()
         {
             // Arrange
-            const int fakeRunId = 123;
-            const int fakeCurrentQuestionIndex = 1;
+            int fakeRunId = 123;
+            int fakeCurrentQuestionIndex = 1;
 
             var fakeAnswerOptions = new List<AnswerOptionDTO>
     {

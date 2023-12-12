@@ -1,10 +1,9 @@
 ﻿using BrainBoxUI.Controllers;
 using BrainBoxUI.Helpers.API;
-using FakeItEasy;
 using Microsoft.AspNetCore.Mvc;
 using SharedModels.Lobby;
 using SharedModels.Question;
-using System.Net;
+
 
 namespace BrainBoxUI.Tests.Controller
 {
@@ -78,9 +77,29 @@ namespace BrainBoxUI.Tests.Controller
             Assert.Equal("RoomId", _controller.ViewBag.RoomId);
             Assert.Null(_controller.ViewBag.ErrorMessage); 
         }
-     
+
+        [Fact]
+        public void CreateRoom_ValidRoomName_ReturnsSuccessView()
+        {
+            // Arrange
+            const string roomName = "TestRoom";
+            const int fakeRoomId = 123;
+            APIError? fakeError;
+
+            A.CallTo(() => _apiRepository.Post<string, int>(A<string>.Ignored, A<string>.Ignored, A<bool>.Ignored, out fakeError))
+                .Returns(fakeRoomId);
+
+            // Act
+            var result = _controller.CreateRoom(roomName) as ViewResult;
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("CreateSuccess", result.ViewName);
+
+            Assert.Equal(fakeRoomId, _controller.ViewBag.RoomId);
+            Assert.Equal(roomName, _controller.ViewBag.RoomName);
+            Assert.Null(_controller.ViewBag.ErrorMessage);
+        }
 
     }
-
-
 }
